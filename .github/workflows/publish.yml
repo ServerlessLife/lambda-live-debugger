@@ -8,13 +8,7 @@ jobs:
     uses: ./.github/workflows/test-publish.yml
 
   publish:
-    needs:
-      - test-cdk-basic
-      - test-sls-basic
-      - test-sls-esbuild-cjs
-      - test-sls-esbuild-esm
-      - test-sam-basic
-      - test-terraform-basic
+    needs: build-and-test
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     concurrency:
