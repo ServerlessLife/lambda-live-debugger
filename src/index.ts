@@ -1,3 +1,4 @@
+// Types exposed to the project, mainly used in lldebugger.config.ts configuraiton file
 export { type LldConfigTs } from "./types/lldConfig.js";
 export type {
   EsBuildOptions,
