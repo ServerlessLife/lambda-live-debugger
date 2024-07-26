@@ -3,9 +3,13 @@ name: Publish to npm
 on:
   workflow_dispatch:
 
+permissions:
+  id-token: write
+  contents: write
+
 jobs:
   build-and-test:
-    uses: ./.github/workflows/test-publish.yml
+    uses: ./.github/workflows/common.yml
 
   publish:
     needs: build-and-test
