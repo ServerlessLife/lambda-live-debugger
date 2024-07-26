@@ -12,3 +12,4 @@ permissions:
 jobs:
   build-and-test:
     uses: ./.github/workflows/common.yml
+    secrets: inherit
