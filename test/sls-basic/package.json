@@ -1,0 +1,19 @@
+{
+  "name": "sls-basic",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "serverless deploy --stage=test",
+    "destroy": "serverless remove --stage=test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "serverless": "^3.38.0"
+  },
+  "dependencies": {
+    "@aws-sdk/client-sts": "^3.577.0"
+  }
+}

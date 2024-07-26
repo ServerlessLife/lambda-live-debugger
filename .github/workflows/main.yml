@@ -1,0 +1,309 @@
+name: Deploy to npm
+
+on:
+  workflow_dispatch:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: build
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+      - name: Install dependencies
+        run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Build
+        run: npm run build
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-west-1
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: GitHubActions
+      - name: Bootstrap CDK
+        # so I do not have to do it manually when CDK is updated
+        run: npx cdk bootstrap aws://${{secrets.AWS_ACCOUNT_ID}}/eu-west-1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+  test-cdk-basic:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    concurrency:
+      group: test-cdk-basic
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+      - name: Install dependencies
+        run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-west-1
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: GitHubActions
+      - name: Destroy
+        run: npm run destroy
+        working-directory: test/cdk-basic
+        continue-on-error: true
+      - name: Deploy
+        run: npm run deploy
+        working-directory: test/cdk-basic
+      - name: Test
+        run: DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 test/cdk-basic.test.ts
+      - name: Test - observable mode
+        run: OBSERVABLE_MODE=true DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 test/cdk-basic.test.ts
+
+  test-sls-basic:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    concurrency:
+      group: test-sls-basic
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+      - name: Install dependencies
+        run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-west-1
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: GitHubActions
+      - name: Destroy
+        run: npm run destroy
+        working-directory: test/sls-basic
+        continue-on-error: true
+      - name: Deploy
+        run: npm run deploy
+        working-directory: test/sls-basic
+      - name: Test
+        run: DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 test/sls-basic.test.ts
+      - name: Test - observable mode
+        run: OBSERVABLE_MODE=true DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 test/sls-basic.test.ts
+
+  test-sls-esbuild-cjs:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    concurrency:
+      group: test-sls-esbuild-cjs
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+      - name: Install dependencies
+        run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-west-1
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: GitHubActions
+      - name: Destroy
+        run: npm run destroy
+        working-directory: test/sls-esbuild-cjs
+        continue-on-error: true
+      - name: Deploy
+        run: npm run deploy
+        working-directory: test/sls-esbuild-cjs
+      - name: Test
+        run: DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 test/sls-esbuild-cjs.test.ts
+      - name: Test - observable mode
+        run: OBSERVABLE_MODE=true DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 test/sls-esbuild-cjs.test.ts
+
+  test-sls-esbuild-esm:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    concurrency:
+      group: test-sls-esbuild-esm
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+      - name: Install dependencies
+        run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-west-1
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: GitHubActions
+      - name: Destroy
+        run: npm run destroy
+        working-directory: test/sls-esbuild-esm
+        continue-on-error: true
+      - name: Deploy
+        run: npm run deploy
+        working-directory: test/sls-esbuild-esm
+      - name: Test
+        run: DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 test/sls-esbuild-esm.test.ts
+      - name: Test - observable mode
+        run: OBSERVABLE_MODE=true DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 test/sls-esbuild-esm.test.ts
+
+  test-sam-basic:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    concurrency:
+      group: test-sam-basic
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+      - name: Install dependencies
+        run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-west-1
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: GitHubActions
+      - name: Destroy
+        run: npm run destroy
+        working-directory: test/sam-basic
+        continue-on-error: true
+      - name: Deploy
+        run: npm run deploy
+        working-directory: test/sam-basic
+      - name: Test
+        run: DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 test/sam-basic.test.ts
+      - name: Test - observable mode
+        run: OBSERVABLE_MODE=true DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 test/sam-basic.test.ts
+
+  test-terraform-basic:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    concurrency:
+      group: test-terraform-basic
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+      - name: Install dependencies
+        run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-west-1
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: GitHubActions
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+      - name: Terraform Init
+        run: |
+          ./create_bucket.sh lld-terraform-basic
+          terraform init -backend-config="bucket=lld-terraform-basic"
+        working-directory: test/terraform-basic
+      - name: Destroy
+        run: npm run destroy
+        working-directory: test/terraform-basic
+        continue-on-error: true
+      - name: Deploy
+        run: npm run deploy
+        working-directory: test/terraform-basic
+      - name: Test
+        run: DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 test/terraform-basic.test.ts
+      - name: Test - observable mode
+        run: OBSERVABLE_MODE=true DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 test/terraform-basic.test.ts
+
+  # publish:
+  #   needs:
+  #     - test-cdk-basic
+  #     - test-sls-basic
+  #     - test-sls-esbuild-cjs
+  #     - test-sls-esbuild-esm
+  #     - test-sam-basic
+  #     - test-terraform-basic
+  #   runs-on: ubuntu-latest
+  #   concurrency:
+  #     group: publish
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Use Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: "20"
+  #         registry-url: "https://registry.npmjs.org"
+  #     - name: Install dependencies
+  #       run: npm ci
+  #     - uses: actions/download-artifact@v4
+  #       with:
+  #         name: dist
+  #         path: dist
+  #     - name: Semantic Release
+  #       run: |
+  #         npm whoami
+  #         npx semantic-release
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.PRIVATE_GITHUB_TOKEN }}
+  #         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  #         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

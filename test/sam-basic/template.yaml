@@ -1,0 +1,89 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  sam-basic
+
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Resources:
+  testTsCommonJs:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: services/testTsCommonJs/
+      Handler: lambda.lambdaHandler
+      Runtime: nodejs20.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 10
+      Policies:
+        - AWSLambdaBasicExecutionRole
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Format: cjs
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - lambda.ts
+
+  testTsEsModule:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: services/testTsEsModule/
+      Handler: lambda.lambdaHandler
+      Runtime: nodejs20.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 10
+      Policies:
+        - AWSLambdaBasicExecutionRole
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Format: esm
+        OutExtension:
+          - .js=.mjs
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        Banner:
+          - js=import { createRequire } from 'module'; const require = createRequire(import.meta.url);
+        EntryPoints:
+          - lambda.ts
+
+  testJsCommonJs:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: services/testJsCommonJs/lambda.lambdaHandler
+      Runtime: nodejs20.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 10
+      Policies:
+        - AWSLambdaBasicExecutionRole
+
+  testJsEsModule:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: services/testJsEsModule/lambda.lambdaHandler
+      Runtime: nodejs20.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 10
+      Policies:
+        - AWSLambdaBasicExecutionRole
+
+Outputs:
+  FunctionNameTestJsCommonJs:
+    Value: !Ref testJsCommonJs
+  FunctionNameTestJsEsModule:
+    Value: !Ref testJsEsModule
+  FunctionNameTestTsCommonJs:
+    Value: !Ref testTsCommonJs
+  FunctionNameTestTsEsModule:
+    Value: !Ref testTsEsModule

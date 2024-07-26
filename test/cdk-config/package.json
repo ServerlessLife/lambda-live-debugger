@@ -1,0 +1,26 @@
+{
+  "name": "cdk-config",
+  "version": "0.0.1",
+  "bin": {
+    "cdk-basic": "bin/cdk-basic.js"
+  },
+  "scripts": {
+    "deploy": "cdk deploy -c environment=check --require-approval never --outputs-file cdk-outputs.json",
+    "build": "cdk synth -c environment=check",
+    "destroy": "cdk destroy  -c environment=check --force"
+  },
+  "devDependencies": {
+    "@types/node": "20.11.30",
+    "@tsconfig/node20": "^20.1.4",
+    "aws-cdk": "2.135.0",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.4.3",
+    "@types/aws-lambda": "^8.10.137"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.135.0",
+    "constructs": "^10.0.0",
+    "source-map-support": "^0.5.21",
+    "@aws-sdk/client-sts": "^3.577.0"
+  }
+}

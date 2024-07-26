@@ -1,0 +1,358 @@
+name: Test with real npm
+
+on:
+  workflow_dispatch:
+    inputs:
+      installGlobally:
+        description: "Install lambda-live-debugger globally"
+        default: "true"
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  test-cdk-basic:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: test-cdk-basic
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+      - name: Move vite.config.ts to test folder
+        run: |
+          mv vite.config.ts test/vite.config.ts
+      - name: Delete everything except the test folder
+        run: |
+          # Enable extended globbing
+          shopt -s extglob
+          rm -rf !(test)
+      - name: Install dependencies
+        run: |
+          npm i
+          cd cdk-basic
+          npm i
+        working-directory: test
+      - name: Install lambda-live-debugger globally
+        if: ${{ github.event.inputs.installGlobally == 'true' }}
+        run: |
+          npm i lambda-live-debugger -g
+        working-directory: test
+      - name: Install lambda-live-debugger locally
+        if: ${{ github.event.inputs.installGlobally != 'true' }}
+        run: |
+          npm i lambda-live-debugger
+        working-directory: test
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-west-1
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: GitHubActions
+      - name: Destroy
+        run: npm run destroy
+        working-directory: test/cdk-basic
+        continue-on-error: true
+      - name: Deploy
+        run: npm run deploy
+        working-directory: test/cdk-basic
+      - name: Test
+        run: REAL_NPM=true DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 cdk-basic.test.ts
+        working-directory: test
+      - name: Test - observable mode
+        run: REAL_NPM=true DISABLE_PARALLEL_DEPLOY=true OBSERVABLE_MODE=true npx vitest --retry 1 cdk-basic.test.ts
+        working-directory: test
+
+  test-sls-basic:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: test-sls-basic
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+      - name: Move vite.config.ts to test folder
+        run: |
+          mv vite.config.ts test/vite.config.ts
+      - name: Delete everything except the test folder
+        run: |
+          # Enable extended globbing
+          shopt -s extglob
+          rm -rf !(test)
+      - name: Install dependencies
+        run: |
+          npm i
+          cd sls-basic
+          npm i
+        working-directory: test
+      - name: Install lambda-live-debugger globally
+        if: ${{ github.event.inputs.installGlobally == 'true' }}
+        run: |
+          npm i lambda-live-debugger -g
+          npm i serverless@3.38.0 -g
+        working-directory: test
+      - name: Install lambda-live-debugger locally
+        if: ${{ github.event.inputs.installGlobally != 'true' }}
+        run: |
+          npm i lambda-live-debugger
+        working-directory: test
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-west-1
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: GitHubActions
+      - name: Destroy
+        run: npm run destroy
+        working-directory: test/sls-basic
+        continue-on-error: true
+      - name: Deploy
+        run: npm run deploy
+        working-directory: test/sls-basic
+      - name: Test
+        run: REAL_NPM=true DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 sls-basic.test.ts
+        working-directory: test
+      - name: Test - observable mode
+        run: REAL_NPM=true DISABLE_PARALLEL_DEPLOY=true OBSERVABLE_MODE=true npx vitest --retry 1 sls-basic.test.ts
+        working-directory: test
+
+  test-sls-esbuild-cjs:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: test-sls-esbuild-cjs
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+      - name: Move vite.config.ts to test folder
+        run: |
+          mv vite.config.ts test/vite.config.ts
+      - name: Delete everything except the test folder
+        run: |
+          # Enable extended globbing
+          shopt -s extglob
+          rm -rf !(test)
+      - name: Install dependencies
+        run: |
+          npm i
+          cd sls-esbuild-cjs
+          npm i
+        working-directory: test
+      - name: Install lambda-live-debugger globally
+        if: ${{ github.event.inputs.installGlobally == 'true' }}
+        run: |
+          npm i lambda-live-debugger -g
+          npm i serverless@3.38.0 -g
+        working-directory: test
+      - name: Install lambda-live-debugger locally
+        if: ${{ github.event.inputs.installGlobally != 'true' }}
+        run: |
+          npm i lambda-live-debugger
+        working-directory: test
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-west-1
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: GitHubActions
+      - name: Destroy
+        run: npm run destroy
+        working-directory: test/sls-esbuild-cjs
+        continue-on-error: true
+      - name: Deploy
+        run: npm run deploy
+        working-directory: test/sls-esbuild-cjs
+      - name: Test
+        run: REAL_NPM=true DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 sls-esbuild-cjs.test.ts
+        working-directory: test
+      - name: Test - observable mode
+        run: REAL_NPM=true DISABLE_PARALLEL_DEPLOY=true OBSERVABLE_MODE=true npx vitest --retry 1 sls-esbuild-cjs.test.ts
+        working-directory: test
+
+  test-sls-esbuild-esm:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: test-sls-esbuild-esm
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+      - name: Move vite.config.ts to test folder
+        run: |
+          mv vite.config.ts test/vite.config.ts
+      - name: Delete everything except the test folder
+        run: |
+          # Enable extended globbing
+          shopt -s extglob
+          rm -rf !(test)
+      - name: Install dependencies
+        run: |
+          npm i
+          cd sls-esbuild-esm
+          npm i
+        working-directory: test
+      - name: Install lambda-live-debugger globally
+        if: ${{ github.event.inputs.installGlobally == 'true' }}
+        run: |
+          npm i lambda-live-debugger -g
+          npm i serverless@3.38.0 -g
+        working-directory: test
+      - name: Install lambda-live-debugger locally
+        if: ${{ github.event.inputs.installGlobally != 'true' }}
+        run: |
+          npm i lambda-live-debugger
+        working-directory: test
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-west-1
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: GitHubActions
+      - name: Destroy
+        run: npm run destroy
+        working-directory: test/sls-esbuild-esm
+        continue-on-error: true
+      - name: Deploy
+        run: npm run deploy
+        working-directory: test/sls-esbuild-esm
+      - name: Test
+        run: REAL_NPM=true DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 sls-esbuild-esm.test.ts
+        working-directory: test
+      - name: Test - observable mode
+        run: REAL_NPM=true DISABLE_PARALLEL_DEPLOY=true OBSERVABLE_MODE=true npx vitest --retry 1 sls-esbuild-esm.test.ts
+        working-directory: test
+
+  test-sam-basic:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: test-sam-basic
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+      - name: Move vite.config.ts to test folder
+        run: |
+          mv vite.config.ts test/vite.config.ts
+      - name: Delete everything except the test folder
+        run: |
+          # Enable extended globbing
+          shopt -s extglob
+          rm -rf !(test)
+      - name: Install dependencies
+        run: |
+          npm i
+          cd sam-basic
+          npm i
+        working-directory: test
+      - name: Install lambda-live-debugger globally
+        if: ${{ github.event.inputs.installGlobally == 'true' }}
+        run: |
+          npm i lambda-live-debugger -g
+          npm i serverless@3.38.0 -g
+        working-directory: test
+      - name: Install lambda-live-debugger locally
+        if: ${{ github.event.inputs.installGlobally != 'true' }}
+        run: |
+          npm i lambda-live-debugger
+        working-directory: test
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-west-1
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: GitHubActions
+      - name: Destroy
+        run: npm run destroy
+        working-directory: test/sam-basic
+        continue-on-error: true
+      - name: Deploy
+        run: npm run deploy
+        working-directory: test/sam-basic
+      - name: Test
+        run: REAL_NPM=true DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 sam-basic.test.ts
+        working-directory: test
+      - name: Test - observable mode
+        run: REAL_NPM=true DISABLE_PARALLEL_DEPLOY=true OBSERVABLE_MODE=true npx vitest --retry 1 sam-basic.test.ts
+        working-directory: test
+
+  test-terraform-basic:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: test-terraform-basic
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+      - name: Move vite.config.ts to test folder
+        run: |
+          mv vite.config.ts test/vite.config.ts
+      - name: Delete everything except the test folder
+        run: |
+          # Enable extended globbing
+          shopt -s extglob
+          rm -rf !(test)
+      - name: Install dependencies
+        run: |
+          npm i
+          cd terraform-basic
+          npm i
+        working-directory: test
+      - name: Install lambda-live-debugger globally
+        if: ${{ github.event.inputs.installGlobally == 'true' }}
+        run: |
+          npm i lambda-live-debugger -g
+        working-directory: test
+      - name: Install lambda-live-debugger locally
+        if: ${{ github.event.inputs.installGlobally != 'true' }}
+        run: |
+          npm i lambda-live-debugger
+        working-directory: test
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-west-1
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: GitHubActions
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+      - name: Terraform Init
+        run: |
+          ./create_bucket.sh lld-terraform-basic
+          terraform init -backend-config="bucket=lld-terraform-basic"
+        working-directory: test/terraform-basic
+      - name: Destroy
+        run: npm run destroy
+        working-directory: test/terraform-basic
+        continue-on-error: true
+      - name: Deploy
+        run: npm run deploy
+        working-directory: test/terraform-basic
+      - name: Test
+        run: REAL_NPM=true DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 terraform-basic.test.ts
+        working-directory: test
+      - name: Test - observable mode
+        run: REAL_NPM=true DISABLE_PARALLEL_DEPLOY=true OBSERVABLE_MODE=true npx vitest --retry 1 terraform-basic.test.ts
+        working-directory: test

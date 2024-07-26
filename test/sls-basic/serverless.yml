@@ -1,0 +1,14 @@
+service: lls-sls-basic
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: eu-west-1
+
+functions:
+  testJsCommonJs:
+    handler: services/testJsCommonJs/lambda.lambdaHandler
+
+  testJsEsModule:
+    handler: services/testJsEsModule/lambda.lambdaHandler

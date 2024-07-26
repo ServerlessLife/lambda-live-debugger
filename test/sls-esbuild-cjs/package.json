@@ -1,0 +1,23 @@
+{
+  "name": "sls-esbuild",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "serverless deploy",
+    "destroy": "serverless remove"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "esbuild": "^0.20.2",
+    "serverless": "^3.38.0",
+    "serverless-esbuild": "^1.52.1",
+    "@tsconfig/node20": "^20.1.4"
+  },
+  "dependencies": {
+    "@aws-sdk/client-sts": "^3.577.0"
+  }
+}

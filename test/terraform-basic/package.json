@@ -1,0 +1,20 @@
+{
+  "name": "terraform-basic",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "init": "./create_bucket.sh lld-terraform-basic-marko && terraform init -backend-config=\"bucket=lld-terraform-basic-marko\"",
+    "build_test-ts-esmodule": "cd services/testTsEsModule && npx tsc && cp package.json ./dist && cd ../..",
+    "build_test-ts-commonjs": "cd services/testTsCommonJs && npx tsc && cp package.json ./dist && cd ../..",
+    "build": "npm run build_test-ts-esmodule && npm run build_test-ts-commonjs",
+    "deploy": "npm run build && terraform apply -auto-approve && terraform output -json > terraform-outputs.json",
+    "destroy": "terraform destroy -auto-approve"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.137"
+  }
+}

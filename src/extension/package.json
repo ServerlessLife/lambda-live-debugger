@@ -1,0 +1,21 @@
+{
+  "name": "extension",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "rm -rf ../../dist/extension && esbuild --sourcemap --bundle --format=cjs --platform=node --sourcemap ./interceptor.ts --outdir=../../dist/extension/nodejs/node_modules && cp lld-wrapper ../../dist/extension && cd ../../dist/extension && zip -r extension.zip ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.137"
+  },
+  "dependencies": {
+    "@aws-sdk/client-iot": "^3.515.0",
+    "@aws-sdk/client-lambda": "^3.515.0",
+    "@aws-sdk/client-s3": "^3.515.0",
+    "aws-iot-device-sdk": "^2.2.13"
+  }
+}
