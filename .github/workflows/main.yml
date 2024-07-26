@@ -1,10 +1,10 @@
 name: Deploy to npm
 
 on:
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
-    branches: [main]
-  push:
-    branches: [main]
 
 permissions:
   id-token: write
@@ -275,35 +275,36 @@ jobs:
       - name: Test - observable mode
         run: OBSERVABLE_MODE=true DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 test/terraform-basic.test.ts
 
-  # publish:
-  #   needs:
-  #     - test-cdk-basic
-  #     - test-sls-basic
-  #     - test-sls-esbuild-cjs
-  #     - test-sls-esbuild-esm
-  #     - test-sam-basic
-  #     - test-terraform-basic
-  #   runs-on: ubuntu-latest
-  #   concurrency:
-  #     group: publish
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - name: Use Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: "20"
-  #         registry-url: "https://registry.npmjs.org"
-  #     - name: Install dependencies
-  #       run: npm ci
-  #     - uses: actions/download-artifact@v4
-  #       with:
-  #         name: dist
-  #         path: dist
-  #     - name: Semantic Release
-  #       run: |
-  #         npm whoami
-  #         npx semantic-release
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.PRIVATE_GITHUB_TOKEN }}
-  #         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-  #         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  publish:
+    needs:
+      - test-cdk-basic
+      - test-sls-basic
+      - test-sls-esbuild-cjs
+      - test-sls-esbuild-esm
+      - test-sam-basic
+      - test-terraform-basic
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: publish
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+      - name: Install dependencies
+        run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - name: Semantic Release
+        run: |
+          npm whoami
+          npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.PRIVATE_GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
