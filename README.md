@@ -2,80 +2,107 @@
 
 ![Logo](logo.png)
 
-Lambda Live Debugger is an indispensable tool that allows you to debug AWS Lambda from your computer, although it is deployed on the cloud. It supports Lambdas written in JavaScript or TypeScript.
+Lambda Live Debugger is an indispensable tool for debugging AWS Lambda functions from your computer, even though they are deployed in the cloud. It supports Lambdas written in JavaScript or TypeScript.
 
-This is essentially the same as offered by [SST](https://sst.dev/) and [Serverless Framework v4](https://www.serverless.com/blog/serverless-framework-v4-general-availability), except it supports an additional Obserability mode.
+This tool offers similar functionality to [SST](https://sst.dev/) and [Serverless Framework v4](https://www.serverless.com/blog/serverless-framework-v4-general-availability), with the addition of an Observability mode.
 
 It supports the following frameworks:
 
-- AWS CDK v2,
-- Serverless Framework v3 (SLS),
-- AWS Serverless Application Model (SAM),
-- Terraform,
-- by implementing a simple function and option to support any framework or setup you might have,
-- ... (if you need any other framework, let me know?)
+- AWS CDK v2
+- Serverless Framework v3 (SLS)
+- AWS Serverless Application Model (SAM)
+- Terraform
+- Any other framework or setup by implementing a simple function in TypeScript
+- ... (Need support for another framework? Let me know!)
 
-## Early alpha state
+## Early Alpha State
 
-**Currently, the project is in the early alpha state. Please let me know if everything works for you. A simple message would help a lot, so I know I am on the right track. I tested many scenarios, but there are numerous ways how people can configure projects and TypeScript configuration. The tool is flexible enough, so the settings can be tweaked to adjust your setup without implementing additional features. Any advice on how to improve the project is also very welcome.**
+**This project is in the early alpha stage. Your feedback is incredibly valuable. Please let me know if it works for you or if you encounter any issues. I've tested many scenarios, but there are numerous ways people configure their projects and TypeScript settings. The tool is flexible and can be adjusted to fit your setup in most cases without needing additional features. If you got stuck, please let me know. Any suggestions for improvements are welcome.**
 
-You can contact me by:
+Contact me via:
 
-- [Open GitHub issue](https://github.com/ServerlessLife/lambda-live-debugger/issues)
+- [GitHub Issues](https://github.com/ServerlessLife/lambda-live-debugger/issues)
 - [LinkedIn](http://www.linkedin.com/in/marko-serverlesslife)
 
-## The problem statement
+## The Problem Statement
 
-The serverless is amazing and resolves many issues that regular systems face. But writing code can be a struggle. You write code, deploy, run, fix, deploy again. That process is time-consuming and tiresome. You can also use one of the tools for running code locally or use unit/integration tests for that, but that has many other issues, and it does not mimic an actual environment close enough.
+Serverless is amazing and solve many issues with traditional systems. But writing code for Lambda functions can be challenging. The cycle of writing, deploying, running, fixing, and redeploying is time-consuming and tedious. While local testing tools and unit/integration tests exist, they often don't replicate the actual environment closely enough.
 
-## How does it work
+## How It Works
 
-It connects to your deployed Lambda, sends the request to your computer, and sends the response back to Lambda. This way, you can debug on your machine, but the system behaves as if the code is running in the cloud with the same permissions.
+Lambda Live Debugger connects to your deployed Lambda, routes requests to your computer, and sends responses back to the Lambda. This allows you to debug locally, but the system behaves as if the code is running in the cloud with the same permissions.
 
-Lambda Live Debugger attaches Lambda Extensions (via Layer) to the Lambda to intercept calls and send them to AWS IoT. AWS IoT is used to transfer messages to and from your machine. Lambda Live Debugger runs locally, connects to the AWS IoT, and executes the code locally. If Lambda is written in TypeScript, it is transpiled to JavaScript. Calls are executed via Node Worker Threads.
+The tool attaches Lambda Extensions (via a Layer) to intercept calls and relay them to AWS IoT, which transfers messages between your Lambda and local machine. If the Lambda is written in TypeScript, it's transpiled to JavaScript. The code is executed via Node Worker Threads.
 
 ![Architecture](./architecture.drawio.png)
 
+### Infrastructure Changes
+
 Lambda Live Debugger makes the following changes to your AWS infrastructure:
 
-- Lambda excentions as a Layer
-- Attach Layer to each Lambda that you are debugging
-- Add policy to Lambda Role to use AWS IoT
+- Adds Lambda Layer
+- Attaches the Layer to each Lambda you're debugging
+- Adds a policy to the Lambda Role for AWS IoT access
 
-In case you do not want to add Layer to all functions, you can limit to the ones you need via configuration parameters.
+In case you do not want to debug all functions and add Layer to them, you can limit to the ones you need via `function` parameter.
 
-While compiling, it creates many temporary files in the folder `.lldebugger`; you can freely delete the folder once you are done debugging or add `.lldebugger` to `.gitignore`. The wizard adds that for you if you want.
+The tool generates temporary files in the `.lldebugger` folder, which can be deleted after debugging. The wizard can add `.lldebugger` to `.gitignore` for you.
 
-## Your developing process with Lambda Live Debugger
+## Development Process
 
-Since you will be deploying code into an actual AWS account while developing, you must use that environment only for yourself or create a temporary environment for you or for a feature you are working on.
-
-Unfortunately, having a separate AWS environment is not always possible because of organizational issues (it is 2024, and companies still do not understand how to work with serverless) or technical issues (it is hard to duplicate databases or other parts of the system). For that purpose, there is an Observability Mode.
+Since you deploy code to a real AWS account, it's best to have a dedicated environment only for yourself. It could be your personla environemnt or environment created for a special feature. That is [common practice when developing serverless systems](https://theburningmonk.com/2019/09/why-you-should-use-temporary-stacks-when-you-do-serverless/). If that's not feasible due to organizational or technical reasons, use Observability Mode.
 
 ## Observability Mode
 
-In Observability Mode, Lambda Live Debugger via Lambda Extension just intercepts the request received by Lambda and forwards it to the local environment, but it does not wait for the response. After that, Lambda continues regular execution and ignores the response from the local environment. The system is not impacted, and regular users and other developers can continue to use it. You can run Observability Mode on the development or testing environment. If you are an adventurer, you can even run it in production. In observability mode, you do not get all Lambda requests. You only get one every 3 seconds. You can configure that interval via `interval` setting. This way, the system will not be overloaded if there are a lot of requests coming in.
+In Observability Mode, Lambda Live Debugger intercepts requests and sends them to your computer without waiting for a response. The Lambda continues as usual. The response from your machine is ignored. This mode can be used in development, testing, or even, if you are an adventures, production environments. It samples requests every 3 seconds by default (configurable with `interval` setting) to avoid overloading the system.
 
-## How to start
+## Getting Started
 
 ### Installation
 
 Install locally:
-`npm install lambda-live-debugger`
+
+```
+npm install lambda-live-debugger
+```
+
 or globally
-`npm install lambda-live-debugger -g` (Linux, Mac: `sudo npm install lambda-live-debugger -g`)
 
-### How to run
+```
+npm install lambda-live-debugger -g
+```
 
-If you use the default profile, default region, and other default settings then just run:
+(On Linux and Mac: `sudo npm install lambda-live-debugger -g`)
 
-`lld` or `npx lld` (if installed locally)
+Running the Tool
 
-But you probably need to tweak some settings. You can do it via CLI parameters or, better run a wizard. The configuration is saved to `lldebugger.config.ts`
+With default profile, region, and other default settings:
 
-`npx lld -w` or `lld -w` (if installed globally)
+```
+lld
+```
 
-### CLI parameters
+or if installed locally:
+
+```
+npx lld
+```
+
+But you probably need to tweak some settings. You can do it via CLI parameters or, better run a wizard:
+
+```
+lld -w
+```
+
+or if installed locally:
+
+```
+npx lld -w
+```
+
+The configuration is saved to `lldebugger.config.ts`
+
+### CLI Parameters
 
 ```
  -V, --version                   output the version number
@@ -102,34 +129,31 @@ But you probably need to tweak some settings. You can do it via CLI parameters o
 
 You might want to configure your development tool for debugging. The wizard automatically configures for VsCode in `.vscode/launch.json`. Here is an example:
 
-```
+```json
 {
- "version": "0.2.0",
- "configurations": [
-
- {
- "name": "Lambda Live Debugger",
- "type": "node",
- "request": "launch",
- "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/lld",
- "runtimeArgs": [],
- "console": "integratedTerminal",
- "skipFiles": [
- "<node_internals>/**"
- ],
- "env": {}
- },
- ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Lambda Live Debugger",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/lld",
+      "runtimeArgs": [],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "env": {}
+    }
+  ]
 }
 ```
 
-If you are using another tool, please send me documentation so I can include it here. Especially the instruction for WebStorm is needed.
+For other tools, please send documentation to include here. WebStorm instructions are especially needed.
 
-### Monorepo
+## Monorepo Setup
 
-If your framework is one of the subfolders, set the `subfolder˙ setting.
+If your framework is in a subfolder, set the `subfolder` parameter.
 
-## Custom configuraiton
+## Custom Configuration
 
 getLambdas: async (foundLambdas) => {
 //you can customize the list of lambdas here or create your own
@@ -138,56 +162,76 @@ getLambdas: async (foundLambdas) => {
 
 ## Removing
 
-You can remove Lambda Live Debugger from your AWS account by running:
-`lld -r` (`npx lld -r` if installed locally)
+To remove Lambda Live Debugger from your AWS account
 
-This will detach the Layer from your Lambda and remove the additional IoT permission policy.
+```
+lld -r
+```
 
-It will not remove the Layer as others might use it. You can do everything, including Layer, with:
-`lld -r=all` (`npx lld -r=all` if installed locally)
+or if installed locally:
 
-## AWS CDK v2
+```
+npx lld -r
+```
 
-`context` is an additional setting for CDK. This is a common way to pass various variables to your code, most often the environment name.
+This detaches the Layer from your Lambdas and removes the IoT permission policy. It will not remove the Layer as others might use it.
 
-## Serverless Framework v3 (SLS)
+To also remove the Layer:
 
-`stage` is an additional setting for SLS to pass the stage/environment name to SLS.
+```
+lld -r=all
+```
 
-## AWS Serverless Application Model (SAM)
+or if installed locally:
 
-`config-env` is an additional setting for SAM to pass the stage/environment name to SLS.
+```
+npx lld -r=all
+```
 
-## Terraform
+## Framework-Specific Notes
 
-Only the most basic setup for Terraform is supported. Check the test case [in](https://github.com/ServerlessLife/lambda-live-debugger/tree/main/test/terraform-basic).
+### AWS CDK v2
 
-I am not a Terraform developer, so I only know the basics. Please provide a project sample so I can build better support.
+Use the `context` parameter to pass context to your CDK code. This is a common way to pass variables to your code, most often the environment name.
+
+### Serverless Framework v3 (SLS)
+
+Use the `stage` parameter to pass the stage/environment name.
+
+### AWS Serverless Application Model (SAM)
+
+Use the `config-env` parameter to pass the stage/environment name.
+
+### Terraform
+
+Only the basic setup is supported. Check the [test case](https://github.com/ServerlessLife/lambda-live-debugger/tree/main/test/terraform-basic).
+
+I am not a Terraform developer, so I only know the basics. Please provide a sample project so I can build better support.
 
 ## Know issues
 
-## Missing features
+...
 
-Please check the open [issues](https://github.com/ServerlessLife/lambda-live-debugger/issues).
+## Missing Features
 
-The most important missing feature is MFA authentication and the most possible configuration for Terraform.
+Check the [open issues](https://github.com/ServerlessLife/lambda-live-debugger/issues). The biggest missing feature right now is MFA authentication and more Terraform configurations.
 
-## Reporting an issue
+## Reporting an Issue
 
-- Make sure the bug is not already reported. Add +1 comment so I know there are multiple users struggling with the same issue. If possible, add some additional info.
-- Make a descriptive title with the prefix "bug:", "help:", "feature:", "discussion:" to indicate if you find a bug, need help, propose a feature... Please also add the matching label and, if needed, set priority via label.
-- Turn on verbose logging and provide the whole log.
-- Carefully describe your setup, or even better, provide a sample project.
+- Make sure the bug isn't already reported. Add a "+1" comment so I know there are multiple users struggling with the same issue. If possible, add some additional info.
+- Use descriptive titles with prefixes like "bug:", "help:", "feature:", or "discussion:". Please also add the matching label and, if needed, set priority via label.
+- Enable verbose logging and provide the full log.
+- Describe your setup in detail, or better yet, provide a sample project.
 
 ## Authors:
 
 - [Marko (ServerlessLife)](https://github.com/ServerlessLife)
-- ⭐ place for you for large code contribution
+- ⭐ Your name here for big code contributions
 
 ## Contributors (alphabetical)
 
-- ⭐ place for you for smaller code/documentation contributions or a sample project as a part of a bug report
+- ⭐ Your name here for smaller code/documentation contributions or sample projects as part of bug reports
 
 ## Declarment
 
-Use this tool at your responsibility...
+Lambda Live Debugger is provided "as is", without warranty of any kind, express or implied. Use it at your own risk, and be mindful of potential impacts on performance, security, and costs when using it in your AWS environment.
