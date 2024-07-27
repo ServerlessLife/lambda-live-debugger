@@ -17,7 +17,7 @@ It supports the following frameworks:
 
 ## Early Alpha State
 
-**This project is in the early alpha stage. Your feedback is incredibly valuable. Please let me know if it works for you or if you encounter any issues. I've tested many scenarios, but there are numerous ways people configure their projects and TypeScript settings. The tool is flexible and can be adjusted to fit your setup in most cases without needing additional features. If you got stuck, please let me know. Any suggestions for improvements are welcome.**
+**This project is in the early alpha stage. Your feedback is incredibly valuable. Please let me know if it works for you or if you encounter any issues. I've tested many scenarios, but people can configure their projects and TypeScript settings in numerous ways. The tool is flexible and can be adjusted to fit your setup in most cases without needing additional features. If you need help, please let me know. Any suggestions for improvements are welcome.**
 
 Contact me via:
 
@@ -26,13 +26,13 @@ Contact me via:
 
 ## The Problem Statement
 
-Serverless is amazing and solve many issues with traditional systems. But writing code for Lambda functions can be challenging. The cycle of writing, deploying, running, fixing, and redeploying is time-consuming and tedious. While local testing tools and unit/integration tests exist, they often don't replicate the actual environment closely enough.
+Serverless is amazing and solves many issues with traditional systems. However, writing code for Lambda functions can be challenging. The cycle of writing, deploying, running, fixing, and redeploying is time-consuming and tedious. While local testing tools and unit/integration tests exist, they often don't replicate the actual environment closely enough.
 
 ## How It Works
 
 Lambda Live Debugger connects to your deployed Lambda, routes requests to your computer, and sends responses back to the Lambda. This allows you to debug locally, but the system behaves as if the code is running in the cloud with the same permissions.
 
-The tool attaches Lambda Extensions (via a Layer) to intercept calls and relay them to AWS IoT, which transfers messages between your Lambda and local machine. If the Lambda is written in TypeScript, it's transpiled to JavaScript. The code is executed via Node Worker Threads.
+The tool attaches Lambda Extensions (via a Layer) to intercept and relay calls to AWS IoT, transferring messages between your Lambda and local machine. If the Lambda is written in TypeScript, it's transpiled to JavaScript. The code is executed via Node Worker Thread.
 
 ![Architecture](./architecture.drawio.png)
 
@@ -44,17 +44,17 @@ Lambda Live Debugger makes the following changes to your AWS infrastructure:
 - Attaches the Layer to each Lambda you're debugging
 - Adds a policy to the Lambda Role for AWS IoT access
 
-In case you do not want to debug all functions and add Layer to them, you can limit to the ones you need via `function` parameter.
+In case you do not want to debug all functions and add Layer to them, you can limit to the ones you need via the `function` parameter.
 
 The tool generates temporary files in the `.lldebugger` folder, which can be deleted after debugging. The wizard can add `.lldebugger` to `.gitignore` for you.
 
 ## Development Process
 
-Since you deploy code to a real AWS account, it's best to have a dedicated environment only for yourself. It could be your personla environemnt or environment created for a special feature. That is [common practice when developing serverless systems](https://theburningmonk.com/2019/09/why-you-should-use-temporary-stacks-when-you-do-serverless/). If that's not feasible due to organizational or technical reasons, use Observability Mode.
+Since you deploy code to a real AWS account, it's best to have a dedicated environment only for yourself. It could be your personal environment or an environment created for a feature. That is [common practice when developing serverless systems](https://theburningmonk.com/2019/09/why-you-should-use-temporary-stacks-when-you-do-serverless/). If that's not feasible due to organizational or technical reasons, use Observability Mode.
 
 ## Observability Mode
 
-In Observability Mode, Lambda Live Debugger intercepts requests and sends them to your computer without waiting for a response. The Lambda continues as usual. The response from your machine is ignored. This mode can be used in development, testing, or even, if you are an adventures, production environments. It samples requests every 3 seconds by default (configurable with `interval` setting) to avoid overloading the system.
+In Observability Mode, Lambda Live Debugger intercepts requests and sends them to your computer without waiting for a response. The Lambda continues as usual. The response from your machine is ignored. This mode can be used in the development, testing, or even, if you are an adventurous, production environment. It samples requests every 3 seconds by default (configurable with an `interval` setting) to avoid overloading the system.
 
 ## Getting Started
 
@@ -88,7 +88,7 @@ or if installed locally:
 npx lld
 ```
 
-But you probably need to tweak some settings. You can do it via CLI parameters or, better run a wizard:
+But you probably need to tweak some settings. You can do it via CLI parameters or, better, run a wizard:
 
 ```
 lld -w
@@ -106,13 +106,12 @@ The configuration is saved to `lldebugger.config.ts`
 
 ```
  -V, --version                   output the version number
- -r, --remove [option]           Remove Lambda Live Debugger infrastructure. Options: 'keep-layer' (default),
- 'remove-all'
- -w, --wizard                    Program interactively asks for each parameter
+ -r, --remove [option]           Remove Lambda Live Debugger infrastructure. Options: 'keep-layer' (default), 'remove-all'. The latest also removes the Lambda Layer
+ -w, --wizard                    Program interactively asks for each parameter and saves it to lldebugger.config.ts
  -v, --verbose                   Verbose logs
  -c, --context <context>         AWS CDK context (default: [])
  -s, --stage <stage>             Serverless Framework stage
- -f, --function <function name>  Filter by function name
+ -f, --function <function name>  Filter by function name. You can use * as a wildcard
  -m, --subfolder <subfolder>     Monorepo subfolder
  -o, --observable                Observable mode
  -i --interval <interval>        Observable mode interval (default: "3000")
@@ -151,7 +150,7 @@ For other tools, please send documentation to include here. WebStorm instruction
 
 ## Monorepo Setup
 
-If your framework is in a subfolder, set the `subfolder` parameter.
+Set the `subfolder` parameter if your framework is in a subfolder.
 
 ## Custom Configuration
 
@@ -218,8 +217,8 @@ Check the [open issues](https://github.com/ServerlessLife/lambda-live-debugger/i
 
 ## Reporting an Issue
 
-- Make sure the bug isn't already reported. Add a "+1" comment so I know there are multiple users struggling with the same issue. If possible, add some additional info.
-- Use descriptive titles with prefixes like "bug:", "help:", "feature:", or "discussion:". Please also add the matching label and, if needed, set priority via label.
+- Make sure the bug hasn't already been reported. Add a "+1" comment so I know there are multiple users struggling with the same issue. If possible, add some additional info.
+- Use descriptive titles with prefixes like "bug:", "help:", "feature:", or "discussion:". Please also add the matching label and, if needed, set priority via a label.
 - Enable verbose logging and provide the full log.
 - Describe your setup in detail, or better yet, provide a sample project.
 

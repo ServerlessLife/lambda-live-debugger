@@ -1,7 +1,37 @@
 {
   "name": "lambda-live-debugger",
-  "version": "0.0.87",
+  "version": "0.0.1",
   "type": "module",
+  "description": "Debug Lambda functions locally like it is running in the cloud",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:ServerlessLife/lambda-live-debugger.git"
+  },
+  "license": "MPL-2.0",
+  "author": {
+    "name": "Marko (ServerlessLife.com)",
+    "email": "marko@serverlesslife.com",
+    "organization": false
+  },
+  "keywords": [
+    "aws",
+    "lambda",
+    "debugger",
+    "serverless",
+    "aws-lambda",
+    "javascript",
+    "typescript",
+    "dev-tools",
+    "lambda-debugger",
+    "aws-cdk",
+    "serverless-framework",
+    "sls",
+    "aws-sam",
+    "sam",
+    "terraform",
+    "local-debugging",
+    "cloud-development"
+  ],
   "bin": {
     "lld": "dist/lldebugger.mjs"
   },
