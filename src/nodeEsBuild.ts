@@ -71,8 +71,8 @@ async function getBuild(functionId: string) {
       Logger.verbose(`[Function ${functionId}] Build complete`);
     }
 
-    const artifactFile = Object.keys(result.metafile?.outputs!).find(
-      (key) => key.endsWith("." + "js") // hack for avoiding renaming to .mjs by build script
+    const artifactFile = Object.keys(result.metafile?.outputs!).find((key) =>
+      key.endsWith(".js")
     );
 
     if (!artifactFile) {

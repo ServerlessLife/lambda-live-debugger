@@ -17,7 +17,15 @@ async function processFiles(directory) {
       await processFiles(fullPath);
     } else if (entry.isFile() && entry.name.endsWith(".js")) {
       const data = await readFile(fullPath, "utf8");
-      const updatedData = data.replace(/\.js"/g, '.mjs"');
+      const updatedData = data
+        .split("\n")
+        .map((line) => {
+          if (line.trim().startsWith("import")) {
+            return line.replace(/\.js"/g, '.mjs"');
+          }
+          return line;
+        })
+        .join("\n");
       const { dir, name } = parse(fullPath);
       const newFullPath = join(dir, `${name}.mjs`);
 

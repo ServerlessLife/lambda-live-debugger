@@ -65,13 +65,13 @@ export class SlsFramework implements IFramework {
       resolveConfigurationPath = (
         await import(
           //@ts-ignore
-          "serverless/lib/cli/resolve-configuration-path." + "js" // hack for avoiding renaming to .mjs by build script
+          "serverless/lib/cli/resolve-configuration-path.js"
         )
       ).default;
       readConfiguration = (
         await import(
           //@ts-ignore
-          "serverless/lib/configuration/read." + "js" // hack for avoiding renaming to .mjs by build script
+          "serverless/lib/configuration/read.js"
         )
       ).default;
 
