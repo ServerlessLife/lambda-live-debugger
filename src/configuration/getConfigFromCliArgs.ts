@@ -20,13 +20,13 @@ export async function getConfigFromCliArgs(
   program.name("lld").description("Lambda Live Debugger").version(version);
   program.option(
     "-r, --remove [option]",
-    "Remove Lambda Live Debugger infrastructure. Options: 'keep-layer' (default), 'remove-all'. The lates also remove the Lambda Layer"
+    "Remove Lambda Live Debugger infrastructure. Options: 'keep-layer' (default), 'remove-all'. The latest also removes the Lambda Layer"
     //validateRemoveOption,
     //"keep-layer"
   );
   program.option(
     "-w, --wizard",
-    "Program interactively asks for each parameter and save it to lldebugger.config.ts"
+    "Program interactively asks for each parameter and saves it to lldebugger.config.ts"
   );
   program.option("-v, --verbose", "Verbose logs");
   program.option(
@@ -38,7 +38,7 @@ export async function getConfigFromCliArgs(
   program.option("-s, --stage <stage>", "Serverless Framework stage");
   program.option(
     "-f, --function <function name>",
-    "Filter by function name. You can use * as wildcard"
+    "Filter by function name. You can use * as a wildcard"
   );
   program.option("-m, --subfolder <subfolder>", "Monorepo subfolder");
   program.option("-o, --observable", "Observable mode");

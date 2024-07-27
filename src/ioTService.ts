@@ -5,6 +5,7 @@ import type {
   AwsCredentialIdentityProvider,
   AwsCredentialIdentity,
 } from "@smithy/types";
+import { Logger } from "./logger.js";
 
 let device: iot.device;
 
@@ -134,24 +135,24 @@ async function connect(props?: {
 
   if (props?.topic) {
     device.subscribe(props.topic, { qos: 1 });
-    console.debug("Subscribed to topic ", props.topic);
+    Logger.verbose("[IoT] Subscribed to topic ", props.topic);
   }
 
   device.on("connect", () => {
-    console.debug("IoT connected");
+    Logger.verbose("[IoT] Connected");
     connectedPromiseResolve();
   });
 
   device.on("error", (err) => {
-    console.debug("IoT error", err);
+    Logger.error("[IoT] Error", err);
   });
 
   device.on("close", () => {
-    console.debug("IoT closed");
+    Logger.verbose("[IoT] Closed");
   });
 
   device.on("reconnect", () => {
-    console.debug("IoT reconnecting...");
+    Logger.verbose("[IoT] Reconnecting...");
   });
 
   if (props?.onMessage) {
@@ -182,6 +183,8 @@ async function connect(props?: {
 
     device.on("message", messageReceived);
   }
+
+  await connectedPromise;
 
   return {
     publish: async (payload, topic) => {

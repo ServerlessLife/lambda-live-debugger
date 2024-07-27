@@ -46,7 +46,7 @@ async function startDebuggerInternal(folder: string, args: string[] = []) {
     lldProcess.stdout?.on("data", (data) => {
       console.log("LLD: " + data.toString());
       const line = data.toString();
-      if (line.includes("IoT connected")) {
+      if (line.includes("Debugger started!")) {
         resolve(true);
       }
     });

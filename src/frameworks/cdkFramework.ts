@@ -3,26 +3,15 @@ import * as fs from "fs/promises";
 import * as path from "path";
 import { BundlingType, LambdaResource } from "../types/resourcesDiscovery.js";
 import { outputFolder } from "../constants.js";
-import type { BundlingOptions } from "aws-cdk-lib/aws-lambda-nodejs";
 import { findPackageJson } from "../utils/findPackageJson.js";
 import { IFramework } from "./iFrameworks.js";
 import { CloudFormation } from "../cloudFormation.js";
 import { AwsConfiguration } from "../types/awsConfiguration.js";
 import { LldConfigBase } from "../types/lldConfig.js";
 import { Logger } from "../logger.js";
-
-// this is global variable to store the data from the CDK code once it is executed
-declare global {
-  var lambdas: Array<{
-    code: any;
-    node: any;
-    //cdkPath: string;
-    stackName: string;
-    codePath: string;
-    handler: string;
-    bundling: BundlingOptions;
-  }>;
-}
+import { Worker } from "node:worker_threads";
+import { getModuleDirname } from "../getDirname.js";
+import { Configuration } from "../configuration.js";
 
 /**
  * Support for AWS CDK framework
@@ -219,10 +208,6 @@ export class CdkFramework implements IFramework {
     config: LldConfigBase
   ) {
     const entryFile = await this.getCdkEntryFile(cdkConfigPath);
-
-    // this is global variable to store the data from the CDK code once it is executed
-    global.lambdas = [];
-
     // Define a plugin to prepend custom code to .ts or .tsx files
     const injectCodePlugin: esbuild.Plugin = {
       name: "injectCode",
@@ -319,30 +304,49 @@ export class CdkFramework implements IFramework {
     process.env.CDK_CONTEXT_JSON = JSON.stringify(CDK_CONTEXT_JSON);
     Logger.verbose(`[CDK] context:`, JSON.stringify(CDK_CONTEXT_JSON, null, 2));
 
-    // execute code to get the data into global.lambdas
-    const codeFile = await fs.readFile(compileOutput, "utf8");
-    //const __dirname = path.resolve("x/"); // CDK needs this, pure magic
-    const __dirname = path.resolve("./node_modules/aws-cdk-lib/x/x"); // CDK needs this, pure magic
-    eval(codeFile);
+    const lambdas: any[] = await new Promise((resolve, reject) => {
+      const worker = new Worker(
+        path.resolve(
+          path.join(getModuleDirname(), "frameworks/cdkFrameworkWorker.mjs")
+        ),
+        {
+          workerData: {
+            verbose: Configuration.config.verbose,
+          },
+        }
+      );
 
-    if (global.lambdas.length === 0) {
-      throw new Error("No Lambda functions found in the CDK code");
-    }
+      worker.on("message", (message) => {
+        resolve(message);
+        worker.terminate();
+      });
 
-    const lambdasPrettified = global.lambdas.map((lambda: any) => ({
-      stackName: lambda.stackName,
-      codePath: lambda.codePath,
-      handler: lambda.handler,
-      bundling: lambda.bundling,
-    }));
+      worker.on("error", (error) => {
+        reject(
+          new Error(`Error running CDK code in worker: ${error.message}`, {
+            cause: error,
+          })
+        );
+      });
+
+      worker.on("exit", (code) => {
+        if (code !== 0) {
+          reject(new Error(`CDK worker stopped with exit code ${code}`));
+        }
+      });
+
+      worker.postMessage({
+        compileOutput,
+      });
+    });
 
     Logger.verbose(
       `[CDK] Found the following Lambda functions in the CDK code:`,
-      JSON.stringify(lambdasPrettified, null, 2)
+      JSON.stringify(lambdas, null, 2)
     );
 
     const list = await Promise.all(
-      global.lambdas.map(async (lambda: any) => {
+      lambdas.map(async (lambda: any) => {
         // handler slit into file and file name
         const handlerSplit = lambda.handler.split(".");
 
@@ -375,7 +379,7 @@ export class CdkFramework implements IFramework {
         Logger.verbose(`[CDK] package.json path: ${packageJsonPath}`);
 
         return {
-          cdkPath: lambda.node.defaultChild.node.path,
+          cdkPath: lambda.cdkPath,
           stackName: lambda.stackName,
           packageJsonPath,
           codePath,

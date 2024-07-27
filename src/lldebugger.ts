@@ -97,7 +97,7 @@ async function run() {
   const rootFolderForWarchingChanges = getRootFolder(folders);
   FileWatcher.watchForFileChanges(rootFolderForWarchingChanges);
 
-  LambdaConnection.connect();
+  await LambdaConnection.connect();
   Logger.log("Debugger started!");
 }
 

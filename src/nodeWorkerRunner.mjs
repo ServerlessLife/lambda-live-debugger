@@ -2,7 +2,7 @@ import { createRequire as topLevelCreateRequire } from "module";
 const require = topLevelCreateRequire(import.meta.url);
 
 import { workerData, parentPort } from "node:worker_threads";
-import { Logger } from "../dist/logger.mjs";
+import { Logger } from "./logger.mjs";
 
 Logger.setVerbose(workerData.verbose);
 Logger.verbose(
