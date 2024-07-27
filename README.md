@@ -60,21 +60,23 @@ In Observability Mode, Lambda Live Debugger intercepts requests and sends them t
 
 ### Installation
 
-Install locally:
-
-```
-npm install lambda-live-debugger
-```
-
-or globally
+Install globally:
 
 ```
 npm install lambda-live-debugger -g
 ```
 
-(On Linux and Mac: `sudo npm install lambda-live-debugger -g`)
+_(On Linux and Mac: `sudo npm install lambda-live-debugger -g`)_
 
-Running the Tool
+or locally
+
+```
+npm install lambda-live-debugger -g
+```
+
+_(If installed locally, you must prefix all commands with `npx`, if they are not part of `scripts` in `package.json`.)_
+
+## Running the Tool
 
 With default profile, region, and other default settings:
 
@@ -82,22 +84,10 @@ With default profile, region, and other default settings:
 lld
 ```
 
-or if installed locally:
-
-```
-npx lld
-```
-
-But you probably need to tweak some settings. You can do it via CLI parameters or, better, run a wizard:
+You probably need to tweak some settings. You can do it via CLI parameters or, better, run the wizard:
 
 ```
 lld -w
-```
-
-or if installed locally:
-
-```
-npx lld -w
 ```
 
 The configuration is saved to `lldebugger.config.ts`
@@ -167,24 +157,12 @@ To remove Lambda Live Debugger from your AWS account
 lld -r
 ```
 
-or if installed locally:
-
-```
-npx lld -r
-```
-
 This detaches the Layer from your Lambdas and removes the IoT permission policy. It will not remove the Layer as others might use it.
 
 To also remove the Layer:
 
 ```
 lld -r=all
-```
-
-or if installed locally:
-
-```
-npx lld -r=all
 ```
 
 ## Framework-Specific Notes
