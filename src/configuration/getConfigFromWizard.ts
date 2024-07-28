@@ -40,7 +40,7 @@ export async function getConfigFromWizard({
     {
       type: "list",
       name: "framework",
-      message: `Which framework are you using (detected ${currentFramework})?`,
+      message: `Which framework are you using (detected: ${currentFramework ?? "?"})?`,
       choices: supportedFrameworks,
       default: currentConfig?.framework ?? currentFramework,
     },
