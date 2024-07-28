@@ -60,7 +60,6 @@
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
     "@types/aws-iot-device-sdk": "^2.2.8",
-    "@types/commander": "^2.12.2",
     "@types/inquirer": "^9.0.7",
     "@types/node": "^20.11.16",
     "@types/serverless": "^3.12.22",
