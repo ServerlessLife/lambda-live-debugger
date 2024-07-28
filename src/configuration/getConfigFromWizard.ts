@@ -16,6 +16,7 @@ import { ResourceDiscovery } from "../resourceDiscovery.js";
 import { GitIgnore } from "../gitignore.js";
 import { VsCode } from "../vsCode.js";
 import { Logger } from "../logger.js";
+import { Configuration } from "../configuration.js";
 
 const configFileName = path.resolve(configFileDefaultName);
 
@@ -205,6 +206,10 @@ export async function getConfigFromWizard({
   ]);
 
   if (answersFilter.function === "Pick one") {
+    // I need to use congiration settings I accquired so far to get the list of lambdas
+    const configTemp = getConfigFromAnswers(answers);
+    Configuration.setConfig(configTemp as any); // not complete config
+
     lambdasList = await ResourceDiscovery.getLambdas(
       getConfigFromAnswers(answers) as LldConfig
     );
@@ -295,10 +300,17 @@ export async function getConfigFromWizard({
   const config = getConfigFromAnswers(answers);
 
   if (save) {
-    // save to file that looks like this:
-    Logger.log(`Saving to config file ${configFileName}`);
+    await saveConfiguration(config);
+  }
 
-    const configContent = `
+  return config;
+}
+
+async function saveConfiguration(config: LldConfigCliArgs) {
+  Logger.log(`Saving to config file ${configFileName}`);
+
+  // save to file that looks like this:
+  const configContent = `
 import { type LldConfigTs } from "lambda-live-debugger";
 
 export default {
@@ -321,17 +333,14 @@ export default {
 } satisfies LldConfigTs;
     `;
 
-    // remove lines that contains undefined or ""
-    const configContentCleaned = configContent
-      .trim()
-      .split("\n")
-      .filter((l) => !l.includes("undefined") && !l.includes('""'))
-      .join("\n");
+  // remove lines that contains undefined or ""
+  const configContentCleaned = configContent
+    .trim()
+    .split("\n")
+    .filter((l) => !l.includes("undefined") && !l.includes('""'))
+    .join("\n");
 
-    await fs.writeFile(configFileName, configContentCleaned);
-  }
-
-  return config;
+  await fs.writeFile(configFileName, configContentCleaned);
 }
 
 function getConfigFromAnswers(answers: any): LldConfigCliArgs {

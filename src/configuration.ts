@@ -38,19 +38,19 @@ async function readConfig() {
     });
 
     const debuggerId = await generateDebuggerId(!!configFromWizard.observable);
-    config = {
+    setConfig({
       ...configFromWizard,
       debuggerId,
       start: false, // don't start the debugger after the wizard
-    };
+    });
   } else {
     const configMerged = { ...configFromCliArgs, ...configFromConfigFile };
     const debuggerId = await generateDebuggerId(!!configMerged.observable);
-    config = {
+    setConfig({
       ...configMerged,
       debuggerId,
       start: true,
-    };
+    });
   }
 }
 
@@ -169,6 +169,14 @@ function saveDiscoveredLambdas(lambdasListNew: LambdaResource[]) {
   }
 }
 
+/**
+ * Set the configuration
+ * @param newConfig
+ */
+function setConfig(newConfig: LldConfig) {
+  config = newConfig;
+}
+
 export const Configuration = {
   readConfig,
   get config() {
@@ -180,4 +188,5 @@ export const Configuration = {
   discoverLambdas,
   getLambda,
   getLambdas,
+  setConfig,
 };
