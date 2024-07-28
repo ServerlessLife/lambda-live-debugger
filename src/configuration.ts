@@ -23,6 +23,9 @@ async function readConfig() {
   const currentFramework = await ResourceDiscovery.getCurrentFrameworkName();
 
   const configFromCliArgs = await getConfigFromCliArgs(supportedFrameworks);
+
+  Logger.setVerbose(configFromCliArgs.verbose === true);
+
   const configFileName = configFromCliArgs.config || configFileDefaultName;
   const configFromConfigFile = (await getConfigTsFromConfigFile(configFileName))
     ?.default;
