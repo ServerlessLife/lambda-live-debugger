@@ -296,8 +296,7 @@ export async function getConfigFromWizard({
 
   if (save) {
     // save to file that looks like this:
-
-    Logger.log("Saving to config file");
+    Logger.log(`Saving to config file ${configFileName}`);
 
     const configContent = `
 import { type LldConfigTs } from "lambda-live-debugger";

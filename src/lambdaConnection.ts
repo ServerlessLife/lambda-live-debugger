@@ -75,7 +75,7 @@ async function onMessageFromLambda(message: IoTMessage) {
     } else {
       // first 50 characters of the response
       const requestPretty = message.data
-        ? JSON.stringify(message.data).substring(0, 50)
+        ? JSON.stringify(message.data).substring(0, 100)
         : "";
       Logger.log(
         `${message.data.functionId} request: ${requestPretty}${requestPretty.length < 50 ? "" : "..."}`
@@ -92,7 +92,7 @@ async function onMessageFromLambda(message: IoTMessage) {
     } else {
       // first 50 characters of the response
       const responsePretty = response
-        ? JSON.stringify(response).substring(0, 50)
+        ? JSON.stringify(response).substring(0, 100)
         : "";
       Logger.log(
         `${message.data.functionId} response: ${responsePretty}${responsePretty.length < 50 ? "" : "..."}`

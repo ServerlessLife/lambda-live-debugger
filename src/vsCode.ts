@@ -142,6 +142,7 @@ async function writeConfiguration(
     const modifiedJsonString = applyEdits(jsonString, edits);
 
     // Write the modified JSON string back to the file
+    Logger.verbose(`Adding to VsCode configuration file: ${filePath}`);
     await fs.writeFile(filePath, modifiedJsonString, "utf-8");
   } catch (err) {
     Logger.error(`Error writing the file: ${err}`);
@@ -187,6 +188,7 @@ async function getCurrentState(): Promise<
     });
 
     if (!exists) {
+      Logger.verbose(`${filePath} exists but configuration does not exist!`);
       return {
         state: "FILE_EXISTS_CONFIGURATION_DOES_NOT_EXIST",
         jsonString,
@@ -194,12 +196,13 @@ async function getCurrentState(): Promise<
         filePath,
       };
     } else {
-      Logger.log("Configuration already exists!");
+      Logger.verbose(`Configuration already exists in ${filePath}`);
       return {
         state: "FILE_EXISTS_CONFIGURATION_EXISTS",
       };
     }
   } else {
+    Logger.verbose(`${filePath} does not exist!`);
     return {
       state: "FILE_DOES_NOT_EXIST",
       filePath,
@@ -236,6 +239,7 @@ async function addConfiguration(lldConfig: LldConfig) {
     // crete folder of filePath recursive if not exists
     await fs.mkdir(path.dirname(state.filePath), { recursive: true });
 
+    Logger.verbose(`Creating VsCode configuration file: ${state.filePath}`);
     await fs.writeFile(
       state.filePath,
       JSON.stringify(config, null, 2),

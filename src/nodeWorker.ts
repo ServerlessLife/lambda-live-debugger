@@ -40,7 +40,10 @@ async function runInWorker(input: {
     }
 
     worker.on("message", (msg) => {
-      Logger.log("Worker message", msg);
+      Logger.verbose(
+        `[Function ${input.fuctionRequest.functionId}] [Worker ${input.fuctionRequest.workerId}] Worker message`,
+        JSON.stringify(msg)
+      );
       if (msg?.errorType) {
         reject(msg);
       } else {
@@ -48,7 +51,10 @@ async function runInWorker(input: {
       }
     });
     worker.on("error", (err) => {
-      Logger.log("Worker error", err);
+      Logger.error(
+        `[Function ${input.fuctionRequest.functionId}] [Worker ${input.fuctionRequest.workerId}] Error`,
+        err
+      );
       reject(err);
     });
 
