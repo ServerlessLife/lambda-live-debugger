@@ -29,7 +29,7 @@ async function run() {
   Logger.setVerbose(Configuration.config.verbose === true);
 
   Logger.verbose(
-    `Parameters: \n ${Object.entries(Configuration.config)
+    `Parameters: \n${Object.entries(Configuration.config)
       .map(([key, value]) => ` - ${key}=${value}`)
       .join("\n")}`
   );

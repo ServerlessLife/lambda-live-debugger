@@ -42,6 +42,7 @@ async function getVsCodeLaunchConfig(lldConfig?: LldConfig) {
 
   //if installed locally
   if (moduleDirname.startsWith("/home/")) {
+    Logger.verbose("Lambda Live Debugger is installed locally");
     // check if file exists
     try {
       //Logger.log("Checking local folder", localFolder);
@@ -52,12 +53,16 @@ async function getVsCodeLaunchConfig(lldConfig?: LldConfig) {
     } catch (err) {
       //Logger.log("Not found", localFolder);
     }
+  } else {
+    Logger.verbose("Lambda Live Debugger is installed globally");
   }
 
-  if (runtimeExecutableSet) {
-    const projectDirname = getProjectDirname();
-    const globalModule1 = path.join(projectDirname, "..", "..", ".bin/lld");
-    const globalModule2 = path.join(projectDirname, "..", "..", "bin/lld");
+  if (!runtimeExecutableSet) {
+    Logger.verbose(
+      `Setting absolute path for runtimeExecutable setting for VsCode configuration`
+    );
+    const globalModule1 = path.join(moduleDirname, "..", "..", ".bin/lld");
+    const globalModule2 = path.join(moduleDirname, "..", "..", "bin/lld");
     const globalModule3 = path.join(
       moduleDirname,
       "..",
@@ -73,6 +78,11 @@ async function getVsCodeLaunchConfig(lldConfig?: LldConfig) {
       [globalModule3]: globalModule3,
     };
 
+    Logger.verbose(
+      `Checking the following possible folders for lld executable:`,
+      JSON.stringify(possibleFolders, null, 2)
+    );
+
     // check each possible folder and set the runtimeExecutable
     for (const folder in possibleFolders) {
       try {
@@ -80,10 +90,10 @@ async function getVsCodeLaunchConfig(lldConfig?: LldConfig) {
         await fs.access(folder, fs.constants.F_OK);
         config.configurations![0].runtimeExecutable = possibleFolders[folder];
         runtimeExecutableSet = true;
-        //Logger.log("Found folder", folder);
+        Logger.verbose(`Found folder with lld executable: ${folder}`);
         break;
       } catch (err) {
-        //Logger.log("Not found", folder);
+        // Not found
       }
     }
 

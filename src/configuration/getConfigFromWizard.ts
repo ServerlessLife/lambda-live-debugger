@@ -286,6 +286,18 @@ export async function getConfigFromWizard({
 
       answers.vscode = answersVsCode.vscode;
     }
+
+    const answersVerbose = await inquirer.prompt([
+      {
+        type: "confirm",
+        name: "verbose",
+        message:
+          "Do you want to use verbose logging? This will log all events to the console.",
+        default: currentConfig?.verbose === true,
+      },
+    ]);
+
+    answers.verbose = answersVerbose.verbose;
   }
 
   /*
@@ -360,7 +372,7 @@ function getConfigFromAnswers(answers: any): LldConfigCliArgs {
       answers.interval !== undefined
         ? answers.interval
         : defaultObservableInterval,
-    verbose: false,
+    verbose: answers.verbose,
     interactive: answers.interactive,
     gitignore: answers.gitignore,
     vscode: answers.vscode,
