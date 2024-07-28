@@ -10,7 +10,7 @@ import {
 } from "jsonc-parser";
 import { VsCodeLaunch } from "./types/vsCodeConfig.js";
 import { LldConfig } from "./types/lldConfig.js";
-import { getModuleDirname } from "./getDirname.js";
+import { getModuleDirname, getProjectDirname } from "./getDirname.js";
 import { Logger } from "./logger.js";
 
 async function getVsCodeLaunchConfig(lldConfig?: LldConfig) {
@@ -54,9 +54,10 @@ async function getVsCodeLaunchConfig(lldConfig?: LldConfig) {
     }
   }
 
-  if (!runtimeExecutableSet) {
-    const globalModule1 = path.join(moduleDirname, "..", "..", ".bin/lld");
-    const globalModule2 = path.join(moduleDirname, "..", "..", "bin/lld");
+  if (runtimeExecutableSet) {
+    const projectDirname = getProjectDirname();
+    const globalModule1 = path.join(projectDirname, "..", "..", ".bin/lld");
+    const globalModule2 = path.join(projectDirname, "..", "..", "bin/lld");
     const globalModule3 = path.join(
       moduleDirname,
       "..",
@@ -165,7 +166,7 @@ async function getCurrentState(): Promise<
       filePath: string;
     }
 > {
-  const filePath = path.join(path.resolve(), ".vscode/launch.json");
+  const filePath = path.join(getProjectDirname(), ".vscode/launch.json");
 
   let createNewFile = false;
 
