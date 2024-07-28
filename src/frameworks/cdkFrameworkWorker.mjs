@@ -18,7 +18,7 @@ parentPort.on("message", async (data) => {
 
   // execute code to get the data into global.lambdas
   const codeFile = await fs.readFile(data.compileOutput, "utf8");
-  const __dirname = path.resolve("./node_modules/aws-cdk-lib/x/x"); // CDK needs this, pure magic
+  const __dirname = path.resolve("./x"); // CDK needs this, pure magic
   eval(codeFile);
 
   if (global.lambdas.length === 0) {
