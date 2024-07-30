@@ -24,6 +24,8 @@ import { LambdaConnection } from "./lambdaConnection.js";
 async function run() {
   const version = await getVersion();
 
+  Logger.log(`Welcome to Lambda Live Debugger version ${version}`);
+
   await Configuration.readConfig();
 
   Logger.setVerbose(Configuration.config.verbose === true);
@@ -49,7 +51,7 @@ async function run() {
   }
 
   Logger.log(
-    `Welcome to Lambda Live Debugger version: ${version}! Starting the debugger
+    `Starting the debugger
       ${
         Configuration.config.observable
           ? "in observable mode"

@@ -151,7 +151,7 @@ async function deployLayer() {
       });
       await getLambdaClient().send(deleteLayerVersionCommand);
     } else {
-      Logger.verbose("Layer already deployed.");
+      Logger.log(`${layerDescription} already deployed.`);
       return existingLayer.LayerVersionArn;
     }
   }
@@ -159,7 +159,7 @@ async function deployLayer() {
   // Read the ZIP file containing your layer code
   const layerContent = await fs.readFile(layerZipPathFullPath);
 
-  Logger.verbose(`Deploying ${layerDescription}`);
+  Logger.log(`Deploying ${layerDescription}`);
 
   // Create the command for publishing a new layer version
   const publishLayerVersionCommand = new PublishLayerVersionCommand({

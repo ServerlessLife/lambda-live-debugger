@@ -41,10 +41,14 @@ export async function getConfigFromWizard({
       type: "list",
       name: "framework",
       message: `Which framework are you using (detected: ${currentFramework ?? "?"})?`,
-      choices: supportedFrameworks,
+      choices: [...supportedFrameworks, "other"],
       default: currentConfig?.framework ?? currentFramework,
     },
   ]);
+
+  if (answers.framework === "other") {
+    answers.framework = undefined;
+  }
 
   const oldContext = currentConfig?.context ?? [];
 

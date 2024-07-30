@@ -226,10 +226,14 @@ async function build(input: {
     // remove all undefined values just to make it cleaner
     removeUndefinedProperties(options);
 
-    Logger.verbose(
-      `[Function ${input.functionId}] Building ${handlerCodePath} with options:`,
-      JSON.stringify(options, null, 2)
-    );
+    if (Configuration.config.verbose) {
+      Logger.verbose(
+        `[Function ${input.functionId}] Building ${handlerCodePath} with options:`,
+        JSON.stringify(options, null, 2)
+      );
+    } else {
+      Logger.log(`[Function ${input.functionId}] Building ${handlerCodePath}`);
+    }
     ctx = await esbuild.context(options);
   }
 
