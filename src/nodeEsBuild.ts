@@ -63,6 +63,7 @@ async function getBuild(functionId: string) {
         ctx: newBuildAssets.then((b) => b.ctx),
         current: true,
       };
+      buildCache[functionId] = buildAssets;
     }
 
     const result = await buildAssets.result;

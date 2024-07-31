@@ -306,7 +306,7 @@ export class CdkFramework implements IFramework {
       "aws:cdk:bundling-stacks": [],
     };
     process.env.CDK_CONTEXT_JSON = JSON.stringify(CDK_CONTEXT_JSON);
-    Logger.verbose(`[CDK] context:`, JSON.stringify(CDK_CONTEXT_JSON, null, 2));
+    Logger.verbose(`[CDK] Context:`, JSON.stringify(CDK_CONTEXT_JSON, null, 2));
 
     const lambdas: any[] = await new Promise((resolve, reject) => {
       const worker = new Worker(
@@ -460,7 +460,7 @@ export class CdkFramework implements IFramework {
     }
 
     entryFile = path.resolve(entryFile);
-    Logger.verbose(`[CDK] entry file: ${entryFile}`);
+    Logger.verbose(`[CDK] Entry file: ${entryFile}`);
 
     return entryFile;
   }

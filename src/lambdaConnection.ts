@@ -69,7 +69,7 @@ async function onMessageFromLambda(message: IoTMessage) {
 
     if (Configuration.config.verbose) {
       Logger.verbose(
-        `[Function ${message.data.functionId}] response: `,
+        `[Function ${message.data.functionId}] Response: `,
         JSON.stringify(message.data, null, 2)
       );
     } else {
@@ -78,7 +78,7 @@ async function onMessageFromLambda(message: IoTMessage) {
         ? JSON.stringify(message.data).substring(0, 100)
         : "";
       Logger.log(
-        `[Function ${message.data.functionId}] request: ${requestPretty}${requestPretty.length < 50 ? "" : "..."}`
+        `[Function ${message.data.functionId}] Request: ${requestPretty}${requestPretty.length < 50 ? "" : "..."}`
       );
     }
 
@@ -86,7 +86,7 @@ async function onMessageFromLambda(message: IoTMessage) {
 
     if (Configuration.config.verbose) {
       Logger.verbose(
-        `[Function ${message.data.functionId}]  response: `,
+        `[Function ${message.data.functionId}] Response: `,
         JSON.stringify(response, null, 2)
       );
     } else {
@@ -95,7 +95,7 @@ async function onMessageFromLambda(message: IoTMessage) {
         ? JSON.stringify(response).substring(0, 100)
         : "";
       Logger.log(
-        `[Function ${message.data.functionId}] response: ${responsePretty}${responsePretty.length < 50 ? "" : "..."}`
+        `[Function ${message.data.functionId}] Response: ${responsePretty}${responsePretty.length < 50 ? "" : "..."}`
       );
     }
 
@@ -121,7 +121,7 @@ async function onMessageFromLambda(message: IoTMessage) {
       );
     }
   } catch (e: any) {
-    Logger.error(`${message.data.functionId} error: `, e.errorMessage);
+    Logger.error(`[Function ${message.data.functionId}] Error: `, e);
 
     const payload: IoTMessage = {
       type: "ERROR",
