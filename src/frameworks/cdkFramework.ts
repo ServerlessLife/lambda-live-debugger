@@ -10,7 +10,7 @@ import { AwsConfiguration } from "../types/awsConfiguration.js";
 import { LldConfigBase } from "../types/lldConfig.js";
 import { Logger } from "../logger.js";
 import { Worker } from "node:worker_threads";
-import { getModuleDirname } from "../getDirname.js";
+import { getModuleDirname, getProjectDirname } from "../getDirname.js";
 import { Configuration } from "../configuration.js";
 
 /**
@@ -276,7 +276,11 @@ export class CdkFramework implements IFramework {
       },
     };
 
-    const compileOutput = path.resolve(`${outputFolder}/compiledCdk.js`);
+    const compileOutput = path.join(
+      getProjectDirname(),
+      outputFolder,
+      `compiledCdk.js`
+    );
     try {
       // Build CDK code
       await esbuild.build({

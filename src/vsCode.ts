@@ -34,9 +34,12 @@ async function getVsCodeLaunchConfig(lldConfig?: LldConfig) {
 
   const moduleDirname = getModuleDirname();
   //Logger.log("Module folder", moduleDirname);
-  const currentFolder = path.resolve();
+  const projectDirname = getProjectDirname();
+
   //Logger.log("Current folder", currentFolder);
-  const localFolder = path.join(currentFolder, "node_modules/.bin/lld");
+  const localFolder = path.resolve(
+    path.join(projectDirname, "node_modules/.bin/lld")
+  );
 
   let runtimeExecutableSet = false;
 
@@ -45,7 +48,10 @@ async function getVsCodeLaunchConfig(lldConfig?: LldConfig) {
     Logger.verbose("Lambda Live Debugger is installed locally");
     // check if file exists
     try {
-      //Logger.log("Checking local folder", localFolder);
+      Logger.log(
+        "Checking local folder for runtimeExecutable setting for VsCode configuration",
+        localFolder
+      );
       await fs.access(localFolder, fs.constants.F_OK);
       config.configurations![0].runtimeExecutable = localRuntimeExecutable;
       runtimeExecutableSet = true;
@@ -61,6 +67,7 @@ async function getVsCodeLaunchConfig(lldConfig?: LldConfig) {
     Logger.verbose(
       `Setting absolute path for runtimeExecutable setting for VsCode configuration`
     );
+    const localFolderSubfolder = path.resolve("node_modules/.bin/lld");
     const globalModule1 = path.join(moduleDirname, "..", "..", ".bin/lld");
     const globalModule2 = path.join(moduleDirname, "..", "..", "bin/lld");
     const globalModule3 = path.join(
@@ -73,6 +80,7 @@ async function getVsCodeLaunchConfig(lldConfig?: LldConfig) {
     );
     const possibleFolders = {
       [localFolder]: "${workspaceFolder}/node_modules/.bin/lld",
+      [localFolderSubfolder]: localFolderSubfolder,
       [globalModule1]: globalModule1,
       [globalModule2]: globalModule2,
       [globalModule3]: globalModule3,
