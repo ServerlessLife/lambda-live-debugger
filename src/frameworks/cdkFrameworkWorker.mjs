@@ -21,7 +21,7 @@ parentPort.on("message", async (data) => {
   const __dirname = path.resolve("./x"); // CDK needs this, pure magic
   eval(codeFile);
 
-  if (global.lambdas.length === 0) {
+  if (!global.lambdas || global.lambdas?.length === 0) {
     throw new Error("No Lambda functions found in the CDK code");
   }
 
@@ -33,29 +33,15 @@ parentPort.on("message", async (data) => {
       path: lambda.code?.path,
     },
     cdkPath: lambda.node.defaultChild.node.path,
-    bundling: lambda.bundling,
+    bundling: {
+      ...lambda.bundling,
+      commandHooks: undefined, // can not be serialized
+    },
   }));
 
-  try {
-    Logger.verbose(
-      `[CDK] [Worker] Sending found lambdas`,
-      JSON.stringify(lambdas, null, 2)
-    );
-    parentPort.postMessage(lambdas);
-  } catch (error) {
-    handleError(error);
-  }
+  Logger.verbose(
+    `[CDK] [Worker] Sending found lambdas`,
+    JSON.stringify(lambdas, null, 2)
+  );
+  parentPort.postMessage(lambdas);
 });
-
-process.on("unhandledRejection", (error) => {
-  Logger.error(`[CDK] [Worker] Unhandled Rejection`, error);
-  handleError(error);
-});
-
-function handleError(error) {
-  parentPort.postMessage({
-    errorType: error.name ?? "Error",
-    errorMessage: error.message,
-    trace: error.stack,
-  });
-}
