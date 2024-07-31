@@ -6,7 +6,7 @@ import { Logger } from "./logger.mjs";
 
 Logger.setVerbose(workerData.verbose);
 Logger.verbose(
-  `[Function ${workerData.functionId}] [Worker ${workerData.workerId}] Worker started. File: ${workerData.artifactFile}, Handler: ${workerData.handler}`
+  `[Function ${workerData.functionId}] [Worker ${workerData.workerId}] Worker started.`
 );
 
 parentPort.on("message", async (data) => {

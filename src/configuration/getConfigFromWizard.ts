@@ -26,10 +26,12 @@ const configFileName = path.resolve(configFileDefaultName);
  * @returns
  */
 export async function getConfigFromWizard({
+  configFromCliArgs,
   supportedFrameworks,
   currentFramework,
   currentConfig,
 }: {
+  configFromCliArgs: LldConfigCliArgs;
   supportedFrameworks: string[];
   currentFramework: string | undefined;
   currentConfig?: LldConfigTs;
@@ -42,7 +44,10 @@ export async function getConfigFromWizard({
       name: "framework",
       message: `Which framework are you using (detected: ${currentFramework ?? "?"})?`,
       choices: [...supportedFrameworks, "other"],
-      default: currentConfig?.framework ?? currentFramework,
+      default:
+        configFromCliArgs.framework ??
+        currentConfig?.framework ??
+        currentFramework,
     },
   ]);
 
@@ -51,6 +56,9 @@ export async function getConfigFromWizard({
   }
 
   const oldContext = currentConfig?.context ?? [];
+  if (configFromCliArgs.context?.length) {
+    oldContext.push(...configFromCliArgs.context);
+  }
 
   if (answers.framework === "cdk") {
     const cdkAnswers = await inquirer.prompt([
@@ -98,7 +106,7 @@ export async function getConfigFromWizard({
         type: "input",
         name: "stage",
         message: "Would you like to enter Serverless Framework stage?",
-        default: currentConfig?.stage,
+        default: configFromCliArgs.stage ?? currentConfig?.stage,
       },
     ]);
 
@@ -111,7 +119,7 @@ export async function getConfigFromWizard({
         type: "input",
         name: "configEnv",
         message: "Would you like to enter SAM environment?",
-        default: currentConfig?.configEnv,
+        default: configFromCliArgs.configEnv ?? currentConfig?.configEnv,
       },
     ]);
 
@@ -127,7 +135,7 @@ export async function getConfigFromWizard({
       name: "subfolder",
       message:
         "If you are using monorepo, enter subfolder where the framework is instaled.",
-      default: currentConfig?.subfolder,
+      default: configFromCliArgs.subfolder ?? currentConfig?.subfolder,
     },
   ]);
 
@@ -144,7 +152,10 @@ export async function getConfigFromWizard({
       name: "observable",
       message:
         "Do you want to use observable mode, which just sends events to the debugger and do not use the respose?",
-      default: currentConfig?.observable ?? false,
+      default:
+        configFromCliArgs.observable !== undefined
+          ? configFromCliArgs.observable
+          : currentConfig?.observable,
     },
   ]);
 
@@ -156,7 +167,12 @@ export async function getConfigFromWizard({
         type: "number",
         name: "interval",
         message: `Would you like to enter observable mode interval at which events are sent to the debugger? Default is ${defaultObservableInterval}`,
-        default: currentConfig?.interval ?? defaultObservableInterval,
+        default:
+          configFromCliArgs.observable !== undefined
+            ? configFromCliArgs.observable
+            : currentConfig?.interval !== undefined
+              ? currentConfig?.interval
+              : defaultObservableInterval,
       },
     ]);
 
@@ -175,19 +191,19 @@ export async function getConfigFromWizard({
       type: "input",
       name: "profile",
       message: "Would you like to use named AWS profile?",
-      default: currentConfig?.profile,
+      default: configFromCliArgs.profile ?? currentConfig?.profile,
     },
     {
       type: "input",
       name: "region",
       message: "Would you like to specify AWS region?",
-      default: currentConfig?.region,
+      default: configFromCliArgs.region ?? currentConfig?.region,
     },
     {
       type: "input",
       name: "role",
       message: "Would you like to specify AWS role?",
-      default: currentConfig?.role,
+      default: configFromCliArgs.role ?? currentConfig?.role,
     },
   ]);
 
@@ -229,7 +245,7 @@ export async function getConfigFromWizard({
         name: "function",
         message: "Pick Lambda to debug",
         choices: lambdasList.map((l) => l.functionName),
-        default: currentConfig?.function,
+        default: currentConfig?.function ?? lambdasList[0].functionName,
       },
     ]);
 
@@ -244,7 +260,7 @@ export async function getConfigFromWizard({
         type: "input",
         name: "name",
         message: "Enter Lambda name to filter. Use * as wildcard",
-        default: currentConfig?.function,
+        default: configFromCliArgs.function ?? currentConfig?.function,
       },
     ]);
 
@@ -301,7 +317,10 @@ export async function getConfigFromWizard({
       },
     ]);
 
-    answers.verbose = answersVerbose.verbose;
+    answers.verbose =
+      configFromCliArgs.verbose !== undefined
+        ? configFromCliArgs.verbose
+        : answersVerbose.verbose;
   }
 
   /*

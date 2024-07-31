@@ -20,9 +20,10 @@ let lambdasList: LambdaResource[] | undefined = undefined;
  */
 async function readConfig() {
   const supportedFrameworks = ResourceDiscovery.getSupportedFrameworksNames();
-  const currentFramework = await ResourceDiscovery.getCurrentFrameworkName();
-
   const configFromCliArgs = await getConfigFromCliArgs(supportedFrameworks);
+  Configuration.setConfig(configFromCliArgs as any); // not complete config
+
+  const currentFramework = await ResourceDiscovery.getCurrentFrameworkName();
 
   Logger.setVerbose(configFromCliArgs.verbose === true);
 
@@ -32,6 +33,7 @@ async function readConfig() {
 
   if (configFromCliArgs.wizard) {
     const configFromWizard = await getConfigFromWizard({
+      configFromCliArgs,
       supportedFrameworks,
       currentFramework,
       currentConfig: configFromConfigFile,

@@ -79,7 +79,7 @@ async function getBuild(functionId: string) {
       throw new Error(`Artifact file not found for function ${functionId}`);
     }
 
-    return artifactFile;
+    return path.join(getProjectDirname(), artifactFile);
   } catch (error: any) {
     throw new Error(`Error building function ${functionId}: ${error.message}`, {
       cause: error,

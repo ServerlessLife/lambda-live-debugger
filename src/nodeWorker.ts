@@ -84,7 +84,7 @@ type WorkerRequest = {
  */
 function startWorker(input: WorkerRequest) {
   Logger.verbose(
-    `[Function ${input.functionId}] [Worker ${input.workerId}] Starting worker`
+    `[Function ${input.functionId}] [Worker ${input.workerId}] Starting worker. Artifact: ${input.artifactFile}`
   );
 
   let localProjectDir = getProjectDirname();
