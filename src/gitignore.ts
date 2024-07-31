@@ -1,13 +1,18 @@
 import fs from "fs/promises";
 import { outputFolder } from "./constants.js";
 import { Logger } from "./logger.js";
+import { getProjectDirname } from "./getDirname.js";
+import path from "path";
 
 /**
  * Check if ".lldebugger" exists in .gitignore
  */
 async function doesExistInGitIgnore() {
   try {
-    const gitignoreContent = await fs.readFile(".gitignore", "utf-8");
+    const gitignoreContent = await fs.readFile(
+      getGitIgnoreFileLocation(),
+      "utf-8"
+    );
     // split by new line
     const lines = gitignoreContent.split("\n");
     // check if ".lldebugger" exists
@@ -16,6 +21,14 @@ async function doesExistInGitIgnore() {
   } catch (error) {
     return false;
   }
+}
+
+/**
+ * Get the location of .gitignore
+ * @returns
+ */
+function getGitIgnoreFileLocation() {
+  return path.join(getProjectDirname(), ".gitignore");
 }
 
 /**
@@ -28,14 +41,14 @@ async function addToGitIgnore() {
   if (!exists) {
     // does file exist?
     try {
-      await fs.access(".gitignore");
+      await fs.access(getGitIgnoreFileLocation());
     } catch (error) {
-      await fs.writeFile(".gitignore", `${outputFolder}\n`);
+      await fs.writeFile(getGitIgnoreFileLocation(), `${outputFolder}\n`);
       return;
     }
 
     // append to existing file
-    await fs.appendFile(".gitignore", `\n${outputFolder}\n`);
+    await fs.appendFile(getGitIgnoreFileLocation(), `\n${outputFolder}\n`);
   } else {
     Logger.log(`${outputFolder} already exists in .gitignore`);
   }
@@ -48,9 +61,12 @@ async function removeFromGitIgnore() {
   Logger.verbose("Removing .gitignore entry...");
   const exists = await doesExistInGitIgnore();
   if (exists) {
-    const gitignoreContent = await fs.readFile(".gitignore", "utf-8");
+    const gitignoreContent = await fs.readFile(
+      getGitIgnoreFileLocation(),
+      "utf-8"
+    );
     const newContent = gitignoreContent.replace(`${outputFolder}\n`, "");
-    await fs.writeFile(".gitignore", newContent);
+    await fs.writeFile(getGitIgnoreFileLocation(), newContent);
   } else {
     Logger.log(`${outputFolder} doesn't exist in .gitignore`);
   }
