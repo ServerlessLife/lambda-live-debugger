@@ -69,7 +69,7 @@ async function onMessageFromLambda(message: IoTMessage) {
 
     if (Configuration.config.verbose) {
       Logger.verbose(
-        `${message.data.functionId} response: `,
+        `[Function ${message.data.functionId}] response: `,
         JSON.stringify(message.data, null, 2)
       );
     } else {
@@ -78,7 +78,7 @@ async function onMessageFromLambda(message: IoTMessage) {
         ? JSON.stringify(message.data).substring(0, 100)
         : "";
       Logger.log(
-        `${message.data.functionId} request: ${requestPretty}${requestPretty.length < 50 ? "" : "..."}`
+        `[Function ${message.data.functionId}] request: ${requestPretty}${requestPretty.length < 50 ? "" : "..."}`
       );
     }
 
@@ -86,7 +86,7 @@ async function onMessageFromLambda(message: IoTMessage) {
 
     if (Configuration.config.verbose) {
       Logger.verbose(
-        `${message.data.functionId} response: `,
+        `[Function ${message.data.functionId}]  response: `,
         JSON.stringify(response, null, 2)
       );
     } else {
@@ -95,7 +95,7 @@ async function onMessageFromLambda(message: IoTMessage) {
         ? JSON.stringify(response).substring(0, 100)
         : "";
       Logger.log(
-        `${message.data.functionId} response: ${responsePretty}${responsePretty.length < 50 ? "" : "..."}`
+        `[Function ${message.data.functionId}] response: ${responsePretty}${responsePretty.length < 50 ? "" : "..."}`
       );
     }
 
