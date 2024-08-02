@@ -22,7 +22,7 @@ parentPort.on("message", async (data) => {
   // execute code to get the data into global.lambdas
   const codeFile = await fs.readFile(data.compileOutput, "utf8");
 
-  fixCdkPaths();
+  await fixCdkPaths(workerData.awsCdkLibPath);
 
   eval(codeFile);
 
@@ -54,12 +54,11 @@ parentPort.on("message", async (data) => {
 /**
  * Some paths are not resolved correctly in the CDK code, so we need to fix them
  */
-function fixCdkPaths() {
-  //const path = require("path"); // leave this line for manual debugging
+async function fixCdkPaths(awsCdkLibPath) {
+  // leave this lines for manual debugging
+  //const awsCdkLibPath = path.resolve("node_modules/aws-cdk-lib");
+  //const path = require("path");
 
-  // Get the path to the aws-cdk-lib module
-  let awsCdkLibPath = require.resolve("aws-cdk-lib");
-  awsCdkLibPath = awsCdkLibPath.replace("/index.js", "");
   Logger.verbose(`[CDK] [Worker] aws-cdk-lib PATH ${awsCdkLibPath}`);
 
   const pathsFix = {
