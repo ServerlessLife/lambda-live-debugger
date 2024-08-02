@@ -76,8 +76,9 @@ async function run() {
     await InfraDeploy.removeInfrastructure();
     // await GitIgnore.removeFromGitIgnore();
     // delete folder .lldebugger
-    Logger.verbose(`Removing ${outputFolder} folder...`);
-    await fs.rm(outputFolder, { recursive: true });
+    const folder = path.join(getProjectDirname(), ".lldebugger");
+    Logger.verbose(`Removing ${folder} folder...`);
+    await fs.rm(folder, { recursive: true });
 
     if (Configuration.config.remove === "all") {
       await InfraDeploy.deleteLayer();
