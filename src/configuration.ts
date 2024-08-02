@@ -46,7 +46,14 @@ async function readConfig() {
       start: false, // don't start the debugger after the wizard
     });
   } else {
-    const configMerged = { ...configFromCliArgs, ...configFromConfigFile };
+    // remove all undefined values from the configFromCliArgs
+    for (const key in configFromCliArgs) {
+      if ((configFromCliArgs as any)[key] === undefined) {
+        delete (configFromCliArgs as any)[key];
+      }
+    }
+
+    const configMerged = { ...configFromConfigFile, ...configFromCliArgs };
     const debuggerId = await generateDebuggerId(!!configMerged.observable);
     setConfig({
       ...configMerged,
