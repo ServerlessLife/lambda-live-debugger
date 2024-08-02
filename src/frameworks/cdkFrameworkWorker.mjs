@@ -1,9 +1,12 @@
 import { createRequire as topLevelCreateRequire } from "module";
 const require = topLevelCreateRequire(import.meta.url);
+import path from "path";
+import { fileURLToPath } from "node:url";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 import { workerData, parentPort } from "node:worker_threads";
 import fs from "fs/promises";
-import path from "path";
 
 import { Logger } from "../logger.mjs";
 
@@ -18,7 +21,9 @@ parentPort.on("message", async (data) => {
 
   // execute code to get the data into global.lambdas
   const codeFile = await fs.readFile(data.compileOutput, "utf8");
-  const __dirname = path.resolve("./x"); // CDK needs this, pure magic
+
+  fixCdkPaths();
+
   eval(codeFile);
 
   if (!global.lambdas || global.lambdas?.length === 0) {
@@ -45,3 +50,53 @@ parentPort.on("message", async (data) => {
   );
   parentPort.postMessage(lambdas);
 });
+
+/**
+ * Some paths are not resolved correctly in the CDK code, so we need to fix them
+ */
+function fixCdkPaths() {
+  //const path = require("path"); // leave this line for manual debugging
+
+  // Get the path to the aws-cdk-lib module
+  let awsCdkLibPath = require.resolve("aws-cdk-lib");
+  awsCdkLibPath = awsCdkLibPath.replace("/index.js", "");
+  Logger.verbose(`[CDK] [Worker] aws-cdk-lib PATH ${awsCdkLibPath}`);
+
+  const pathsFix = {
+    "custom-resource-handlers/": `${awsCdkLibPath}/custom-resource-handlers/`,
+  };
+
+  // Create a proxy to intercept calls to the path module so we can fix paths
+  const pathProxy = new Proxy(path, {
+    get(target, prop) {
+      if (typeof target[prop] === "function") {
+        return function (...args) {
+          if (prop === "resolve") {
+            let resolvedPath = target[prop].apply(target, args);
+
+            for (const [key, value] of Object.entries(pathsFix)) {
+              if (resolvedPath.includes(key)) {
+                // replace the beginning of the path with the value
+                const i = resolvedPath.indexOf(key);
+                const newResolvedPath = `${value}${resolvedPath.substring(i + key.length)}`;
+                Logger.verbose(
+                  `[CDK] [Worker] Fixing path ${resolvedPath} -> ${newResolvedPath}`
+                );
+                resolvedPath = newResolvedPath;
+              }
+            }
+
+            return resolvedPath;
+          }
+          return target[prop].apply(target, args);
+        };
+      }
+      return target[prop];
+    },
+  });
+
+  // Override the path module in the require cache
+  require.cache[require.resolve("path")] = {
+    exports: pathProxy,
+  };
+}
