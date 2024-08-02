@@ -2,6 +2,7 @@ import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
 import * as lambda_nodejs from "aws-cdk-lib/aws-lambda-nodejs";
 import * as lambda from "aws-cdk-lib/aws-lambda";
+import * as log from "aws-cdk-lib/aws-logs";
 
 export class CdkbasicStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -14,6 +15,7 @@ export class CdkbasicStack extends cdk.Stack {
         entry: "services/testTsCommonJs/lambda.ts",
         handler: "lambdaHandler",
         runtime: lambda.Runtime.NODEJS_20_X,
+        logRetention: log.RetentionDays.ONE_DAY,
       }
     );
 
@@ -27,6 +29,7 @@ export class CdkbasicStack extends cdk.Stack {
         bundling: {
           format: lambda_nodejs.OutputFormat.ESM,
         },
+        logRetention: log.RetentionDays.ONE_DAY,
       }
     );
 
@@ -37,6 +40,7 @@ export class CdkbasicStack extends cdk.Stack {
         entry: "services/testJsCommonJs/lambda.js",
         handler: "lambdaHandler",
         runtime: lambda.Runtime.NODEJS_20_X,
+        logRetention: log.RetentionDays.ONE_DAY,
       }
     );
 
@@ -51,6 +55,7 @@ export class CdkbasicStack extends cdk.Stack {
         bundling: {
           format: lambda_nodejs.OutputFormat.ESM,
         },
+        logRetention: log.RetentionDays.ONE_DAY,
       }
     );
 
@@ -61,6 +66,7 @@ export class CdkbasicStack extends cdk.Stack {
         runtime: lambda.Runtime.NODEJS_20_X,
         handler: "lambda.lambdaHandler",
         code: lambda.Code.fromAsset("services/testJsCommonJs"),
+        logRetention: log.RetentionDays.ONE_DAY,
       }
     );
 
@@ -71,6 +77,7 @@ export class CdkbasicStack extends cdk.Stack {
         runtime: lambda.Runtime.NODEJS_20_X,
         handler: "lambda.lambdaHandler",
         code: lambda.Code.fromAsset("services/testJsEsModule"),
+        logRetention: log.RetentionDays.ONE_DAY,
       }
     );
 
