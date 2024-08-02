@@ -12,6 +12,7 @@ import { Logger } from "../logger.js";
 import { Worker } from "node:worker_threads";
 import { getModuleDirname, getProjectDirname } from "../getDirname.js";
 import { Configuration } from "../configuration.js";
+import { findNpmPath } from "../utils/findNpmPath.js";
 
 /**
  * Support for AWS CDK framework
@@ -308,6 +309,12 @@ export class CdkFramework implements IFramework {
     process.env.CDK_CONTEXT_JSON = JSON.stringify(CDK_CONTEXT_JSON);
     Logger.verbose(`[CDK] Context:`, JSON.stringify(CDK_CONTEXT_JSON, null, 2));
 
+    const awsCdkLibPath = await findNpmPath(
+      path.join(getProjectDirname(), config.subfolder ?? "/"),
+      "aws-cdk-lib"
+    );
+    Logger.verbose(`[CDK] aws-cdk-lib path: ${awsCdkLibPath}`);
+
     const lambdas: any[] = await new Promise((resolve, reject) => {
       const worker = new Worker(
         path.resolve(
@@ -316,6 +323,7 @@ export class CdkFramework implements IFramework {
         {
           workerData: {
             verbose: Configuration.config.verbose,
+            awsCdkLibPath,
           },
         }
       );
