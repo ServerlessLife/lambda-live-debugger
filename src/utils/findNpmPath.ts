@@ -36,6 +36,13 @@ async function checkModuleInPackageJson(dir: string, moduleName: string) {
   const devDependencies = packageJson.devDependencies || {};
   if (dependencies[moduleName] || devDependencies[moduleName]) {
     const modulePath = path.join(dir, "node_modules", moduleName);
+
+    try {
+      await fs.access(modulePath);
+    } catch {
+      return undefined;
+    }
+
     return modulePath;
   }
   return undefined;
