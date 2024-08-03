@@ -1,0 +1,6 @@
+.lldebugger
+dist
+cdk.out
+.serverless
+.aws-sam
+src/extension/aws

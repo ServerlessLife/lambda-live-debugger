@@ -28,7 +28,10 @@ jobs:
           npm run typecheck
       - name: Lint
         run: |
-          npm run lint
+          npx eslint .
+      - name: Prettier
+        run: |
+          npx prettier --check .
 
   build:
     needs:

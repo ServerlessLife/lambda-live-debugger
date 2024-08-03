@@ -11,6 +11,7 @@ export default [
       "**/dist/**",
       "**/cdk.out/**",
       "**/.lldebugger/**",
+      "**/.serverless/**",
       "**/.aws-sam/**",
       "src/extension/aws/*.js",
     ],
