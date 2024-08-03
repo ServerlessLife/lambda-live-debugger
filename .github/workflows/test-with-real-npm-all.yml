@@ -1,0 +1,37 @@
+name: Test with real npm - all combinations
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  test-global-not-monorepo:
+    uses: ./.github/workflows/common-test.yml
+    with:
+      mode: global
+      testMonorepo: false
+    secrets: inherit
+
+  test-local-not-monorepo:
+    uses: ./.github/workflows/common-test.yml
+    with:
+      mode: local
+      testMonorepo: false
+    secrets: inherit
+
+  test-global-monorepo:
+    uses: ./.github/workflows/common-test.yml
+    with:
+      mode: global
+      testMonorepo: true
+    secrets: inherit
+
+  test-local-monorepo:
+    uses: ./.github/workflows/common-test.yml
+    with:
+      mode: local
+      testMonorepo: true
+    secrets: inherit

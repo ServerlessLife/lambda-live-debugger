@@ -7,13 +7,24 @@ permissions:
   id-token: write
   contents: write
 
+env:
+  node_version: 20
+
 jobs:
-  build-and-test:
-    uses: ./.github/workflows/common.yml
+  build:
+    uses: ./.github/workflows/common-build.yml
     secrets: inherit
 
+  test:
+    uses: ./.github/workflows/common-test.yml
+    secrets: inherit
+    needs: build
+    with:
+      mode: build
+      testMonorepo: false
+
   publish:
-    needs: build-and-test
+    needs: test
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     concurrency:
@@ -23,7 +34,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: ${{ env.node_version }}
           registry-url: "https://registry.npmjs.org"
       - name: Install dependencies
         run: npm ci

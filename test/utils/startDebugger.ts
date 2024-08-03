@@ -18,21 +18,37 @@ export async function startDebugger(folder: string, args: string[] = []) {
 async function startDebuggerInternal(folder: string, args: string[] = []) {
   console.log("Starting LLD...");
 
+  let testMonorepo = false;
+  if (process.env.TEST_MONOREPO === "true") {
+    testMonorepo = true;
+    // just the last two part of the folder
+    const folderParts = folder.split("/");
+    const testProjectFolder =
+      folderParts[folderParts.length - 2] +
+      "/" +
+      folderParts[folderParts.length - 1];
+    args.push(`-m ${testProjectFolder}`);
+  }
+
   if (process.env.OBSERVABLE_MODE === "true") {
     args.push("-o");
   }
 
   args.push("-v");
 
-  let command = `node ../../dist/lldebugger.mjs ${args?.join(" ")}`;
+  let command = `node ${
+    testMonorepo ? "" : "../../"
+  }dist/lldebugger.mjs ${args?.join(" ")}`;
 
   if (process.env.REAL_NPM === "true") {
     console.log("Running the debugger with the real NPM");
     command = `lld ${args?.join(" ")}`;
+  } else {
+    console.log("Running the debugger with just genereted code");
   }
 
   const lldProcess = spawn(command, {
-    cwd: folder,
+    cwd: !testMonorepo ? folder : undefined,
     shell: true,
   });
 

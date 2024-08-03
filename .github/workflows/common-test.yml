@@ -1,7 +1,18 @@
-name: Common CI
+name: Common CI tests
+
+run-name: "Test: mode=${{ inputs.mode }}, testMonorepo=${{ inputs.testMonorepo }}"
 
 on:
   workflow_call:
+    inputs:
+      mode:
+        description: "'build' (just builded code, used while publishing) or 'global' (real NPM installed globally) or 'local' (real NPM installed locally)"
+        type: string
+        required: true
+      testMonorepo:
+        description: "Test monorepo by specifying folder in config"
+        type: string
+        required: true
 
 permissions:
   id-token: write
@@ -9,43 +20,12 @@ permissions:
 
 env:
   DISABLE_PARALLEL_DEPLOY: false
+  REAL_NPM: ${{ inputs.mode == 'global' || inputs.mode == 'local' }}
+  TEST_MONOREPO: ${{ github.event.inputs.testMonorepo }}
   node_version: 20
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    concurrency:
-      group: build
-    steps:
-      - uses: actions/checkout@v4
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.node_version }}
-          registry-url: "https://registry.npmjs.org"
-      - name: Install dependencies
-        run: npm ci
-      - name: Typecheck
-        run: npm run typecheck
-      - name: Build
-        run: npm run build
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-region: eu-west-1
-          role-to-assume: ${{ secrets.AWS_ROLE }}
-          role-session-name: GitHubActions
-      - name: Bootstrap CDK
-        # so I do not have to do it manually when CDK is updated
-        run: npx cdk bootstrap aws://${{secrets.AWS_ACCOUNT_ID}}/eu-west-1
-      - uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist
-
   test-cdk-basic:
-    needs:
-      - build
     runs-on: ubuntu-latest
     concurrency:
       group: test-cdk-basic
@@ -58,10 +38,22 @@ jobs:
           registry-url: "https://registry.npmjs.org"
       - name: Install dependencies
         run: npm ci
-      - uses: actions/download-artifact@v4
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        if: ${{ inputs.mode == 'build' }}
         with:
           name: dist
           path: dist
+      - name: Install lambda-live-debugger globally
+        if: ${{ inputs.mode == 'global' }}
+        run: |
+          npm i lambda-live-debugger -g
+        working-directory: test
+      - name: Install lambda-live-debugger locally
+        if: ${{ inputs.mode == 'local' }}
+        run: |
+          npm i lambda-live-debugger
+        working-directory: test
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -81,8 +73,6 @@ jobs:
         run: OBSERVABLE_MODE=true npx vitest --retry 1 test/cdk-basic.test.ts
 
   test-sls-basic:
-    needs:
-      - build
     runs-on: ubuntu-latest
     concurrency:
       group: test-sls-basic
@@ -95,10 +85,23 @@ jobs:
           registry-url: "https://registry.npmjs.org"
       - name: Install dependencies
         run: npm ci
-      - uses: actions/download-artifact@v4
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        if: ${{ inputs.mode == 'build' }}
         with:
           name: dist
           path: dist
+      - name: Install lambda-live-debugger globally
+        if: ${{ inputs.mode == 'global' }}
+        run: |
+          npm i lambda-live-debugger -g
+          npm i serverless@3.38.0 -g
+        working-directory: test
+      - name: Install lambda-live-debugger locally
+        if: ${{ inputs.mode == 'local' }}
+        run: |
+          npm i lambda-live-debugger
+        working-directory: test
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -118,8 +121,6 @@ jobs:
         run: OBSERVABLE_MODE=true npx vitest --retry 1 test/sls-basic.test.ts
 
   test-sls-esbuild-cjs:
-    needs:
-      - build
     runs-on: ubuntu-latest
     concurrency:
       group: test-sls-esbuild-cjs
@@ -132,10 +133,23 @@ jobs:
           registry-url: "https://registry.npmjs.org"
       - name: Install dependencies
         run: npm ci
-      - uses: actions/download-artifact@v4
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        if: ${{ inputs.mode == 'build' }}
         with:
           name: dist
           path: dist
+      - name: Install lambda-live-debugger globally
+        if: ${{ inputs.mode == 'global' }}
+        run: |
+          npm i lambda-live-debugger -g
+          npm i serverless@3.38.0 -g
+        working-directory: test
+      - name: Install lambda-live-debugger locally
+        if: ${{ inputs.mode == 'local' }}
+        run: |
+          npm i lambda-live-debugger
+        working-directory: test
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -155,8 +169,6 @@ jobs:
         run: OBSERVABLE_MODE=true npx vitest --retry 1 test/sls-esbuild-cjs.test.ts
 
   test-sls-esbuild-esm:
-    needs:
-      - build
     runs-on: ubuntu-latest
     concurrency:
       group: test-sls-esbuild-esm
@@ -169,10 +181,23 @@ jobs:
           registry-url: "https://registry.npmjs.org"
       - name: Install dependencies
         run: npm ci
-      - uses: actions/download-artifact@v4
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        if: ${{ inputs.mode == 'build' }}
         with:
           name: dist
           path: dist
+      - name: Install lambda-live-debugger globally
+        if: ${{ inputs.mode == 'global' }}
+        run: |
+          npm i lambda-live-debugger -g
+          npm i serverless@3.38.0 -g
+        working-directory: test
+      - name: Install lambda-live-debugger locally
+        if: ${{ inputs.mode == 'local' }}
+        run: |
+          npm i lambda-live-debugger
+        working-directory: test
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -192,8 +217,6 @@ jobs:
         run: OBSERVABLE_MODE=true npx vitest --retry 1 test/sls-esbuild-esm.test.ts
 
   test-sam-basic:
-    needs:
-      - build
     runs-on: ubuntu-latest
     concurrency:
       group: test-sam-basic
@@ -210,10 +233,22 @@ jobs:
           registry-url: "https://registry.npmjs.org"
       - name: Install dependencies
         run: npm ci
-      - uses: actions/download-artifact@v4
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        if: ${{ inputs.mode == 'build' }}
         with:
           name: dist
           path: dist
+      - name: Install lambda-live-debugger globally
+        if: ${{ inputs.mode == 'global' }}
+        run: |
+          npm i lambda-live-debugger -g
+        working-directory: test
+      - name: Install lambda-live-debugger locally
+        if: ${{ inputs.mode == 'local' }}
+        run: |
+          npm i lambda-live-debugger
+        working-directory: test
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -233,8 +268,6 @@ jobs:
         run: OBSERVABLE_MODE=true npx vitest --retry 1 test/sam-basic.test.ts
 
   test-terraform-basic:
-    needs:
-      - build
     runs-on: ubuntu-latest
     concurrency:
       group: test-terraform-basic
@@ -247,10 +280,22 @@ jobs:
           registry-url: "https://registry.npmjs.org"
       - name: Install dependencies
         run: npm ci
-      - uses: actions/download-artifact@v4
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        if: ${{ inputs.mode == 'build' }}
         with:
           name: dist
           path: dist
+      - name: Install lambda-live-debugger globally
+        if: ${{ inputs.mode == 'global' }}
+        run: |
+          npm i lambda-live-debugger -g
+        working-directory: test
+      - name: Install lambda-live-debugger locally
+        if: ${{ inputs.mode == 'local' }}
+        run: |
+          npm i lambda-live-debugger
+        working-directory: test
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -275,37 +320,3 @@ jobs:
         run: npx vitest --retry 1 test/terraform-basic.test.ts
       - name: Test - observable mode
         run: OBSERVABLE_MODE=true npx vitest --retry 1 test/terraform-basic.test.ts
-
-  publish:
-    needs:
-      - test-cdk-basic
-      - test-sls-basic
-      - test-sls-esbuild-cjs
-      - test-sls-esbuild-esm
-      - test-sam-basic
-      - test-terraform-basic
-    if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    concurrency:
-      group: publish
-    steps:
-      - uses: actions/checkout@v4
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.node_version }}
-          registry-url: "https://registry.npmjs.org"
-      - name: Install dependencies
-        run: npm ci
-      - uses: actions/download-artifact@v4
-        with:
-          name: dist
-          path: dist
-      - name: Semantic Release
-        run: |
-          npm whoami
-          npx semantic-release
-        env:
-          GITHUB_TOKEN: ${{ secrets.PRIVATE_GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
