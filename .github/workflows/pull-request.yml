@@ -10,6 +10,14 @@ permissions:
   contents: write
 
 jobs:
-  build-and-test:
-    uses: ./.github/workflows/common.yml
+  build:
+    uses: ./.github/workflows/common-build.yml
     secrets: inherit
+
+  test:
+    uses: ./.github/workflows/common-test.yml
+    secrets: inherit
+    needs: build
+    with:
+      mode: build
+      testMonorepo: false

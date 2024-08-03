@@ -11,7 +11,28 @@ env:
   node_version: 20
 
 jobs:
+  lint:
+    name: lint & typecheck
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.node_version }}
+          cache: "npm"
+      - name: Install NPM dependencies
+        run: npm ci
+      - name: Typecheck
+        run: |
+          npm run typecheck
+      - name: Lint
+        run: |
+          npm run lint
+
   build:
+    needs:
+      - lint
     runs-on: ubuntu-latest
     concurrency:
       group: build
