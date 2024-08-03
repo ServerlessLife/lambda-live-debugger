@@ -1,0 +1,57 @@
+name: Update NPM Packages
+
+on:
+  schedule:
+    - cron: "0 0 * * 0"
+  workflow_dispatch:
+
+env:
+  node_version: 20
+
+jobs:
+  update-packages:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.node_version }}
+          cache: "npm"
+
+      - name: Install npm-check-updates
+        run: npm install -g npm-check-updates
+
+      - name: Update packages in each package.json
+        run: |
+          package_files=$(find . -name 'package.json' -not -path '*/node_modules/*')
+          for file in $package_files; do
+            dir=$(dirname "$file")
+            echo "Updating packages in $dir"
+            (cd "$dir" && ncu -u)
+          done
+
+      - name: Install updated packages in root
+        run: npm install --force
+
+      - name: Commit updated package.json files
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "marko@serverlesslife.com"
+          git add .
+          git commit -m "fix: Update dependencies" --no-verify || true
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.PRIVATE_GITHUB_TOKEN }}
+          commit-message: "fix: Update dependencies"
+          title: "fix: Update NPM dependencies"
+          body: "This is an auto-generated PR with dependency updates."
+          branch: "fix/update-dependencies"
+          delete-branch: true
+
+      - name: Check output
+        run: echo "Pull Request Number - ${{ steps.create-pull-request.outputs.pull-request-number }}"
