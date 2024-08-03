@@ -24,7 +24,6 @@ export const lambdaHandler: Handler = async (event, context) => {
     const fs = await import("fs");
     const path = await import("path");
     const filePath = path.join(
-      process.env.LOCAL_PROJECT_DIR!,
       "..",
       "local_lambda_responses",
       `${context.functionName}.json`

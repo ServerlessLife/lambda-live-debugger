@@ -23,7 +23,6 @@ const lambdaHandler = async (event, context) => {
     const fs = require("fs");
     const path = require("path");
     const filePath = path.join(
-      process.env.LOCAL_PROJECT_DIR,
       "..",
       "local_lambda_responses",
       `${context.functionName}.json`

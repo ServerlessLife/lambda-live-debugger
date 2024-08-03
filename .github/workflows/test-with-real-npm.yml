@@ -11,6 +11,11 @@ permissions:
   id-token: write
   contents: write
 
+env:
+  REAL_NPM: true
+  DISABLE_PARALLEL_DEPLOY: false
+  node_version: 20
+
 jobs:
   test-cdk-basic:
     runs-on: ubuntu-latest
@@ -21,7 +26,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: ${{ env.node_version }}
           registry-url: "https://registry.npmjs.org"
       - name: Move vite.config.ts to test folder
         run: |
@@ -61,10 +66,10 @@ jobs:
         run: npm run deploy
         working-directory: test/cdk-basic
       - name: Test
-        run: REAL_NPM=true DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 cdk-basic.test.ts
+        run: npx vitest --retry 1 cdk-basic.test.ts
         working-directory: test
       - name: Test - observable mode
-        run: REAL_NPM=true DISABLE_PARALLEL_DEPLOY=true OBSERVABLE_MODE=true npx vitest --retry 1 cdk-basic.test.ts
+        run: OBSERVABLE_MODE=true npx vitest --retry 1 cdk-basic.test.ts
         working-directory: test
 
   test-sls-basic:
@@ -76,7 +81,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: ${{ env.node_version }}
           registry-url: "https://registry.npmjs.org"
       - name: Move vite.config.ts to test folder
         run: |
@@ -117,10 +122,10 @@ jobs:
         run: npm run deploy
         working-directory: test/sls-basic
       - name: Test
-        run: REAL_NPM=true DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 sls-basic.test.ts
+        run: npx vitest --retry 1 sls-basic.test.ts
         working-directory: test
       - name: Test - observable mode
-        run: REAL_NPM=true DISABLE_PARALLEL_DEPLOY=true OBSERVABLE_MODE=true npx vitest --retry 1 sls-basic.test.ts
+        run: OBSERVABLE_MODE=true npx vitest --retry 1 sls-basic.test.ts
         working-directory: test
 
   test-sls-esbuild-cjs:
@@ -132,7 +137,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: ${{ env.node_version }}
           registry-url: "https://registry.npmjs.org"
       - name: Move vite.config.ts to test folder
         run: |
@@ -173,10 +178,10 @@ jobs:
         run: npm run deploy
         working-directory: test/sls-esbuild-cjs
       - name: Test
-        run: REAL_NPM=true DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 sls-esbuild-cjs.test.ts
+        run: npx vitest --retry 1 sls-esbuild-cjs.test.ts
         working-directory: test
       - name: Test - observable mode
-        run: REAL_NPM=true DISABLE_PARALLEL_DEPLOY=true OBSERVABLE_MODE=true npx vitest --retry 1 sls-esbuild-cjs.test.ts
+        run: OBSERVABLE_MODE=true npx vitest --retry 1 sls-esbuild-cjs.test.ts
         working-directory: test
 
   test-sls-esbuild-esm:
@@ -188,7 +193,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: ${{ env.node_version }}
           registry-url: "https://registry.npmjs.org"
       - name: Move vite.config.ts to test folder
         run: |
@@ -229,10 +234,10 @@ jobs:
         run: npm run deploy
         working-directory: test/sls-esbuild-esm
       - name: Test
-        run: REAL_NPM=true DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 sls-esbuild-esm.test.ts
+        run: npx vitest --retry 1 sls-esbuild-esm.test.ts
         working-directory: test
       - name: Test - observable mode
-        run: REAL_NPM=true DISABLE_PARALLEL_DEPLOY=true OBSERVABLE_MODE=true npx vitest --retry 1 sls-esbuild-esm.test.ts
+        run: OBSERVABLE_MODE=true npx vitest --retry 1 sls-esbuild-esm.test.ts
         working-directory: test
 
   test-sam-basic:
@@ -248,7 +253,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: ${{ env.node_version }}
           registry-url: "https://registry.npmjs.org"
       - name: Move vite.config.ts to test folder
         run: |
@@ -289,10 +294,10 @@ jobs:
         run: npm run deploy
         working-directory: test/sam-basic
       - name: Test
-        run: REAL_NPM=true DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 sam-basic.test.ts
+        run: npx vitest --retry 1 sam-basic.test.ts
         working-directory: test
       - name: Test - observable mode
-        run: REAL_NPM=true DISABLE_PARALLEL_DEPLOY=true OBSERVABLE_MODE=true npx vitest --retry 1 sam-basic.test.ts
+        run: OBSERVABLE_MODE=true npx vitest --retry 1 sam-basic.test.ts
         working-directory: test
 
   test-terraform-basic:
@@ -304,7 +309,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: ${{ env.node_version }}
           registry-url: "https://registry.npmjs.org"
       - name: Move vite.config.ts to test folder
         run: |
@@ -351,8 +356,8 @@ jobs:
         run: npm run deploy
         working-directory: test/terraform-basic
       - name: Test
-        run: REAL_NPM=true DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 terraform-basic.test.ts
+        run: npx vitest --retry 1 terraform-basic.test.ts
         working-directory: test
       - name: Test - observable mode
-        run: REAL_NPM=true DISABLE_PARALLEL_DEPLOY=true OBSERVABLE_MODE=true npx vitest --retry 1 terraform-basic.test.ts
+        run: OBSERVABLE_MODE=true npx vitest --retry 1 terraform-basic.test.ts
         working-directory: test
