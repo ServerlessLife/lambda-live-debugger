@@ -31,7 +31,7 @@ function watchForFileChanges(folder: string) {
     },
   });
 
-  watcher.on("change", async (file) => {
+  watcher.on("change", async () => {
     if (processingChange) {
       return;
     }

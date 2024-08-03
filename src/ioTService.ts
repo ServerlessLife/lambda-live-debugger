@@ -80,7 +80,7 @@ async function getIoTEndpoint({
   const response = await iot.send(
     new DescribeEndpointCommand({
       endpointType: "iot:Data-ATS",
-    })
+    }),
   );
 
   if (!response.endpointAddress)
@@ -199,7 +199,7 @@ async function connect(props?: {
             },
             () => {
               r();
-            }
+            },
           );
         });
       }

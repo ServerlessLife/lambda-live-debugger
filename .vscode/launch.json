@@ -9,9 +9,7 @@
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": ["../../src/lldebugger.ts", "-c environment=test"],
       "request": "launch",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
+      "skipFiles": ["<node_internals>/**"],
       "console": "integratedTerminal",
       "type": "node",
       "cwd": "${workspaceRoot}/test/cdk-basic"
@@ -21,9 +19,7 @@
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": ["../../src/lldebugger.ts", "-c environment=test", "-o"],
       "request": "launch",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
+      "skipFiles": ["<node_internals>/**"],
       "console": "integratedTerminal",
       "type": "node",
       "cwd": "${workspaceRoot}/test/cdk-basic"
@@ -33,9 +29,7 @@
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": ["../../src/lldebugger.ts", "--stage=test"],
       "request": "launch",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
+      "skipFiles": ["<node_internals>/**"],
       "console": "integratedTerminal",
       "type": "node",
       "cwd": "${workspaceRoot}/test/sls-basic"
@@ -45,9 +39,7 @@
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": ["../../src/lldebugger.ts", "--stage=test", "-o"],
       "request": "launch",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
+      "skipFiles": ["<node_internals>/**"],
       "console": "integratedTerminal",
       "type": "node",
       "cwd": "${workspaceRoot}/test/sls-basic"
@@ -57,9 +49,7 @@
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": ["../../src/lldebugger.ts"],
       "request": "launch",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
+      "skipFiles": ["<node_internals>/**"],
       "console": "integratedTerminal",
       "type": "node",
       "cwd": "${workspaceRoot}/test/sls-esbuild-cjs"
@@ -69,9 +59,7 @@
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": ["../../src/lldebugger.ts", "-o"],
       "request": "launch",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
+      "skipFiles": ["<node_internals>/**"],
       "console": "integratedTerminal",
       "type": "node",
       "cwd": "${workspaceRoot}/test/sls-esbuild-cjs"
@@ -82,9 +70,7 @@
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": ["../../src/lldebugger.ts"],
       "request": "launch",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
+      "skipFiles": ["<node_internals>/**"],
       "console": "integratedTerminal",
       "type": "node",
       "cwd": "${workspaceRoot}/test/sls-esbuild-esm"
@@ -94,9 +80,7 @@
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": ["../../src/lldebugger.ts", "-o"],
       "request": "launch",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
+      "skipFiles": ["<node_internals>/**"],
       "console": "integratedTerminal",
       "type": "node",
       "cwd": "${workspaceRoot}/test/sls-esbuild-esm"
@@ -106,9 +90,7 @@
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": ["../../src/lldebugger.ts", "--config-env=test"],
       "request": "launch",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
+      "skipFiles": ["<node_internals>/**"],
       "console": "integratedTerminal",
       "type": "node",
       "cwd": "${workspaceRoot}/test/sam-basic"
@@ -118,9 +100,7 @@
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": ["../../src/lldebugger.ts", "--config-env=test", "-o"],
       "request": "launch",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
+      "skipFiles": ["<node_internals>/**"],
       "console": "integratedTerminal",
       "type": "node",
       "cwd": "${workspaceRoot}/test/sam-basic"
@@ -130,9 +110,7 @@
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": ["../../src/lldebugger.ts", "--config-env=test"],
       "request": "launch",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
+      "skipFiles": ["<node_internals>/**"],
       "console": "integratedTerminal",
       "type": "node",
       "cwd": "${workspaceRoot}/test/terraform-basic"
@@ -142,9 +120,7 @@
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": ["../../src/lldebugger.ts", "--config-env=test", "-o"],
       "request": "launch",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
+      "skipFiles": ["<node_internals>/**"],
       "console": "integratedTerminal",
       "type": "node",
       "cwd": "${workspaceRoot}/test/terraform-basic"
@@ -154,13 +130,10 @@
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": ["../../src/lldebugger.ts", "-w"],
       "request": "launch",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
+      "skipFiles": ["<node_internals>/**"],
       "console": "integratedTerminal",
       "type": "node",
       "cwd": "${workspaceRoot}/test/cdk-config"
-    },
-
+    }
   ]
 }

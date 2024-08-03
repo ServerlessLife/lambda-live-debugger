@@ -48,13 +48,13 @@ async function getBuild(functionId: string) {
       Logger.verbose(`[Function ${functionId}] Using existing build`);
     } else {
       Logger.verbose(
-        `[Function ${functionId}] No existing build found, building...`
+        `[Function ${functionId}] No existing build found, building...`,
       );
       newBuild = true;
       const newBuildAssets = build({
         functionId,
         function: func,
-        oldCtx: !!buildCache[functionId]
+        oldCtx: buildCache[functionId]
           ? await buildCache[functionId].ctx
           : undefined,
       });
@@ -72,8 +72,8 @@ async function getBuild(functionId: string) {
       Logger.verbose(`[Function ${functionId}] Build complete`);
     }
 
-    const artifactFile = Object.keys(result.metafile?.outputs!).find((key) =>
-      key.endsWith(".js")
+    const artifactFile = Object.keys(result.metafile!.outputs!).find((key) =>
+      key.endsWith(".js"),
     );
 
     if (!artifactFile) {
@@ -104,13 +104,13 @@ async function build(input: {
   const targetFolder = path.join(
     getProjectDirname(),
     `${outputFolder}/artifacts`,
-    input.functionId
+    input.functionId,
   );
   await fs.rm(targetFolder, { recursive: true, force: true });
   await fs.mkdir(targetFolder, { recursive: true });
 
   const esbuildOptions = removeUndefinedProperties(
-    input.function.esBuildOptions
+    input.function.esBuildOptions,
   );
 
   const handlerCodePath = input.function.codePath;
@@ -120,12 +120,12 @@ async function build(input: {
   let isESMFromPackageJson = false;
   if (packageJsonPath) {
     const packageJson = JSON.parse(
-      await fs.readFile(packageJsonPath, { encoding: "utf-8" })
+      await fs.readFile(packageJsonPath, { encoding: "utf-8" }),
     );
     isESMFromPackageJson = packageJson.type === "module";
   }
 
-  let isESMFromBundling = esbuildOptions?.format === "esm" ? true : undefined;
+  const isESMFromBundling = esbuildOptions?.format === "esm" ? true : undefined;
 
   let isESM: boolean;
 
@@ -139,7 +139,7 @@ async function build(input: {
         isESMFromPackageJson ? "ESM" : "CJS"
       }, bundling options: ${isESMFromBundling ? "ESM" : "CJS"}. Using ${
         isESMFromBundling ? "ESM" : "CJS"
-      } from bunding otions.`
+      } from bunding otions.`,
     );
     isESM = isESMFromBundling;
   } else if (isESMFromPackageJson !== undefined) {
@@ -153,7 +153,7 @@ async function build(input: {
   let ctx = input.oldCtx;
 
   Logger.verbose(
-    `[Function ${input.functionId}] Module type: ${isESM ? "ESM" : "CJS"})`
+    `[Function ${input.functionId}] Module type: ${isESM ? "ESM" : "CJS"})`,
   );
 
   if (!ctx) {
@@ -195,32 +195,32 @@ async function build(input: {
       loader: combineObject(optionsDefault.loader, esbuildOptions?.loader),
       resolveExtensions: combineArray(
         optionsDefault.resolveExtensions,
-        esbuildOptions?.resolveExtensions
+        esbuildOptions?.resolveExtensions,
       ),
       mainFields: combineArray(
         optionsDefault.mainFields,
-        esbuildOptions?.mainFields
+        esbuildOptions?.mainFields,
       ),
       conditions: combineArray(
         optionsDefault.conditions,
-        esbuildOptions?.conditions
+        esbuildOptions?.conditions,
       ),
       outExtension: combineObject(
         optionsDefault.outExtension,
-        esbuildOptions?.outExtension
+        esbuildOptions?.outExtension,
       ),
       banner: combineObjectStrings(
         optionsDefault.banner,
-        esbuildOptions?.banner
+        esbuildOptions?.banner,
       ),
       footer: combineObjectStrings(
         optionsDefault.footer,
-        esbuildOptions?.footer
+        esbuildOptions?.footer,
       ),
       plugins: combineArray(optionsDefault.plugins, esbuildOptions?.plugins),
       nodePaths: combineArray(
         optionsDefault.nodePaths,
-        esbuildOptions?.nodePaths
+        esbuildOptions?.nodePaths,
       ),
     };
 
@@ -230,7 +230,7 @@ async function build(input: {
     if (Configuration.config.verbose) {
       Logger.verbose(
         `[Function ${input.functionId}] Building ${handlerCodePath} with options:`,
-        JSON.stringify(options, null, 2)
+        JSON.stringify(options, null, 2),
       );
     } else {
       Logger.log(`[Function ${input.functionId}] Building ${handlerCodePath}`);

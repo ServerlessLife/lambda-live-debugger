@@ -7,9 +7,9 @@
  * Defines custom error types throwable by the runtime.
  */
 
-'use strict';
+"use strict";
 
-const util = require('util');
+const util = require("util");
 
 function _isError(obj) {
   return (
@@ -17,9 +17,9 @@ function _isError(obj) {
     obj.name &&
     obj.message &&
     obj.stack &&
-    typeof obj.name === 'string' &&
-    typeof obj.message === 'string' &&
-    typeof obj.stack === 'string'
+    typeof obj.name === "string" &&
+    typeof obj.message === "string" &&
+    typeof obj.stack === "string"
   );
 }
 
@@ -43,7 +43,7 @@ function toRapidResponse(error) {
       return {
         errorType: error.name,
         errorMessage: error.message,
-        trace: error.stack.split('\n'),
+        trace: error.stack.split("\n"),
       };
     } else {
       return {
@@ -54,9 +54,9 @@ function toRapidResponse(error) {
     }
   } catch (_err) {
     return {
-      errorType: 'handled',
+      errorType: "handled",
       errorMessage:
-        'callback called with Error argument, but there was a problem while retrieving one or more of its message, name, and stack',
+        "callback called with Error argument, but there was a problem while retrieving one or more of its message, name, and stack",
     };
   }
 }
@@ -70,10 +70,10 @@ module.exports.toRapidResponse = toRapidResponse;
 module.exports.toFormatted = (error) => {
   try {
     return (
-      '\t' + JSON.stringify(error, (_k, v) => _withEnumerableProperties(v))
+      "\t" + JSON.stringify(error, (_k, v) => _withEnumerableProperties(v))
     );
   } catch (err) {
-    return '\t' + JSON.stringify(toRapidResponse(error));
+    return "\t" + JSON.stringify(toRapidResponse(error));
   }
 };
 
@@ -91,10 +91,10 @@ function _withEnumerableProperties(error) {
         errorMessage: error.message,
         code: error.code,
       },
-      error
+      error,
     );
-    if (typeof error.stack == 'string') {
-      ret.stack = error.stack.split('\n');
+    if (typeof error.stack == "string") {
+      ret.stack = error.stack.split("\n");
     }
     return ret;
   } else {

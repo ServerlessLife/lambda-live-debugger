@@ -25,7 +25,7 @@ export async function getVersion(): Promise<string> {
       `Error reading version from ${pachageJsonPath}: ${error.message}`,
       {
         cause: error,
-      }
+      },
     );
   }
 }

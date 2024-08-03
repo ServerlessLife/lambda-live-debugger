@@ -6,7 +6,7 @@
  */
 export function combineArray<T>(
   a: T[] | undefined,
-  b: T[] | undefined
+  b: T[] | undefined,
 ): T[] | undefined {
   if (!a && !b) {
     return undefined;

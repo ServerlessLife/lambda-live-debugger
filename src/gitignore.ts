@@ -11,14 +11,14 @@ async function doesExistInGitIgnore() {
   try {
     const gitignoreContent = await fs.readFile(
       getGitIgnoreFileLocation(),
-      "utf-8"
+      "utf-8",
     );
     // split by new line
     const lines = gitignoreContent.split("\n");
     // check if ".lldebugger" exists
     const exists = lines.includes(outputFolder);
     return exists;
-  } catch (error) {
+  } catch {
     return false;
   }
 }
@@ -42,7 +42,7 @@ async function addToGitIgnore() {
     // does file exist?
     try {
       await fs.access(getGitIgnoreFileLocation());
-    } catch (error) {
+    } catch {
       await fs.writeFile(getGitIgnoreFileLocation(), `${outputFolder}\n`);
       return;
     }
@@ -63,7 +63,7 @@ async function removeFromGitIgnore() {
   if (exists) {
     const gitignoreContent = await fs.readFile(
       getGitIgnoreFileLocation(),
-      "utf-8"
+      "utf-8",
     );
     const newContent = gitignoreContent.replace(`${outputFolder}\n`, "");
     await fs.writeFile(getGitIgnoreFileLocation(), newContent);

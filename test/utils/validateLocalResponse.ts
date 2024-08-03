@@ -5,14 +5,14 @@ import { setTimeout } from "timers/promises";
 
 export async function validateLocalResponse(
   lambdaName: any,
-  payload: { lambdaName: any; timestamp: string }
+  payload: { lambdaName: any; timestamp: string },
 ) {
   // Initial wait for 1 second
   await setTimeout(1000);
 
   const filePath = path.resolve(
     __dirname,
-    `../local_lambda_responses/${lambdaName}.json`
+    `../local_lambda_responses/${lambdaName}.json`,
   );
 
   let responseFile;

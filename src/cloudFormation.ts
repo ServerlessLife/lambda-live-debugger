@@ -12,7 +12,7 @@ let cloudFormationClient: CloudFormationClient;
  */
 async function getCloudFormationStackTemplate(
   stackName: string,
-  awsConfiguration: AwsConfiguration
+  awsConfiguration: AwsConfiguration,
 ) {
   const { GetTemplateCommand } = await import("@aws-sdk/client-cloudformation");
   const command = new GetTemplateCommand({ StackName: stackName });
@@ -31,7 +31,7 @@ async function getCloudFormationStackTemplate(
     if (error.name === "ValidationError") {
       throw new Error(
         `Stack ${stackName} not found. Try specifying a region. Error: ${error.message}`,
-        { cause: error }
+        { cause: error },
       );
     } else {
       throw error;
@@ -65,7 +65,7 @@ async function getCloudFormationClient(awsConfiguration: AwsConfiguration) {
  */
 async function getCloudFormationResources(
   stackName: string,
-  awsConfiguration: AwsConfiguration
+  awsConfiguration: AwsConfiguration,
 ) {
   const { ListStackResourcesCommand } = await import(
     "@aws-sdk/client-cloudformation"
@@ -83,7 +83,7 @@ async function getCloudFormationResources(
     if (error.name === "ValidationError") {
       throw new Error(
         `Stack ${stackName} not found. Try specifying a region. Error: ${error.message}`,
-        { cause: error }
+        { cause: error },
       );
     } else {
       throw error;
@@ -99,7 +99,7 @@ async function getCloudFormationResources(
  */
 async function getLambdasInStack(
   stackName: string,
-  awsConfiguration: AwsConfiguration
+  awsConfiguration: AwsConfiguration,
 ): Promise<
   Array<{
     lambdaName: string;
@@ -108,18 +108,20 @@ async function getLambdasInStack(
 > {
   const response = await getCloudFormationResources(
     stackName,
-    awsConfiguration
+    awsConfiguration,
   );
   const lambdaResources = response.StackResourceSummaries?.filter(
-    (resource) => resource.ResourceType === "AWS::Lambda::Function"
+    (resource) => resource.ResourceType === "AWS::Lambda::Function",
   );
 
-  return lambdaResources?.map((resource) => {
-    return {
-      lambdaName: resource.PhysicalResourceId!,
-      logicalId: resource.LogicalResourceId!,
-    };
-  })!;
+  return (
+    lambdaResources?.map((resource) => {
+      return {
+        lambdaName: resource.PhysicalResourceId!,
+        logicalId: resource.LogicalResourceId!,
+      };
+    }) ?? []
+  );
 }
 
 export const CloudFormation = {

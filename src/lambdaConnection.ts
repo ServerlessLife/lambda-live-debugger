@@ -41,7 +41,7 @@ async function onMessageFromLambda(message: IoTMessage) {
           functionId: message.data.functionId,
         },
       },
-      `${topic}/${message.data.workerId}`
+      `${topic}/${message.data.workerId}`,
     );
   }
 
@@ -70,7 +70,7 @@ async function onMessageFromLambda(message: IoTMessage) {
     if (Configuration.config.verbose) {
       Logger.verbose(
         `[Function ${message.data.functionId}] Response: `,
-        JSON.stringify(message.data, null, 2)
+        JSON.stringify(message.data, null, 2),
       );
     } else {
       // first 50 characters of the response
@@ -78,7 +78,7 @@ async function onMessageFromLambda(message: IoTMessage) {
         ? JSON.stringify(message.data).substring(0, 100)
         : "";
       Logger.log(
-        `[Function ${message.data.functionId}] Request: ${requestPretty}${requestPretty.length < 50 ? "" : "..."}`
+        `[Function ${message.data.functionId}] Request: ${requestPretty}${requestPretty.length < 50 ? "" : "..."}`,
       );
     }
 
@@ -87,7 +87,7 @@ async function onMessageFromLambda(message: IoTMessage) {
     if (Configuration.config.verbose) {
       Logger.verbose(
         `[Function ${message.data.functionId}] Response: `,
-        JSON.stringify(response, null, 2)
+        JSON.stringify(response, null, 2),
       );
     } else {
       // first 50 characters of the response
@@ -95,7 +95,7 @@ async function onMessageFromLambda(message: IoTMessage) {
         ? JSON.stringify(response).substring(0, 100)
         : "";
       Logger.log(
-        `[Function ${message.data.functionId}] Response: ${responsePretty}${responsePretty.length < 50 ? "" : "..."}`
+        `[Function ${message.data.functionId}] Response: ${responsePretty}${responsePretty.length < 50 ? "" : "..."}`,
       );
     }
 
@@ -117,7 +117,7 @@ async function onMessageFromLambda(message: IoTMessage) {
     if (!Configuration.config.observable) {
       await ioTServiceConnection.publish(
         payload,
-        `${topic}/${message.data.workerId}`
+        `${topic}/${message.data.workerId}`,
       );
     }
   } catch (e: any) {
@@ -138,7 +138,7 @@ async function onMessageFromLambda(message: IoTMessage) {
     if (!Configuration.config.observable) {
       await ioTServiceConnection.publish(
         payload,
-        `${topic}/${message.data.workerId}`
+        `${topic}/${message.data.workerId}`,
       );
     } else {
       // if we are in observable mode, mark the worker as processed

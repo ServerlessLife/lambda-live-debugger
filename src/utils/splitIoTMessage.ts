@@ -22,7 +22,7 @@ export function splitMessageToChunks(input: any) {
         index,
         count: parts?.length,
         data: part,
-      }
+      },
   );
 
   return fragments;

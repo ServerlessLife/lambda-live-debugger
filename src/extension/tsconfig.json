@@ -2,8 +2,13 @@
   "extends": "@tsconfig/node20/tsconfig.json",
   "compilerOptions": {
     "module": "CommonJS",
-    "moduleResolution": "node",
+    "moduleResolution": "node"
   },
-  "include": ["**/*", "../ioTService.*", "../utils/splitIoTMessage.*", "../logger.*"],
+  "include": [
+    "**/*",
+    "../ioTService.*",
+    "../utils/splitIoTMessage.*",
+    "../logger.*"
+  ],
   "exclude": []
 }

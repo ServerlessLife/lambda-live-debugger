@@ -13,7 +13,6 @@ import { VsCode } from "./vsCode.js";
 import path from "path";
 import { getRootFolder } from "./utils/getRootFolder.js";
 import fs from "fs/promises";
-import { outputFolder } from "./constants.js";
 import { Logger } from "./logger.js";
 import { getModuleDirname, getProjectDirname } from "./getDirname.js";
 import { LambdaConnection } from "./lambdaConnection.js";
@@ -33,7 +32,7 @@ async function run() {
   Logger.verbose(
     `Parameters: \n${Object.entries(Configuration.config)
       .map(([key, value]) => ` - ${key}=${value}`)
-      .join("\n")}`
+      .join("\n")}`,
   );
   Logger.verbose(`NPM module folder: ${getModuleDirname()}`);
   Logger.verbose(`Project folder: ${getProjectDirname()}`);
@@ -43,7 +42,7 @@ async function run() {
   }
 
   if (Configuration.config.vscode) {
-    await VsCode.addConfiguration(Configuration.config);
+    await VsCode.addConfiguration();
   }
 
   if (!Configuration.config.start && !Configuration.config.remove) {
@@ -57,7 +56,7 @@ async function run() {
           ? "in observable mode"
           : `(ID ${Configuration.config.debuggerId})`
       }
-    ...`
+    ...`,
   );
 
   if (Configuration.config.subfolder) {
@@ -71,7 +70,7 @@ async function run() {
 
   if (Configuration.config.remove) {
     Logger.log(
-      `Removing Lambda Live Debugger${Configuration.config.remove === "all" ? " including layer" : ""}...`
+      `Removing Lambda Live Debugger${Configuration.config.remove === "all" ? " including layer" : ""}...`,
     );
     await InfraDeploy.removeInfrastructure();
     // await GitIgnore.removeFromGitIgnore();

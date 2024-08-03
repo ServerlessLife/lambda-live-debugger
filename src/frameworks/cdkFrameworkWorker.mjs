@@ -3,6 +3,7 @@ const require = topLevelCreateRequire(import.meta.url);
 import path from "path";
 import { fileURLToPath } from "node:url";
 const __filename = fileURLToPath(import.meta.url);
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const __dirname = path.dirname(__filename);
 
 import { workerData, parentPort } from "node:worker_threads";
@@ -46,7 +47,7 @@ parentPort.on("message", async (data) => {
 
   Logger.verbose(
     `[CDK] [Worker] Sending found lambdas`,
-    JSON.stringify(lambdas, null, 2)
+    JSON.stringify(lambdas, null, 2),
   );
   parentPort.postMessage(lambdas);
 });
@@ -79,7 +80,7 @@ async function fixCdkPaths(awsCdkLibPath) {
                 const i = resolvedPath.indexOf(key);
                 const newResolvedPath = `${value}${resolvedPath.substring(i + key.length)}`;
                 Logger.verbose(
-                  `[CDK] [Worker] Fixing path ${resolvedPath} -> ${newResolvedPath}`
+                  `[CDK] [Worker] Fixing path ${resolvedPath} -> ${newResolvedPath}`,
                 );
                 resolvedPath = newResolvedPath;
               }

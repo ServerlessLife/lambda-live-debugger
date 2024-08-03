@@ -34,7 +34,7 @@ describe("sam-basic", async () => {
   test("check infra", async () => {
     const lambdaName = await getSamFunctionName(
       folder,
-      "FunctionNameTestTsCommonJs"
+      "FunctionNameTestTsCommonJs",
     );
     await expectInfraDeployed(lambdaName);
   });
@@ -42,7 +42,7 @@ describe("sam-basic", async () => {
   test("call Lambda - testTsCommonJs", async () => {
     const lambdaName = await getSamFunctionName(
       folder,
-      "FunctionNameTestTsCommonJs"
+      "FunctionNameTestTsCommonJs",
     );
 
     const payload = getSamplePayload(lambdaName);
@@ -58,7 +58,7 @@ describe("sam-basic", async () => {
   test("call Lambda - testTsEsModule", async () => {
     const lambdaName = await getSamFunctionName(
       folder,
-      "FunctionNameTestTsEsModule"
+      "FunctionNameTestTsEsModule",
     );
 
     const payload = getSamplePayload(lambdaName);
@@ -74,7 +74,7 @@ describe("sam-basic", async () => {
   test("call Lambda - testJsCommonJs", async () => {
     const lambdaName = await getSamFunctionName(
       folder,
-      "FunctionNameTestJsCommonJs"
+      "FunctionNameTestJsCommonJs",
     );
 
     const payload = getSamplePayload(lambdaName);
@@ -90,7 +90,7 @@ describe("sam-basic", async () => {
   test("call Lambda - testJsEsModule", async () => {
     const lambdaName = await getSamFunctionName(
       folder,
-      "FunctionNameTestJsEsModule"
+      "FunctionNameTestJsEsModule",
     );
 
     const payload = getSamplePayload(lambdaName);
@@ -108,7 +108,7 @@ describe("sam-basic", async () => {
       await removeInfra(lldProcess, folder, ["--config-env=test"]);
       const lambdaName = await getSamFunctionName(
         folder,
-        "FunctionNameTestTsCommonJs"
+        "FunctionNameTestTsCommonJs",
       );
       await expectInfraRemoved(lambdaName);
     }
@@ -117,10 +117,10 @@ describe("sam-basic", async () => {
 
 export async function getSamFunctionName(folder: string, functionName: string) {
   const outputs = JSON.parse(
-    await fs.readFile(`${folder}/sam-outputs.json`, "utf-8")
+    await fs.readFile(`${folder}/sam-outputs.json`, "utf-8"),
   );
   const lambdaName = outputs.find(
-    (o: any) => o.OutputKey === functionName
+    (o: any) => o.OutputKey === functionName,
   )?.OutputValue;
   return lambdaName;
 }

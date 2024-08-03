@@ -21,7 +21,7 @@ async function runInWorker(input: {
 }) {
   const func = await Configuration.getLambda(input.fuctionRequest.functionId);
 
-  return new Promise<void>(async (resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     let worker = workers.get(input.fuctionRequest.workerId);
 
     if (!worker) {
@@ -35,14 +35,14 @@ async function runInWorker(input: {
       });
     } else {
       Logger.verbose(
-        `[Function ${input.fuctionRequest.functionId}] [Worker ${input.fuctionRequest.workerId}] Reusing worker`
+        `[Function ${input.fuctionRequest.functionId}] [Worker ${input.fuctionRequest.workerId}] Reusing worker`,
       );
     }
 
     worker.on("message", (msg) => {
       Logger.verbose(
         `[Function ${input.fuctionRequest.functionId}] [Worker ${input.fuctionRequest.workerId}] Worker message`,
-        JSON.stringify(msg)
+        JSON.stringify(msg),
       );
       if (msg?.errorType) {
         reject(msg);
@@ -53,7 +53,7 @@ async function runInWorker(input: {
     worker.on("error", (err) => {
       Logger.error(
         `[Function ${input.fuctionRequest.functionId}] [Worker ${input.fuctionRequest.workerId}] Error`,
-        err
+        err,
       );
       reject(err);
     });
@@ -84,10 +84,10 @@ type WorkerRequest = {
  */
 function startWorker(input: WorkerRequest) {
   Logger.verbose(
-    `[Function ${input.functionId}] [Worker ${input.workerId}] Starting worker. Artifact: ${input.artifactFile}`
+    `[Function ${input.functionId}] [Worker ${input.workerId}] Starting worker. Artifact: ${input.artifactFile}`,
   );
 
-  let localProjectDir = getProjectDirname();
+  const localProjectDir = getProjectDirname();
 
   const worker = new Worker(
     path.resolve(path.join(getModuleDirname(), `./nodeWorkerRunner.mjs`)),
@@ -103,24 +103,24 @@ function startWorker(input: WorkerRequest) {
       stdin: true,
       stdout: true,
       //type: "module",
-    }
+    },
   );
 
   worker.stdout.on("data", (data: Buffer) => {
     Logger.verbose(
       `[Function ${input.functionId}] [Worker ${input.workerId}] `,
-      data.toString()
+      data.toString(),
     );
   });
   worker.stderr.on("data", (data: Buffer) => {
     Logger.verbose(
       `[Function ${input.functionId}] [Worker ${input.workerId}] `,
-      data.toString()
+      data.toString(),
     );
   });
   worker.on("exit", () => {
     Logger.verbose(
-      `[Function ${input.functionId}] [Worker ${input.workerId}] Worker exited`
+      `[Function ${input.functionId}] [Worker ${input.workerId}] Worker exited`,
     );
     workers.delete(input.workerId);
   });

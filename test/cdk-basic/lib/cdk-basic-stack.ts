@@ -16,7 +16,7 @@ export class CdkbasicStack extends cdk.Stack {
         handler: "lambdaHandler",
         runtime: lambda.Runtime.NODEJS_20_X,
         logRetention: log.RetentionDays.ONE_DAY,
-      }
+      },
     );
 
     const functionTestTsEsModule = new lambda_nodejs.NodejsFunction(
@@ -30,7 +30,7 @@ export class CdkbasicStack extends cdk.Stack {
           format: lambda_nodejs.OutputFormat.ESM,
         },
         logRetention: log.RetentionDays.ONE_DAY,
-      }
+      },
     );
 
     const functionTestJsCommonJs = new lambda_nodejs.NodejsFunction(
@@ -41,7 +41,7 @@ export class CdkbasicStack extends cdk.Stack {
         handler: "lambdaHandler",
         runtime: lambda.Runtime.NODEJS_20_X,
         logRetention: log.RetentionDays.ONE_DAY,
-      }
+      },
     );
 
     //testJsEsModule
@@ -56,7 +56,7 @@ export class CdkbasicStack extends cdk.Stack {
           format: lambda_nodejs.OutputFormat.ESM,
         },
         logRetention: log.RetentionDays.ONE_DAY,
-      }
+      },
     );
 
     const functionTestJsCommonJsBase = new lambda.Function(
@@ -67,7 +67,7 @@ export class CdkbasicStack extends cdk.Stack {
         handler: "lambda.lambdaHandler",
         code: lambda.Code.fromAsset("services/testJsCommonJs"),
         logRetention: log.RetentionDays.ONE_DAY,
-      }
+      },
     );
 
     const functionTestJsEsModuleBase = new lambda.Function(
@@ -78,7 +78,7 @@ export class CdkbasicStack extends cdk.Stack {
         handler: "lambda.lambdaHandler",
         code: lambda.Code.fromAsset("services/testJsEsModule"),
         logRetention: log.RetentionDays.ONE_DAY,
-      }
+      },
     );
 
     new cdk.CfnOutput(this, "FunctionNameTestTsCommonJs", {

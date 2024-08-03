@@ -10,12 +10,12 @@ export async function getPolicyDocument(roleArn: string | undefined) {
       new GetRolePolicyCommand({
         RoleName: roleName,
         PolicyName: "LambdaLiveDebuggerPolicy",
-      })
+      }),
     );
 
     if (policy.PolicyDocument) {
       const policyDocument = JSON.parse(
-        decodeURIComponent(policy.PolicyDocument)
+        decodeURIComponent(policy.PolicyDocument),
       );
       return policyDocument;
     } else {

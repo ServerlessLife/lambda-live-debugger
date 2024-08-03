@@ -9,7 +9,7 @@ export async function expectInfraDeployed(lambdaName: any) {
     const policyDocument = await getPolicyDocument(roleArn);
 
     expect(
-      lambdaConfiguration.Configuration?.Environment?.Variables
+      lambdaConfiguration.Configuration?.Environment?.Variables,
     ).toMatchObject({
       AWS_LAMBDA_EXEC_WRAPPER: "/opt/lld-wrapper",
       LLD_DEBUGGER_ID: expect.any(String),
@@ -20,7 +20,7 @@ export async function expectInfraDeployed(lambdaName: any) {
 
     const initialTimeout = parseInt(
       lambdaConfiguration.Configuration?.Environment?.Variables
-        ?.LLD_INITIAL_TIMEOUT as string
+        ?.LLD_INITIAL_TIMEOUT as string,
     );
     expect(initialTimeout).toBeLessThanOrEqual(10);
     expect(initialTimeout).toBeGreaterThan(0);
@@ -28,7 +28,7 @@ export async function expectInfraDeployed(lambdaName: any) {
     expect(lambdaConfiguration.Configuration?.Layers?.length).toEqual(1);
 
     expect(lambdaConfiguration.Configuration?.Layers![0].Arn).toContain(
-      ":layer:LambdaLiveDebugger:"
+      ":layer:LambdaLiveDebugger:",
     );
     expect(policyDocument).toEqual({
       Statement: [

@@ -46,7 +46,8 @@ async function getLambdas(config: LldConfig) {
     }
   }
 
-  let framework: IFramework | undefined = await getCurrentFramework(frameworks);
+  const framework: IFramework | undefined =
+    await getCurrentFramework(frameworks);
 
   if (framework) {
     Logger.verbose(`Getting resources with '${framework.name}' framework`);
@@ -59,8 +60,8 @@ async function getLambdas(config: LldConfig) {
         (l) =>
           l.functionName === functionNameFilter ||
           new RegExp("^" + functionNameFilter.split("*").join(".*") + "$").test(
-            l.functionName
-          )
+            l.functionName,
+          ),
       );
     }
   } else {
@@ -76,7 +77,7 @@ async function getLambdas(config: LldConfig) {
  * Get the current framework
  */
 async function getCurrentFramework(
-  frameworks: IFramework[]
+  frameworks: IFramework[],
 ): Promise<IFramework | undefined> {
   let framework: IFramework | undefined;
   for (const f of frameworks) {

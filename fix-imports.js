@@ -1,4 +1,4 @@
-import { readdir, readFile, writeFile, rename, stat } from "fs/promises";
+import { readdir, readFile, writeFile, rename } from "fs/promises";
 import { join, dirname, parse } from "path";
 import { fileURLToPath } from "url";
 
@@ -39,6 +39,8 @@ const directoryPath = join(__dirname, "dist");
 
 processFiles(directoryPath)
   .then(() =>
-    console.log("JS files have been converted to MJS and import paths updated.")
+    console.log(
+      "JS files have been converted to MJS and import paths updated.",
+    ),
   )
   .catch((err) => console.error("Error processing files:", err));

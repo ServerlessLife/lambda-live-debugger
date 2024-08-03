@@ -10,7 +10,7 @@ export async function findPackageJson(codePath: any) {
   const handlerParsedPath = path.parse(codePath);
   const packageJsonRoot = await findAboveFolderWithAFile(
     handlerParsedPath.dir,
-    "package.json"
+    "package.json",
   );
 
   const packageJsonPath = packageJsonRoot
@@ -27,7 +27,7 @@ export async function findPackageJson(codePath: any) {
  */
 async function findAboveFolderWithAFile(
   dir: string,
-  file: string
+  file: string,
 ): Promise<string | undefined> {
   if (dir === "/") return undefined;
 

@@ -1,6 +1,6 @@
 import { Command, InvalidOptionArgumentError } from "commander";
 import { getVersion } from "../version.js";
-import { LldConfigCliArgs, LldConfigBase } from "../types/lldConfig.js";
+import { LldConfigCliArgs } from "../types/lldConfig.js";
 import { defaultObservableInterval, outputFolder } from "../constants.js";
 
 const validRemoveOptions = ["keep-layer", "all"];
@@ -11,7 +11,7 @@ const validRemoveOptions = ["keep-layer", "all"];
  * @returns Configuration
  */
 export async function getConfigFromCliArgs(
-  supportedFrameworks: string[] = []
+  supportedFrameworks: string[] = [],
 ): Promise<LldConfigCliArgs> {
   const version = await getVersion();
 
@@ -20,32 +20,32 @@ export async function getConfigFromCliArgs(
   program.name("lld").description("Lambda Live Debugger").version(version);
   program.option(
     "-r, --remove [option]",
-    "Remove Lambda Live Debugger infrastructure. Options: 'keep-layer' (default), 'remove-all'. The latest also removes the Lambda Layer"
+    "Remove Lambda Live Debugger infrastructure. Options: 'keep-layer' (default), 'remove-all'. The latest also removes the Lambda Layer",
     //validateRemoveOption,
     //"keep-layer"
   );
   program.option(
     "-w, --wizard",
-    "Program interactively asks for each parameter and saves it to lldebugger.config.ts"
+    "Program interactively asks for each parameter and saves it to lldebugger.config.ts",
   );
   program.option("-v, --verbose", "Verbose logs");
   program.option(
     "-c, --context <context>",
     "AWS CDK context",
     (value: string, previous: string[]) => previous.concat(value),
-    []
+    [],
   );
   program.option("-s, --stage <stage>", "Serverless Framework stage");
   program.option(
     "-f, --function <function name>",
-    "Filter by function name. You can use * as a wildcard"
+    "Filter by function name. You can use * as a wildcard",
   );
   program.option("-m, --subfolder <subfolder>", "Monorepo subfolder");
   program.option("-o, --observable", "Observable mode");
   program.option(
     "-i --interval <interval>",
     "Observable mode interval",
-    defaultObservableInterval.toString()
+    defaultObservableInterval.toString(),
   );
   program.option("--config-env <evironment>", "SAM environment");
   program.option("--profile <profile>", "AWS profile to use");
@@ -53,7 +53,7 @@ export async function getConfigFromCliArgs(
   program.option("--role <role>", "AWS role to use");
   program.option(
     "--framework <framework>",
-    `Framework to use (${supportedFrameworks.join(", ")})`
+    `Framework to use (${supportedFrameworks.join(", ")})`,
   );
   program.option("--gitignore", `Add ${outputFolder} to .gitignore`);
   program.parse(process.argv);
@@ -66,7 +66,7 @@ export async function getConfigFromCliArgs(
   } else if (args.remove) {
     if (!validRemoveOptions.includes(args.remove)) {
       throw new InvalidOptionArgumentError(
-        `Invalid option: '${args.remove}'. Valid options are: ${validRemoveOptions.join(", ")}`
+        `Invalid option: '${args.remove}'. Valid options are: ${validRemoveOptions.join(", ")}`,
       );
     }
   }

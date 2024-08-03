@@ -14,7 +14,7 @@ export class CdkbasicStack extends cdk.Stack {
         entry: "services/testTsCommonJs/lambda.ts",
         handler: "lambdaHandler",
         runtime: lambda.Runtime.NODEJS_20_X,
-      }
+      },
     );
 
     const functionTestTsEsModule = new lambda_nodejs.NodejsFunction(
@@ -27,7 +27,7 @@ export class CdkbasicStack extends cdk.Stack {
         bundling: {
           format: lambda_nodejs.OutputFormat.ESM,
         },
-      }
+      },
     );
 
     const functionTestJsCommonJs = new lambda_nodejs.NodejsFunction(
@@ -37,7 +37,7 @@ export class CdkbasicStack extends cdk.Stack {
         entry: "services/testJsCommonJs/lambda.js",
         handler: "lambdaHandler",
         runtime: lambda.Runtime.NODEJS_20_X,
-      }
+      },
     );
 
     //testJsEsModule
@@ -51,7 +51,7 @@ export class CdkbasicStack extends cdk.Stack {
         bundling: {
           format: lambda_nodejs.OutputFormat.ESM,
         },
-      }
+      },
     );
 
     const functionTestJsCommonJsBase = new lambda.Function(
@@ -61,7 +61,7 @@ export class CdkbasicStack extends cdk.Stack {
         runtime: lambda.Runtime.NODEJS_20_X,
         handler: "lambda.lambdaHandler",
         code: lambda.Code.fromAsset("services/testJsCommonJs"),
-      }
+      },
     );
 
     const functionTestJsEsModuleBase = new lambda.Function(
@@ -71,7 +71,7 @@ export class CdkbasicStack extends cdk.Stack {
         runtime: lambda.Runtime.NODEJS_20_X,
         handler: "lambda.lambdaHandler",
         code: lambda.Code.fromAsset("services/testJsEsModule"),
-      }
+      },
     );
 
     new cdk.CfnOutput(this, "FunctionNameTestTsCommonJs", {

@@ -32,18 +32,18 @@ export class SamFramework implements IFramework {
   public async canHandle(): Promise<boolean> {
     try {
       await fs.access(path.resolve(this.samConfigFile), constants.F_OK);
-    } catch (error) {
+    } catch {
       Logger.verbose(
-        `[SAM] This is not a SAM framework project. ${path.resolve(this.samConfigFile)} not found.`
+        `[SAM] This is not a SAM framework project. ${path.resolve(this.samConfigFile)} not found.`,
       );
       return false;
     }
 
     try {
       await fs.access(path.resolve(this.samTemplateFile), constants.F_OK);
-    } catch (error) {
+    } catch {
       Logger.verbose(
-        `[SAM] This is not a SAM framework project. ${path.resolve(this.samTemplateFile)} not found.`
+        `[SAM] This is not a SAM framework project. ${path.resolve(this.samTemplateFile)} not found.`,
       );
       return false;
     }
@@ -67,7 +67,7 @@ export class SamFramework implements IFramework {
 
     const samConfigContent = await fs.readFile(
       path.resolve(this.samConfigFile),
-      "utf-8"
+      "utf-8",
     );
 
     const samConfig = toml.parse(samConfigContent);
@@ -75,13 +75,13 @@ export class SamFramework implements IFramework {
 
     if (!stackName) {
       throw new Error(
-        `Stack name not found in ${path.resolve(this.samConfigFile)}`
+        `Stack name not found in ${path.resolve(this.samConfigFile)}`,
       );
     }
 
     const samTemplateContent = await fs.readFile(
       path.resolve(this.samTemplateFile),
-      "utf-8"
+      "utf-8",
     );
     const template = yaml.parse(samTemplateContent);
 
@@ -89,14 +89,12 @@ export class SamFramework implements IFramework {
 
     // get all resources of type AWS::Serverless::Function
     for (const resourceName in template.Resources) {
-      if (template.Resources.hasOwnProperty(resourceName)) {
-        const resource = template.Resources[resourceName];
-        if (resource.Type === "AWS::Serverless::Function") {
-          lambdas.push({
-            Name: resourceName,
-            ...resource,
-          });
-        }
+      const resource = template.Resources[resourceName];
+      if (resource.Type === "AWS::Serverless::Function") {
+        lambdas.push({
+          Name: resourceName,
+          ...resource,
+        });
       }
     }
 
@@ -106,25 +104,25 @@ export class SamFramework implements IFramework {
 
     const lambdasInStack = await CloudFormation.getLambdasInStack(
       stackName,
-      awsConfiguration
+      awsConfiguration,
     );
 
     Logger.verbose(
       `[SAM] Found Lambdas in stack ${stackName}:`,
-      JSON.stringify(lambdasInStack, null, 2)
+      JSON.stringify(lambdasInStack, null, 2),
     );
 
     // get tags for each Lambda
     for (const func of lambdas) {
       const handlerFull = path.join(
         func.Properties.CodeUri ?? "",
-        func.Properties.Handler
+        func.Properties.Handler,
       );
       const handlerParts = handlerFull.split(".");
       const handler = handlerParts[1];
 
       const functionName = lambdasInStack.find(
-        (lambda) => lambda.logicalId === func.Name
+        (lambda) => lambda.logicalId === func.Name,
       )?.lambdaName;
 
       if (!functionName) {
@@ -138,7 +136,7 @@ export class SamFramework implements IFramework {
         if (func.Metadata?.BuildProperties?.EntryPoints?.length > 0) {
           codePath = path.join(
             func.Properties.CodeUri ?? "",
-            func.Metadata?.BuildProperties?.EntryPoints[0]
+            func.Metadata?.BuildProperties?.EntryPoints[0],
           );
         }
 
@@ -164,7 +162,9 @@ export class SamFramework implements IFramework {
             await fs.access(cp, constants.F_OK);
             codePath = cp;
             break;
-          } catch (error) {}
+          } catch {
+            // ignore, file not found
+          }
         }
       }
 

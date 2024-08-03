@@ -11,14 +11,14 @@ import { LldConfigBase } from "../types/lldConfig.js";
  * @returns Configuration
  */
 export async function getConfigTsFromConfigFile(
-  configFile: string
+  configFile: string,
 ): Promise<{ default: LldConfigBase } | undefined> {
   const compileOutput = path.resolve(`${outputFolder}/configCompiled.mjs`);
 
   // if file does not exist, return empty config
   try {
     await fs.stat(configFile);
-  } catch (err) {
+  } catch {
     return undefined;
   }
 
@@ -44,7 +44,7 @@ export async function getConfigTsFromConfigFile(
   } catch (error: any) {
     throw new Error(
       `Error building config file ${configFile}: ${error.message}`,
-      { cause: error }
+      { cause: error },
     );
   }
 

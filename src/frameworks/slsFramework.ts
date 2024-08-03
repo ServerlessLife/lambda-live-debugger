@@ -35,13 +35,13 @@ export class SlsFramework implements IFramework {
       try {
         await fs.access(file, constants.F_OK);
         return true;
-      } catch (error) {
+      } catch {
         continue;
       }
     }
 
     Logger.verbose(
-      `[SLS] This is not a Serverless framework project. None of the files found: ${serverlessFiles.join(", ")}`
+      `[SLS] This is not a Serverless framework project. None of the files found: ${serverlessFiles.join(", ")}`,
     );
 
     return false;
@@ -79,7 +79,7 @@ export class SlsFramework implements IFramework {
     } catch (error: any) {
       Logger.error("Error loading serverless modules", error);
       Logger.log(
-        "If you are running Lambda Live Debugger from a global installation, install Serverless Framework globally as well."
+        "If you are running Lambda Live Debugger from a global installation, install Serverless Framework globally as well.",
       );
       throw new Error(`Error loading serverless modules. ${error.message}`, {
         cause: error,
@@ -88,21 +88,21 @@ export class SlsFramework implements IFramework {
 
     const configurationPath = await resolveConfigurationPath();
     Logger.verbose(
-      `[SLS] Configuration path: ${path.resolve(configurationPath)}`
+      `[SLS] Configuration path: ${path.resolve(configurationPath)}`,
     );
 
     const configuration = await readConfiguration(configurationPath);
     Logger.verbose(
       `[SLS] Configuration:`,
-      JSON.stringify(configuration, null, 2)
+      JSON.stringify(configuration, null, 2),
     );
 
     const serviceDir = process.cwd();
-    let configurationFilename =
+    const configurationFilename =
       configuration && configurationPath.slice(serviceDir.length + 1);
 
     Logger.verbose(
-      `[SLS] Configuration filename: ${path.resolve(configurationFilename)}`
+      `[SLS] Configuration filename: ${path.resolve(configurationFilename)}`,
     );
 
     const commands: string[] = [];
@@ -155,7 +155,7 @@ export class SlsFramework implements IFramework {
 
     const lambdasDiscovered: LambdaResource[] = [];
 
-    let esBuildOptions: EsBuildOptions | undefined =
+    const esBuildOptions: EsBuildOptions | undefined =
       this.getEsBuildOptions(serverless);
 
     const lambdas = serverless.service.functions;
@@ -163,51 +163,49 @@ export class SlsFramework implements IFramework {
     Logger.verbose(`[SLS] Found Lambdas:`, JSON.stringify(lambdas, null, 2));
 
     for (const func in lambdas) {
-      if (lambdas.hasOwnProperty(func)) {
-        const lambda = lambdas[func] as Serverless.FunctionDefinitionHandler;
-        const handlerFull = lambda.handler;
-        const handlerParts = handlerFull.split(".");
-        const handler = handlerParts[1];
+      const lambda = lambdas[func] as Serverless.FunctionDefinitionHandler;
+      const handlerFull = lambda.handler;
+      const handlerParts = handlerFull.split(".");
+      const handler = handlerParts[1];
 
-        const possibleCodePaths = [
-          `${handlerParts[0]}.ts`,
-          `${handlerParts[0]}.js`,
-          `${handlerParts[0]}.cjs`,
-          `${handlerParts[0]}.mjs`,
-        ];
-        let codePath: string | undefined;
-        for (const cp of possibleCodePaths) {
-          try {
-            await fs.access(cp, constants.F_OK);
-            codePath = cp;
-            break;
-          } catch (error) {}
+      const possibleCodePaths = [
+        `${handlerParts[0]}.ts`,
+        `${handlerParts[0]}.js`,
+        `${handlerParts[0]}.cjs`,
+        `${handlerParts[0]}.mjs`,
+      ];
+      let codePath: string | undefined;
+      for (const cp of possibleCodePaths) {
+        try {
+          await fs.access(cp, constants.F_OK);
+          codePath = cp;
+          break;
+        } catch {
+          // ignore, file not found
         }
-
-        if (!codePath) {
-          throw new Error(`Code path not found for handler: ${handlerFull}`);
-        }
-
-        const functionName = lambda.name;
-        if (!functionName) {
-          throw new Error(
-            `Function name not found for handler: ${handlerFull}`
-          );
-        }
-
-        const packageJsonPath = await findPackageJson(codePath);
-        Logger.verbose(`[SLS] package.json path: ${packageJsonPath}`);
-
-        const lambdaResource: LambdaResource = {
-          functionName,
-          codePath,
-          handler,
-          packageJsonPath,
-          esBuildOptions,
-        };
-
-        lambdasDiscovered.push(lambdaResource);
       }
+
+      if (!codePath) {
+        throw new Error(`Code path not found for handler: ${handlerFull}`);
+      }
+
+      const functionName = lambda.name;
+      if (!functionName) {
+        throw new Error(`Function name not found for handler: ${handlerFull}`);
+      }
+
+      const packageJsonPath = await findPackageJson(codePath);
+      Logger.verbose(`[SLS] package.json path: ${packageJsonPath}`);
+
+      const lambdaResource: LambdaResource = {
+        functionName,
+        codePath,
+        handler,
+        packageJsonPath,
+        esBuildOptions,
+      };
+
+      lambdasDiscovered.push(lambdaResource);
     }
 
     return lambdasDiscovered;
@@ -220,12 +218,12 @@ export class SlsFramework implements IFramework {
 
     // 2) Get from serverless-esbuild plugin
     const esBuildPlugin = serverless.service.plugins?.find(
-      (p) => p === "serverless-esbuild"
+      (p) => p === "serverless-esbuild",
     );
 
     if (esBuildPlugin) {
       Logger.verbose("[SLS] serverless-esbuild plugin detected");
-      let settings = serverless.service.custom?.esbuild;
+      const settings = serverless.service.custom?.esbuild;
       if (settings) {
         esBuildOptions = {
           minify: settings.minify,
@@ -236,13 +234,13 @@ export class SlsFramework implements IFramework {
     } else {
       // 3) Get from serverless-plugin-typescript plugin
       const typeScriptPlugin = serverless.service.plugins?.find(
-        (p) => p === "serverless-plugin-typescript"
+        (p) => p === "serverless-plugin-typescript",
       );
 
       if (typeScriptPlugin) {
         Logger.verbose("[SLS] serverless-plugin-typescript plugin detected");
 
-        let settings = serverless.service.custom?.serverlessPluginTypescript;
+        const settings = serverless.service.custom?.serverlessPluginTypescript;
         if (settings) {
           esBuildOptions = {
             tsconfig: settings.tsConfigFileLocation,

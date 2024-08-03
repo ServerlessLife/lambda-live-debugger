@@ -7,7 +7,6 @@ import { exec } from "child_process";
 import { promisify } from "util";
 import ts from "typescript";
 import { IFramework } from "./iFrameworks.js";
-import { LldConfigBase } from "../types/lldConfig.js";
 import { Logger } from "../logger.js";
 
 export const execAsync = promisify(exec);
@@ -49,7 +48,7 @@ export class TerraformFramework implements IFramework {
 
     if (!r) {
       Logger.verbose(
-        `[Terraform] This is not a Terraform project. There are no *.tf files in ${path.resolve(".")} folder.`
+        `[Terraform] This is not a Terraform project. There are no *.tf files in ${path.resolve(".")} folder.`,
       );
     }
 
@@ -61,13 +60,13 @@ export class TerraformFramework implements IFramework {
    * @param config Configuration
    * @returns Lambda functions
    */
-  public async getLambdas(config: LldConfigBase): Promise<LambdaResource[]> {
+  public async getLambdas(): Promise<LambdaResource[]> {
     const state = await this.readTerraformState();
     const lambdas = this.extractLambdaInfo(state);
 
     Logger.verbose(
       "[Terraform] Found Lambdas:",
-      JSON.stringify(lambdas, null, 2)
+      JSON.stringify(lambdas, null, 2),
     );
 
     const lambdasDiscovered: LambdaResource[] = [];
@@ -81,11 +80,11 @@ export class TerraformFramework implements IFramework {
     for (const func of lambdas) {
       const functionName = func.functionName;
       const handlerParts = func.handler.split(".");
-      let handler: string;
-      // get last part of the handler
-      handler = handlerParts[handlerParts.length - 1];
 
-      let filename = func.sourceFilename;
+      // get last part of the handler
+      const handler = handlerParts[handlerParts.length - 1];
+
+      const filename = func.sourceFilename;
       let pathWithourExtension: string;
       if (filename) {
         // remove extension
@@ -122,7 +121,9 @@ export class TerraformFramework implements IFramework {
           await fs.access(cp, constants.F_OK);
           codePath = cp;
           break;
-        } catch (error) {}
+        } catch {
+          // ignore, file not found
+        }
       }
 
       if (!codePath) {
@@ -157,7 +158,7 @@ export class TerraformFramework implements IFramework {
       if (resource.type === "aws_lambda_function") {
         Logger.verbose(
           "[Terraform] Found Lambda:",
-          JSON.stringify(resource, null, 2)
+          JSON.stringify(resource, null, 2),
         );
 
         let sourceDir: string | undefined;
@@ -174,14 +175,14 @@ export class TerraformFramework implements IFramework {
         // get dependency "data.archive_file"
         const dependencies = resource.depends_on;
         const archiveFileResourceName = dependencies.find((dep) =>
-          dep.startsWith("data.archive_file.")
+          dep.startsWith("data.archive_file."),
         );
 
         if (archiveFileResourceName) {
           // get the resource
           const name = archiveFileResourceName.split(".")[2];
           const archiveFileResource = state.resources.find(
-            (r) => r.name === name
+            (r) => r.name === name,
           );
 
           // get source_dir or source_filename
@@ -218,19 +219,19 @@ export class TerraformFramework implements IFramework {
     } catch (error: any) {
       throw new Error(
         `Failed to get Terraform state from 'terraform show --json' command: ${error.message}`,
-        { cause: error }
+        { cause: error },
       );
     }
 
     if (output.stderr) {
       throw new Error(
-        `Failed to get Terraform state from 'terraform show --json' command: ${output.stderr}`
+        `Failed to get Terraform state from 'terraform show --json' command: ${output.stderr}`,
       );
     }
 
     if (!output.stdout) {
       throw new Error(
-        "Failed to get Terraform state from 'terraform show --json' command"
+        "Failed to get Terraform state from 'terraform show --json' command",
       );
     }
 
@@ -242,7 +243,7 @@ export class TerraformFramework implements IFramework {
 
     if (!jsonString) {
       throw new Error(
-        "Failed to get Terraform state. JSON string not found in the output."
+        "Failed to get Terraform state. JSON string not found in the output.",
       );
     }
 
@@ -255,7 +256,7 @@ export class TerraformFramework implements IFramework {
       Logger.error("Failed to parse Terraform state JSON:", error);
       throw new Error(
         `Failed to parse Terraform state JSON: ${error.message}`,
-        { cause: error }
+        { cause: error },
       );
     }
   }
@@ -271,7 +272,7 @@ export class TerraformFramework implements IFramework {
       try {
         await fs.access(tsConfigPath, constants.F_OK);
         break;
-      } catch (error) {
+      } catch {
         // tsconfig.json not found, move up one directory
         currentDir = path.dirname(currentDir);
       }
@@ -286,7 +287,7 @@ export class TerraformFramework implements IFramework {
     const compilerOptions = ts.parseJsonConfigFileContent(
       configFile.config,
       ts.sys,
-      "./"
+      "./",
     );
 
     return compilerOptions.options.outDir

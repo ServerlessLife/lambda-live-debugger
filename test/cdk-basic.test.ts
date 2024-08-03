@@ -36,7 +36,7 @@ describe("cdk-basic", async () => {
   test("check infra", async () => {
     const lambdaName = await getFunctionName(
       folder,
-      "FunctionNameTestTsCommonJs"
+      "FunctionNameTestTsCommonJs",
     );
     await expectInfraDeployed(lambdaName);
   });
@@ -44,7 +44,7 @@ describe("cdk-basic", async () => {
   test("call Lambda - testTsCommonJs", async () => {
     const lambdaName = await getFunctionName(
       folder,
-      "FunctionNameTestTsCommonJs"
+      "FunctionNameTestTsCommonJs",
     );
 
     const payload = getSamplePayload(lambdaName);
@@ -60,7 +60,7 @@ describe("cdk-basic", async () => {
   test("call Lambda - testTsEsModule", async () => {
     const lambdaName = await getFunctionName(
       folder,
-      "FunctionNameTestTsEsModule"
+      "FunctionNameTestTsEsModule",
     );
 
     const payload = getSamplePayload(lambdaName);
@@ -76,7 +76,7 @@ describe("cdk-basic", async () => {
   test("call Lambda - testJsCommonJs", async () => {
     const lambdaName = await getFunctionName(
       folder,
-      "FunctionNameTestJsCommonJs"
+      "FunctionNameTestJsCommonJs",
     );
 
     const payload = getSamplePayload(lambdaName);
@@ -92,7 +92,7 @@ describe("cdk-basic", async () => {
   test("call Lambda - testJsEsModule", async () => {
     const lambdaName = await getFunctionName(
       folder,
-      "FunctionNameTestJsEsModule"
+      "FunctionNameTestJsEsModule",
     );
 
     const payload = getSamplePayload(lambdaName);
@@ -108,7 +108,7 @@ describe("cdk-basic", async () => {
   test("call Lambda - testJsCommonJsBase", async () => {
     const lambdaName = await getFunctionName(
       folder,
-      "FunctionNameTestJsCommonJsBase"
+      "FunctionNameTestJsCommonJsBase",
     );
 
     const payload = getSamplePayload(lambdaName);
@@ -124,7 +124,7 @@ describe("cdk-basic", async () => {
   test("call Lambda - testJsEsModuleBase", async () => {
     const lambdaName = await getFunctionName(
       folder,
-      "FunctionNameTestJsEsModuleBase"
+      "FunctionNameTestJsEsModuleBase",
     );
 
     const payload = getSamplePayload(lambdaName);
@@ -142,7 +142,7 @@ describe("cdk-basic", async () => {
       await removeInfra(lldProcess, folder);
       const lambdaName = await getFunctionName(
         folder,
-        "FunctionNameTestTsCommonJs"
+        "FunctionNameTestTsCommonJs",
       );
       await expectInfraRemoved(lambdaName);
     }
@@ -151,7 +151,7 @@ describe("cdk-basic", async () => {
 
 async function getFunctionName(folder: string, functionName: string) {
   const cdkOutputs = JSON.parse(
-    await fs.readFile(path.join(folder, "cdk-outputs.json"), "utf-8")
+    await fs.readFile(path.join(folder, "cdk-outputs.json"), "utf-8"),
   );
   const lambdaName = cdkOutputs["test-lld-cdk-basic"][functionName];
   return lambdaName;

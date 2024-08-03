@@ -3,6 +3,6 @@
   "compilerOptions": {
     "module": "esnext",
     "moduleResolution": "node",
-    "outDir": "./dist",
+    "outDir": "./dist"
   }
 }

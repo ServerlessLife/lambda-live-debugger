@@ -7,7 +7,7 @@ export async function getTestProjectFolder(projectName: string) {
   try {
     await fs.access(projectFolder);
     return projectFolder;
-  } catch (e) {
+  } catch {
     return path.resolve(projectName);
   }
 }

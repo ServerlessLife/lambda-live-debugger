@@ -4,21 +4,21 @@ let verboseEnabled = false;
  * @param args
  */
 function verbose(...args) {
-    if (verboseEnabled) {
-        console.info(...args);
-    }
+  if (verboseEnabled) {
+    console.info(...args);
+  }
 }
 /**
  *
  * @param enabled
  */
 function setVerbose(enabled) {
-    verboseEnabled = enabled;
+  verboseEnabled = enabled;
 }
 export const Logger = {
-    log: console.log,
-    error: console.error,
-    warn: console.warn,
-    verbose,
-    setVerbose,
+  log: console.log,
+  error: console.error,
+  warn: console.warn,
+  verbose,
+  setVerbose,
 };

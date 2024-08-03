@@ -13,10 +13,10 @@ async function buildLambda(functionId: string) {
   const artifactFile = await NodeEsBuild.getBuild(functionId);
 
   try {
-    fs.access(artifactFile!, fs.constants.F_OK);
-  } catch (err) {
+    await fs.access(artifactFile!, fs.constants.F_OK);
+  } catch {
     throw new Error(
-      `${functionId} function artifact file ${artifactFile} not found.`
+      `${functionId} function artifact file ${artifactFile} not found.`,
     );
   }
 

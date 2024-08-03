@@ -4,7 +4,7 @@ import { setTimeout } from "timers/promises";
 export async function removeInfra(
   lldProcess: ChildProcess | undefined,
   folder: string,
-  args: string[] = []
+  args: string[] = [],
 ) {
   lldProcess?.kill();
 

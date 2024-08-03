@@ -126,8 +126,6 @@ export async function getConfigFromWizard({
     answers = { ...answers, ...samAnswers };
   }
 
-  answers.framework === currentFramework ? undefined : answers.framework;
-
   // monorepo subfolder
   const answersSubfolder = await inquirer.prompt([
     {
@@ -231,7 +229,7 @@ export async function getConfigFromWizard({
     Configuration.setConfig(configTemp as any); // not complete config
 
     lambdasList = await ResourceDiscovery.getLambdas(
-      getConfigFromAnswers(answers) as LldConfig
+      getConfigFromAnswers(answers) as LldConfig,
     );
 
     if (!lambdasList) {
@@ -405,7 +403,7 @@ function getConfigFromAnswers(answers: any): LldConfigCliArgs {
   Object.keys(config).forEach((key) =>
     (config as any)[key] === undefined || (config as any)[key] === ""
       ? delete (config as any)[key]
-      : {}
+      : {},
   );
 
   return config;

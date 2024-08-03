@@ -25,7 +25,7 @@ export const lambdaHandler = async (event, context) => {
     const filePath = path.join(
       "..",
       "local_lambda_responses",
-      `${context.functionName}.json`
+      `${context.functionName}.json`,
     );
 
     fs.writeFileSync(filePath, JSON.stringify(response, null, 2));

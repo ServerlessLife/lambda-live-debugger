@@ -9,11 +9,10 @@ import {
   FormattingOptions,
 } from "jsonc-parser";
 import { VsCodeLaunch } from "./types/vsCodeConfig.js";
-import { LldConfig } from "./types/lldConfig.js";
 import { getModuleDirname, getProjectDirname } from "./getDirname.js";
 import { Logger } from "./logger.js";
 
-async function getVsCodeLaunchConfig(lldConfig?: LldConfig) {
+async function getVsCodeLaunchConfig() {
   const localRuntimeExecutable = "${workspaceFolder}/node_modules/.bin/lld";
 
   const config: VsCodeLaunch = {
@@ -38,7 +37,7 @@ async function getVsCodeLaunchConfig(lldConfig?: LldConfig) {
 
   //Logger.log("Current folder", currentFolder);
   const localFolder = path.resolve(
-    path.join(projectDirname, "node_modules/.bin/lld")
+    path.join(projectDirname, "node_modules/.bin/lld"),
   );
 
   let runtimeExecutableSet = false;
@@ -50,13 +49,13 @@ async function getVsCodeLaunchConfig(lldConfig?: LldConfig) {
     try {
       Logger.log(
         "Checking local folder for runtimeExecutable setting for VsCode configuration",
-        localFolder
+        localFolder,
       );
       await fs.access(localFolder, fs.constants.F_OK);
       config.configurations![0].runtimeExecutable = localRuntimeExecutable;
       runtimeExecutableSet = true;
       //Logger.log("Found local folder", localFolder);
-    } catch (err) {
+    } catch {
       //Logger.log("Not found", localFolder);
     }
   } else {
@@ -65,7 +64,7 @@ async function getVsCodeLaunchConfig(lldConfig?: LldConfig) {
 
   if (!runtimeExecutableSet) {
     Logger.verbose(
-      `Setting absolute path for runtimeExecutable setting for VsCode configuration`
+      `Setting absolute path for runtimeExecutable setting for VsCode configuration`,
     );
     const localFolderSubfolder = path.resolve("node_modules/.bin/lld");
     const globalModule1 = path.join(moduleDirname, "..", "..", ".bin/lld");
@@ -76,7 +75,7 @@ async function getVsCodeLaunchConfig(lldConfig?: LldConfig) {
       "..",
       "..",
       "..",
-      "bin/lld"
+      "bin/lld",
     );
     const possibleFolders = {
       [localFolder]: "${workspaceFolder}/node_modules/.bin/lld",
@@ -88,7 +87,7 @@ async function getVsCodeLaunchConfig(lldConfig?: LldConfig) {
 
     Logger.verbose(
       `Checking the following possible folders for lld executable:`,
-      JSON.stringify(possibleFolders, null, 2)
+      JSON.stringify(possibleFolders, null, 2),
     );
 
     // check each possible folder and set the runtimeExecutable
@@ -100,14 +99,14 @@ async function getVsCodeLaunchConfig(lldConfig?: LldConfig) {
         runtimeExecutableSet = true;
         Logger.verbose(`Found folder with lld executable: ${folder}`);
         break;
-      } catch (err) {
+      } catch {
         // Not found
       }
     }
 
     if (!runtimeExecutableSet) {
       Logger.error(
-        `Could not find lld executable. Please check the setting runtimeExecutable in '.vscode/launch.json'.`
+        `Could not find lld executable. Please check the setting runtimeExecutable in '.vscode/launch.json'.`,
       );
     }
   }
@@ -130,7 +129,7 @@ async function readLaunchJson(filePath: string): Promise<{
     if (errors.length) {
       errors.forEach((error) => {
         Logger.error(
-          `Error at offset ${error.offset}: ${printParseErrorCode(error.error)}`
+          `Error at offset ${error.offset}: ${printParseErrorCode(error.error)}`,
         );
       });
     } else {
@@ -147,7 +146,7 @@ async function writeConfiguration(
   filePath: string,
   jsonString: string,
   changes: any,
-  position: number
+  position: number,
 ) {
   try {
     const formattingOptions: FormattingOptions = {
@@ -191,7 +190,7 @@ async function getCurrentState(): Promise<
   // does file exist
   try {
     await fs.access(filePath, fs.constants.F_OK);
-  } catch (err) {
+  } catch {
     createNewFile = true;
   }
 
@@ -239,11 +238,11 @@ async function isConfigured() {
   return false;
 }
 
-async function addConfiguration(lldConfig: LldConfig) {
+async function addConfiguration() {
   Logger.log("Adding configuration to .vscode/launch.json");
   const state = await getCurrentState();
 
-  const config = await getVsCodeLaunchConfig(lldConfig);
+  const config = await getVsCodeLaunchConfig();
 
   if (state.state === "FILE_EXISTS_CONFIGURATION_DOES_NOT_EXIST") {
     const { jsonString, filePath, configurationsLength } = state;
@@ -252,7 +251,7 @@ async function addConfiguration(lldConfig: LldConfig) {
       filePath,
       jsonString,
       config.configurations![0],
-      configurationsLength
+      configurationsLength,
     );
   } else if (state.state === "FILE_DOES_NOT_EXIST") {
     // crete folder of filePath recursive if not exists
@@ -262,7 +261,7 @@ async function addConfiguration(lldConfig: LldConfig) {
     await fs.writeFile(
       state.filePath,
       JSON.stringify(config, null, 2),
-      "utf-8"
+      "utf-8",
     );
   }
 }

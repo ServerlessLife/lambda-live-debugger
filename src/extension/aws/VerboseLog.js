@@ -6,10 +6,10 @@
  *
  */
 
-'use strict';
+"use strict";
 
-const EnvVarName = 'AWS_LAMBDA_RUNTIME_VERBOSE';
-const Tag = 'RUNTIME';
+const EnvVarName = "AWS_LAMBDA_RUNTIME_VERBOSE";
+const Tag = "RUNTIME";
 const Verbosity = (() => {
   if (!process.env[EnvVarName]) {
     return 0;
@@ -28,7 +28,7 @@ exports.logger = function (category) {
     verbose: function () {
       if (Verbosity >= 1) {
         const args = [...arguments].map((arg) =>
-          typeof arg === 'function' ? arg() : arg
+          typeof arg === "function" ? arg() : arg,
         );
         console.log.apply(null, [Tag, category, ...args]);
       }
@@ -36,7 +36,7 @@ exports.logger = function (category) {
     vverbose: function () {
       if (Verbosity >= 2) {
         const args = [...arguments].map((arg) =>
-          typeof arg === 'function' ? arg() : arg
+          typeof arg === "function" ? arg() : arg,
         );
         console.log.apply(null, [Tag, category, ...args]);
       }
@@ -44,7 +44,7 @@ exports.logger = function (category) {
     vvverbose: function () {
       if (Verbosity >= 3) {
         const args = [...arguments].map((arg) =>
-          typeof arg === 'function' ? arg() : arg
+          typeof arg === "function" ? arg() : arg,
         );
         console.log.apply(null, [Tag, category, ...args]);
       }

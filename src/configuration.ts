@@ -141,11 +141,11 @@ async function discoverLambdas() {
   if (!lambdasListNew) {
     if (noFramework) {
       throw new Error(
-        `No framework was found, or Lambdas provided via ${configFileDefaultName} config file. If you are using monorepo, you should configure a subfolder via config/cli parameter or run the Lambda Live Debugger from a subfolder that contains the framework project.`
+        `No framework was found, or Lambdas provided via ${configFileDefaultName} config file. If you are using monorepo, you should configure a subfolder via config/cli parameter or run the Lambda Live Debugger from a subfolder that contains the framework project.`,
       );
     } else {
       throw new Error(
-        `No Lambdas were provided via ${configFileDefaultName} config file, but some were found via the framework. Check the settings 'getLambdas' or remove it.`
+        `No Lambdas were provided via ${configFileDefaultName} config file, but some were found via the framework. Check the settings 'getLambdas' or remove it.`,
       );
     }
   }
@@ -173,7 +173,7 @@ function saveDiscoveredLambdas(lambdasListNew: LambdaResource[]) {
     Logger.log(
       ` - ${getLambdas()
         .map((f) => `${f.functionName} code: ${f.codePath}`)
-        .join("\n - ")}`
+        .join("\n - ")}`,
     );
   }
 }

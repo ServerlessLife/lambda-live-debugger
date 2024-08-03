@@ -8,7 +8,7 @@ import { AwsConfiguration } from "./types/awsConfiguration.js";
  * @returns
  */
 function getCredentialsProvider(
-  awsConfiguration: AwsConfiguration
+  awsConfiguration: AwsConfiguration,
 ): AwsCredentialIdentityProvider {
   return fromNodeProviderChain({
     clientConfig: { region: awsConfiguration.region },

@@ -34,7 +34,7 @@ describe("terraform-basic", async () => {
   test("check infra", async () => {
     const lambdaName = await getFunctionName(
       folder,
-      "lambda-test-js-commonjs_1_name"
+      "lambda-test-js-commonjs_1_name",
     );
     await expectInfraDeployed(lambdaName);
   });
@@ -42,7 +42,7 @@ describe("terraform-basic", async () => {
   test("call Lambda - testTsCommonJs", async () => {
     const lambdaName = await getFunctionName(
       folder,
-      "lambda-test-ts-commonjs_name"
+      "lambda-test-ts-commonjs_name",
     );
 
     const payload = getSamplePayload(lambdaName);
@@ -58,7 +58,7 @@ describe("terraform-basic", async () => {
   test("call Lambda - testTsEsModule", async () => {
     const lambdaName = await getFunctionName(
       folder,
-      "lambda-test-ts-esmodule_name"
+      "lambda-test-ts-esmodule_name",
     );
 
     const payload = getSamplePayload(lambdaName);
@@ -74,7 +74,7 @@ describe("terraform-basic", async () => {
   test("call Lambda - testJsCommonJs_1", async () => {
     const lambdaName = await getFunctionName(
       folder,
-      "lambda-test-js-commonjs_1_name"
+      "lambda-test-js-commonjs_1_name",
     );
 
     const payload = getSamplePayload(lambdaName);
@@ -90,7 +90,7 @@ describe("terraform-basic", async () => {
   test("call Lambda - testJsCommonJs_2", async () => {
     const lambdaName = await getFunctionName(
       folder,
-      "lambda-test-js-commonjs_2_name"
+      "lambda-test-js-commonjs_2_name",
     );
 
     const payload = getSamplePayload(lambdaName);
@@ -106,7 +106,7 @@ describe("terraform-basic", async () => {
   test("call Lambda - testJsEsModule", async () => {
     const lambdaName = await getFunctionName(
       folder,
-      "lambda-test-js-esmodule_name"
+      "lambda-test-js-esmodule_name",
     );
 
     const payload = getSamplePayload(lambdaName);
@@ -124,7 +124,7 @@ describe("terraform-basic", async () => {
       await removeInfra(lldProcess, folder);
       const lambdaName = await getFunctionName(
         folder,
-        "lambda-test-js-commonjs_1_name"
+        "lambda-test-js-commonjs_1_name",
       );
       await expectInfraRemoved(lambdaName);
     }
@@ -134,12 +134,12 @@ describe("terraform-basic", async () => {
 export async function getFunctionName(folder: string, functionName: string) {
   let jsonString: string | undefined = await fs.readFile(
     `${folder}/terraform-outputs.json`,
-    "utf-8"
+    "utf-8",
   );
 
   // on CICD we get strange output
-  let start = jsonString.indexOf("{");
-  let end = jsonString.lastIndexOf("::debug::Terraform exited with code 0.");
+  const start = jsonString.indexOf("{");
+  const end = jsonString.lastIndexOf("::debug::Terraform exited with code 0.");
   if (start > -1 && end > -1) {
     jsonString = jsonString.substring(start, end);
   }
@@ -154,16 +154,16 @@ export async function getFunctionName(folder: string, functionName: string) {
     outputs = JSON.parse(jsonString);
   } catch (e: any) {
     throw new Error(
-      `Failed to parse Terraform outputs: ${e.message}. JSON: ${jsonString}`
+      `Failed to parse Terraform outputs: ${e.message}. JSON: ${jsonString}`,
     );
   }
 
   try {
     const lambdaName = outputs[functionName].value;
     return lambdaName;
-  } catch (e: any) {
+  } catch {
     throw new Error(
-      `Failed to get function name for ${functionName}. Outputs: ${JSON.stringify(outputs)}`
+      `Failed to get function name for ${functionName}. Outputs: ${JSON.stringify(outputs)}`,
     );
   }
 }
