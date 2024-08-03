@@ -90,7 +90,7 @@ You probably need to tweak some settings. You can do it via CLI parameters or, b
 lld -w
 ```
 
-The configuration is saved to `lldebugger.config.ts`
+The configuration is saved to `lldebugger.config.ts`.
 
 ### CLI Parameters
 
@@ -113,6 +113,35 @@ The configuration is saved to `lldebugger.config.ts`
  --gitignore                     Add .lldebugger to .gitignore
  -h, --help                      display help for command
 ```
+
+## Configuration file lldebugger.config.ts
+
+Example lldebugger.config.ts:
+
+```typescript
+import { type LldConfigTs } from "lambda-live-debugger";
+
+export default {
+  framework: "cdk",
+  context: ["environment=development"],
+  region: "eu-central-1",
+  observable: false,
+  verbose: false,
+  //getLambdas: async (foundLambdas) => {
+  //  you can customize the list of lambdas here or create your own
+  //  return foundLambdas;
+  //},
+} satisfies LldConfigTs;
+```
+
+The setting are the same as for CLI parameters.
+
+### Custom framework implementation and adjustment
+
+getLambdas: async (foundLambdas) => {
+//you can customize the list of lambdas here or create your own
+//return foundLambdas;
+},
 
 ### Debugging
 
@@ -141,13 +170,6 @@ For other tools, please send documentation to include here. WebStorm instruction
 ## Monorepo Setup
 
 Set the `subfolder` parameter if your framework is in a subfolder.
-
-## Custom Configuration
-
-getLambdas: async (foundLambdas) => {
-//you can customize the list of lambdas here or create your own
-//return foundLambdas;
-},
 
 ## Removing
 
