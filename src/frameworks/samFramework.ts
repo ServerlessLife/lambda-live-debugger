@@ -15,8 +15,8 @@ import { Logger } from "../logger.js";
  * Support for AWS SAM framework
  */
 export class SamFramework implements IFramework {
-  protected samConfigFile = path.resolve("samconfig.toml");
-  protected samTemplateFile = path.resolve("template.yaml");
+  protected samConfigFile = "samconfig.toml";
+  protected samTemplateFile = "template.yaml";
 
   /**
    * Framework name
@@ -31,19 +31,19 @@ export class SamFramework implements IFramework {
    */
   public async canHandle(): Promise<boolean> {
     try {
-      await fs.access(this.samConfigFile, constants.F_OK);
+      await fs.access(path.resolve(this.samConfigFile), constants.F_OK);
     } catch (error) {
       Logger.verbose(
-        `[SAM] This is not a SAM framework project. ${this.samConfigFile} not found.`
+        `[SAM] This is not a SAM framework project. ${path.resolve(this.samConfigFile)} not found.`
       );
       return false;
     }
 
     try {
-      await fs.access(this.samTemplateFile, constants.F_OK);
+      await fs.access(path.resolve(this.samTemplateFile), constants.F_OK);
     } catch (error) {
       Logger.verbose(
-        `[SAM] This is not a SAM framework project. ${this.samTemplateFile} not found.`
+        `[SAM] This is not a SAM framework project. ${path.resolve(this.samTemplateFile)} not found.`
       );
       return false;
     }
@@ -65,16 +65,24 @@ export class SamFramework implements IFramework {
 
     const environment = config.configEnv ?? "default";
 
-    const samConfigContent = await fs.readFile(this.samConfigFile, "utf-8");
+    const samConfigContent = await fs.readFile(
+      path.resolve(this.samConfigFile),
+      "utf-8"
+    );
 
     const samConfig = toml.parse(samConfigContent);
     const stackName = samConfig[environment]?.global?.parameters?.stack_name;
 
     if (!stackName) {
-      throw new Error(`Stack name not found in ${this.samConfigFile}`);
+      throw new Error(
+        `Stack name not found in ${path.resolve(this.samConfigFile)}`
+      );
     }
 
-    const samTemplateContent = await fs.readFile(this.samTemplateFile, "utf-8");
+    const samTemplateContent = await fs.readFile(
+      path.resolve(this.samTemplateFile),
+      "utf-8"
+    );
     const template = yaml.parse(samTemplateContent);
 
     const lambdas: any[] = [];

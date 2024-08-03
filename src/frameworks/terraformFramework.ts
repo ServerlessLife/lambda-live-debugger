@@ -45,7 +45,15 @@ export class TerraformFramework implements IFramework {
   public async canHandle(): Promise<boolean> {
     // is there any filey with *.tf extension
     const files = await fs.readdir(process.cwd());
-    return files.some((f) => f.endsWith(".tf"));
+    const r = files.some((f) => f.endsWith(".tf"));
+
+    if (!r) {
+      Logger.verbose(
+        `[Terraform] This is not a Terraform project. There are no *.tf files in ${path.resolve(".")} folder.`
+      );
+    }
+
+    return r;
   }
 
   /**
