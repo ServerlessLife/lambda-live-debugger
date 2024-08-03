@@ -7,6 +7,10 @@ permissions:
   id-token: write
   contents: write
 
+env:
+  DISABLE_PARALLEL_DEPLOY: false
+  node_version: 20
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,7 +21,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: ${{ env.node_version }}
           registry-url: "https://registry.npmjs.org"
       - name: Install dependencies
         run: npm ci
@@ -50,7 +54,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: ${{ env.node_version }}
           registry-url: "https://registry.npmjs.org"
       - name: Install dependencies
         run: npm ci
@@ -72,9 +76,9 @@ jobs:
         run: npm run deploy
         working-directory: test/cdk-basic
       - name: Test
-        run: DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 test/cdk-basic.test.ts
+        run: npx vitest --retry 1 test/cdk-basic.test.ts
       - name: Test - observable mode
-        run: OBSERVABLE_MODE=true DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 test/cdk-basic.test.ts
+        run: OBSERVABLE_MODE=true npx vitest --retry 1 test/cdk-basic.test.ts
 
   test-sls-basic:
     needs:
@@ -87,7 +91,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: ${{ env.node_version }}
           registry-url: "https://registry.npmjs.org"
       - name: Install dependencies
         run: npm ci
@@ -109,9 +113,9 @@ jobs:
         run: npm run deploy
         working-directory: test/sls-basic
       - name: Test
-        run: DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 test/sls-basic.test.ts
+        run: npx vitest --retry 1 test/sls-basic.test.ts
       - name: Test - observable mode
-        run: OBSERVABLE_MODE=true DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 test/sls-basic.test.ts
+        run: OBSERVABLE_MODE=true npx vitest --retry 1 test/sls-basic.test.ts
 
   test-sls-esbuild-cjs:
     needs:
@@ -124,7 +128,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: ${{ env.node_version }}
           registry-url: "https://registry.npmjs.org"
       - name: Install dependencies
         run: npm ci
@@ -146,9 +150,9 @@ jobs:
         run: npm run deploy
         working-directory: test/sls-esbuild-cjs
       - name: Test
-        run: DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 test/sls-esbuild-cjs.test.ts
+        run: npx vitest --retry 1 test/sls-esbuild-cjs.test.ts
       - name: Test - observable mode
-        run: OBSERVABLE_MODE=true DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 test/sls-esbuild-cjs.test.ts
+        run: OBSERVABLE_MODE=true npx vitest --retry 1 test/sls-esbuild-cjs.test.ts
 
   test-sls-esbuild-esm:
     needs:
@@ -161,7 +165,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: ${{ env.node_version }}
           registry-url: "https://registry.npmjs.org"
       - name: Install dependencies
         run: npm ci
@@ -183,9 +187,9 @@ jobs:
         run: npm run deploy
         working-directory: test/sls-esbuild-esm
       - name: Test
-        run: DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 test/sls-esbuild-esm.test.ts
+        run: npx vitest --retry 1 test/sls-esbuild-esm.test.ts
       - name: Test - observable mode
-        run: OBSERVABLE_MODE=true DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 test/sls-esbuild-esm.test.ts
+        run: OBSERVABLE_MODE=true npx vitest --retry 1 test/sls-esbuild-esm.test.ts
 
   test-sam-basic:
     needs:
@@ -202,7 +206,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: ${{ env.node_version }}
           registry-url: "https://registry.npmjs.org"
       - name: Install dependencies
         run: npm ci
@@ -224,9 +228,9 @@ jobs:
         run: npm run deploy
         working-directory: test/sam-basic
       - name: Test
-        run: DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 test/sam-basic.test.ts
+        run: npx vitest --retry 1 test/sam-basic.test.ts
       - name: Test - observable mode
-        run: OBSERVABLE_MODE=true DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 test/sam-basic.test.ts
+        run: OBSERVABLE_MODE=true npx vitest --retry 1 test/sam-basic.test.ts
 
   test-terraform-basic:
     needs:
@@ -239,7 +243,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: ${{ env.node_version }}
           registry-url: "https://registry.npmjs.org"
       - name: Install dependencies
         run: npm ci
@@ -268,9 +272,9 @@ jobs:
         run: npm run deploy
         working-directory: test/terraform-basic
       - name: Test
-        run: DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 test/terraform-basic.test.ts
+        run: npx vitest --retry 1 test/terraform-basic.test.ts
       - name: Test - observable mode
-        run: OBSERVABLE_MODE=true DISABLE_PARALLEL_DEPLOY=true npx vitest --retry 1 test/terraform-basic.test.ts
+        run: OBSERVABLE_MODE=true npx vitest --retry 1 test/terraform-basic.test.ts
 
   publish:
     needs:
@@ -289,7 +293,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: ${{ env.node_version }}
           registry-url: "https://registry.npmjs.org"
       - name: Install dependencies
         run: npm ci
