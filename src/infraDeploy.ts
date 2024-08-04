@@ -151,7 +151,7 @@ async function deployLayer() {
       });
       await getLambdaClient().send(deleteLayerVersionCommand);
     } else {
-      Logger.log(`${layerDescription} already deployed.`);
+      Logger.verbose(`${layerDescription} already deployed.`);
       return existingLayer.LayerVersionArn;
     }
   }
@@ -159,7 +159,7 @@ async function deployLayer() {
   // Read the ZIP file containing your layer code
   const layerContent = await fs.readFile(layerZipPathFullPath);
 
-  Logger.log(`Deploying ${layerDescription}`);
+  Logger.verbose(`Deploying ${layerDescription}`);
 
   // Create the command for publishing a new layer version
   const publishLayerVersionCommand = new PublishLayerVersionCommand({
@@ -424,7 +424,7 @@ async function attachLayerToLambda(
   // check if layers with the wrong version are attached
   if (!needToUpdate && ddlLayerArns.find((arn) => arn !== layerArn)) {
     needToUpdate = true;
-    Logger.log("Layer with the wrong version attached to the function");
+    Logger.verbose("Layer with the wrong version attached to the function");
   }
 
   const ddlEnvironmentVariables = getEnvironmentVarablesForDebugger(
@@ -458,7 +458,7 @@ async function attachLayerToLambda(
 
       await getLambdaClient().send(updateFunctionConfigurationCommand);
 
-      Logger.log(
+      Logger.verbose(
         `[Function ${functionName}] Lambda layer and environment variables updated`,
       );
     } catch (error: any) {
@@ -468,7 +468,7 @@ async function attachLayerToLambda(
       );
     }
   } else {
-    Logger.log(
+    Logger.verbose(
       `[Function ${functionName}] Lambda layer and environment already up to date`,
     );
   }
@@ -517,7 +517,7 @@ async function addPolicyToLambdaRole(functionName: string) {
 
   if (addPolicy) {
     // add inline policy to the role using PutRolePolicyCommand
-    Logger.log(
+    Logger.verbose(
       `[Function ${functionName}] Attaching policy to the role ${roleName}`,
     );
 
@@ -586,7 +586,7 @@ async function removePolicyFromLambdaRole(functionName: string) {
 
     if (existingPolicy) {
       try {
-        Logger.log(
+        Logger.verbose(
           `[Function ${functionName}] Removing policy from the role ${roleName}`,
         );
         await getIAMClient().send(
@@ -602,7 +602,7 @@ async function removePolicyFromLambdaRole(functionName: string) {
         );
       }
     } else {
-      Logger.log(
+      Logger.verbose(
         `[Function ${functionName}] No need to remove policy from the role ${roleName}, policy not found`,
       );
     }

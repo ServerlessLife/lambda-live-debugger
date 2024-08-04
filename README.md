@@ -19,20 +19,24 @@ It supports the following frameworks:
 
 **This project is in the early alpha stage. Your feedback is incredibly valuable. Please let me know if it works for you or if you encounter any issues. I've tested many scenarios, but people can configure their projects and TypeScript settings in numerous ways. The tool is flexible and can be adjusted to fit your setup in most cases without needing additional features. If you need help, please let me know. Any suggestions for improvements are welcome.**
 
-Contact me via:
+If the tool is working well for you, please fill out the general [FEEDBACK FORM](https://forms.gle/v6ekZtuB45Rv3EyW9). This helps us understand how extensively the tool has been tested and whether there is a general interest in its further development.
 
+If you've encountered a bug, need help, or would like to request additional features, please create an issue on [GitHub Issue](https://github.com/ServerlessLife/lambda-live-debugger/issues).
+
+Contact me via:
+- [Feedback Form](https://forms.gle/v6ekZtuB45Rv3EyW9)
 - [GitHub Issues](https://github.com/ServerlessLife/lambda-live-debugger/issues)
 - [LinkedIn](http://www.linkedin.com/in/marko-serverlesslife)
 
 ## The Problem Statement
 
-Serverless is amazing and solves many issues with traditional systems. However, writing code for Lambda functions can be challenging. The cycle of writing, deploying, running, fixing, and redeploying is time-consuming and tedious. While local testing tools and unit/integration tests exist, they often don't replicate the actual environment closely enough.
+Serverless is amazing and solves many issues with traditional systems. However, writing code for Lambda functions can be challenging. The cycle of writing, deploying, running, fixing, and redeploying is time-consuming and tedious. You could use tools to run Lambda locally or use unit/integration tests; those approaches often don't replicate the actual environment closely enough.
 
 ## How It Works
 
-Lambda Live Debugger connects to your deployed Lambda, routes requests to your computer, and sends responses back to the Lambda. This allows you to debug locally, but the system behaves as if the code is running in the cloud with the same permissions.
+Lambda Live Debugger connects to your deployed Lambda, routes requests to your computer, and sends responses back to the deployed Lambda. This allows you to debug locally, but the system behaves as if the code is running in the cloud with the same permissions.
 
-The tool attaches Lambda Extensions (via a Layer) to intercept and relay calls to AWS IoT, transferring messages between your Lambda and local machine. If the Lambda is written in TypeScript, it's transpiled to JavaScript. The code is executed via Node Worker Thread.
+The tool attaches Lambda Extensions (via a Layer), intercepts, and relays calls to AWS IoT. AWS IoT transfers messages between your Lambda and local machine. If the Lambda is written in TypeScript, it's transpiled to JavaScript. The code is executed via the Node Worker Thread.
 
 ![Architecture](./architecture.drawio.png)
 
@@ -40,7 +44,7 @@ The tool attaches Lambda Extensions (via a Layer) to intercept and relay calls t
 
 Lambda Live Debugger makes the following changes to your AWS infrastructure:
 
-- Adds Lambda Layer
+- Deploys Lambda Layer
 - Attaches the Layer to each Lambda you're debugging
 - Adds a policy to the Lambda Role for AWS IoT access
 
@@ -71,7 +75,7 @@ _(On Linux and Mac: `sudo npm install lambda-live-debugger -g`)_
 or locally
 
 ```
-npm install lambda-live-debugger -g
+npm install lambda-live-debugger
 ```
 
 _(If installed locally, you must prefix all commands with `npx`, if they are not part of `scripts` in `package.json`.)_
@@ -116,17 +120,17 @@ The configuration is saved to `lldebugger.config.ts`.
 
 ## Configuration file lldebugger.config.ts
 
-Example lldebugger.config.ts:
+Example `lldebugger.config.ts`:
 
 ```typescript
 import { type LldConfigTs } from "lambda-live-debugger";
 
 export default {
-  framework: "cdk",
-  context: ["environment=development"],
-  region: "eu-central-1",
-  observable: false,
-  verbose: false,
+ framework: "cdk",
+ context: ["environment=development"],
+ region: "eu-central-1",
+ observable: false,
+ verbose: false,
   //getLambdas: async (foundLambdas) => {
   //  you can customize the list of lambdas here or create your own
   //  return foundLambdas;
@@ -138,10 +142,12 @@ The setting are the same as for CLI parameters.
 
 ### Custom framework implementation and adjustment
 
+```typescript
 getLambdas: async (foundLambdas) => {
 //you can customize the list of lambdas here or create your own
 //return foundLambdas;
 },
+```
 
 ### Debugging
 
@@ -151,7 +157,7 @@ You might want to configure your development tool for debugging. The wizard auto
 {
   "version": "0.2.0",
   "configurations": [
-    {
+ {
       "name": "Lambda Live Debugger",
       "type": "node",
       "request": "launch",
@@ -160,8 +166,8 @@ You might want to configure your development tool for debugging. The wizard auto
       "console": "integratedTerminal",
       "skipFiles": ["<node_internals>/**"],
       "env": {}
-    }
-  ]
+ }
+ ]
 }
 ```
 
@@ -209,18 +215,19 @@ I am not a Terraform developer, so I only know the basics. Please provide a samp
 
 ## Know issues
 
-...
+Check the [GitHub issues](https://github.com/ServerlessLife/lambda-live-debugger/issues).
 
 ## Missing Features
 
-Check the [open issues](https://github.com/ServerlessLife/lambda-live-debugger/issues). The biggest missing feature right now is MFA authentication and more Terraform configurations.
+Check the [GitHub issues](https://github.com/ServerlessLife/lambda-live-debugger/issues). The biggest missing feature right now is MFA authentication and more Terraform configurations.
 
 ## Reporting an Issue
 
-- Make sure the bug hasn't already been reported. Add a "+1" comment so I know there are multiple users struggling with the same issue. If possible, add some additional info.
-- Use descriptive titles with prefixes like "bug:", "help:", "feature:", or "discussion:". Please also add the matching label and, if needed, set priority via a label.
+- Make sure the bug hasn't already been reported. If you fount if, add a "+1" comment so I know there are multiple users struggling with the same issue. If possible, add some additional info.
+- Use descriptive titles with prefixes like "bug:", "help:", "feature:", or "discussion:".
 - Enable verbose logging and provide the full log.
 - Describe your setup in detail, or better yet, provide a sample project.
+- Specify exact framework version (CDK, SLS, SAM ...) and exact version of Lambda Live Debugger version.
 
 ## Authors:
 
@@ -229,7 +236,7 @@ Check the [open issues](https://github.com/ServerlessLife/lambda-live-debugger/i
 
 ## Contributors (alphabetical)
 
-- ⭐ Your name here for smaller code/documentation contributions or sample projects as part of bug reports
+- ⭐ Your name here for documentation contributions, minor code additions, or sample projects submitted with bug reports.
 
 ## Declarment
 
