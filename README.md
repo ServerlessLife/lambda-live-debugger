@@ -2,7 +2,7 @@
 
 ![Logo](logo.png)
 
-Lambda Live Debugger is an indispensable tool for debugging AWS Lambda functions from your computer, even though they are deployed in the cloud. It supports Lambdas written in JavaScript or TypeScript.
+Lambda Live Debugger ([GitHub](https://github.com/ServerlessLife/lambda-live-debugger)) is an indispensable tool for debugging AWS Lambda functions from your computer, even though they are deployed in the cloud. It supports Lambdas written in JavaScript or TypeScript.
 
 This tool offers similar functionality to [SST](https://sst.dev/) and [Serverless Framework v4](https://www.serverless.com/blog/serverless-framework-v4-general-availability), with the addition of an Observability Mode.
 
