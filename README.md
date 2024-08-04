@@ -19,11 +19,12 @@ It supports the following frameworks:
 
 **This project is in the early alpha stage. Your feedback is incredibly valuable. Please let me know if it works for you or if you encounter any issues. I've tested many scenarios, but people can configure their projects and TypeScript settings in numerous ways. The tool is flexible and can be adjusted to fit your setup in most cases without needing additional features. If you need help, please let me know. Any suggestions for improvements are welcome.**
 
-If the tool is working well for you, please fill out the general [FEEDBACK FORM](https://forms.gle/v6ekZtuB45Rv3EyW9). This helps us understand how extensively the tool has been tested and whether there is a general interest in its further development.
+If the tool is working well for you, please fill out the general [FEEDBACK FORM](https://forms.gle/v6ekZtuB45Rv3EyW9). This helps me understand how extensively the tool has been tested and whether there is a general interest in its further development.
 
 If you've encountered a bug, need help, or would like to request additional features, please create an issue on [GitHub Issue](https://github.com/ServerlessLife/lambda-live-debugger/issues).
 
 Contact me via:
+
 - [Feedback Form](https://forms.gle/v6ekZtuB45Rv3EyW9)
 - [GitHub Issues](https://github.com/ServerlessLife/lambda-live-debugger/issues)
 - [LinkedIn](http://www.linkedin.com/in/marko-serverlesslife)
@@ -126,11 +127,11 @@ Example `lldebugger.config.ts`:
 import { type LldConfigTs } from "lambda-live-debugger";
 
 export default {
- framework: "cdk",
- context: ["environment=development"],
- region: "eu-central-1",
- observable: false,
- verbose: false,
+  framework: "cdk",
+  context: ["environment=development"],
+  region: "eu-central-1",
+  observable: false,
+  verbose: false,
   //getLambdas: async (foundLambdas) => {
   //  you can customize the list of lambdas here or create your own
   //  return foundLambdas;
@@ -157,7 +158,7 @@ You might want to configure your development tool for debugging. The wizard auto
 {
   "version": "0.2.0",
   "configurations": [
- {
+    {
       "name": "Lambda Live Debugger",
       "type": "node",
       "request": "launch",
@@ -166,8 +167,8 @@ You might want to configure your development tool for debugging. The wizard auto
       "console": "integratedTerminal",
       "skipFiles": ["<node_internals>/**"],
       "env": {}
- }
- ]
+    }
+  ]
 }
 ```
 
