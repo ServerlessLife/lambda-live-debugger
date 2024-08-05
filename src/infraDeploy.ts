@@ -80,23 +80,36 @@ function getIAMClient(): IAMClient {
 /**
  * Find an existing layer
  * @param layerName
+ * @param description
  * @returns
  */
-async function findExistingLayer(layerName: string) {
-  const listLayerVersionsCommand = new ListLayerVersionsCommand({
-    LayerName: layerName,
-  });
+async function findExistingLayerVersion(
+  layerName: string,
+  description: string,
+) {
+  let nextMarker: string | undefined;
 
-  const response = await getLambdaClient().send(listLayerVersionsCommand);
-  if (response.LayerVersions && response.LayerVersions.length > 0) {
-    const latestLayer = response.LayerVersions[0];
+  do {
+    const listLayerVersionsCommand = new ListLayerVersionsCommand({
+      LayerName: layerName,
+      Marker: nextMarker,
+    });
 
-    Logger.verbose(
-      `Latest layer version: ${latestLayer.Version}, description: ${latestLayer.Description}`,
-    );
+    const response = await getLambdaClient().send(listLayerVersionsCommand);
+    if (response.LayerVersions && response.LayerVersions.length > 0) {
+      const matchingLayer = response.LayerVersions.find(
+        (layer) => layer.Description === description,
+      );
+      if (matchingLayer) {
+        Logger.verbose(
+          `Matching layer version: ${matchingLayer.Version}, description: ${matchingLayer.Description}`,
+        );
+        return matchingLayer;
+      }
+    }
 
-    return latestLayer;
-  }
+    nextMarker = response.NextMarker;
+  } while (nextMarker);
 
   Logger.verbose("No existing layer found.");
 
@@ -110,31 +123,11 @@ async function findExistingLayer(layerName: string) {
 async function deployLayer() {
   const layerDescription = `Lambda Live Debugger Layer version ${await getVersion()}`;
 
-  let layerZipPathFullPath = path.resolve(
-    path.join(getModuleDirname(), "./extension/extension.zip"),
+  // Check if the layer already exists
+  const existingLayer = await findExistingLayerVersion(
+    layerName,
+    layerDescription,
   );
-
-  Logger.verbose(`Layer ZIP path: ${layerZipPathFullPath}`);
-
-  // check if file exists
-  try {
-    await fs.access(layerZipPathFullPath);
-  } catch {
-    // if I am debugging
-    const layerZipPathFullPath2 = path.join(
-      getModuleDirname(),
-      "../dist/extension/extension.zip",
-    );
-
-    try {
-      await fs.access(layerZipPathFullPath2);
-      layerZipPathFullPath = layerZipPathFullPath2;
-    } catch {
-      throw new Error(`File for the layer not found: ${layerZipPathFullPath}`);
-    }
-  }
-
-  const existingLayer = await findExistingLayer(layerName);
   if (
     existingLayer &&
     existingLayer.LayerVersionArn &&
@@ -155,6 +148,31 @@ async function deployLayer() {
       return existingLayer.LayerVersionArn;
     }
   }
+
+  // check the ZIP
+  let layerZipPathFullPath = path.resolve(
+    path.join(getModuleDirname(), "./extension/extension.zip"),
+  );
+
+  // get the full path to the ZIP file
+  try {
+    await fs.access(layerZipPathFullPath);
+  } catch {
+    // if I am debugging
+    const layerZipPathFullPath2 = path.join(
+      getModuleDirname(),
+      "../dist/extension/extension.zip",
+    );
+
+    try {
+      await fs.access(layerZipPathFullPath2);
+      layerZipPathFullPath = layerZipPathFullPath2;
+    } catch {
+      throw new Error(`File for the layer not found: ${layerZipPathFullPath}`);
+    }
+  }
+
+  Logger.verbose(`Layer ZIP path: ${layerZipPathFullPath}`);
 
   // Read the ZIP file containing your layer code
   const layerContent = await fs.readFile(layerZipPathFullPath);
