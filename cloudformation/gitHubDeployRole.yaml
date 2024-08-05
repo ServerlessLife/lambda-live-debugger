@@ -108,6 +108,10 @@ Resources:
                   - ecr:SetRepositoryPolicy
                 Resource:
                   - Fn::Sub: arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/cdk-hnb659fds-container-assets-*
+              - Effect: Allow
+                Action:
+                  - cloudwatch:PutRetentionPolicy
+                Resource: "*"
 
         - PolicyName: SLSandSAMDeployPolicy
           PolicyDocument:
