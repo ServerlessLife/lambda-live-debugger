@@ -41,6 +41,11 @@ The tool attaches Lambda Extensions (via a Layer), intercepts, and relays calls 
 
 ![Architecture](./architecture.drawio.png)
 
+AWS keys generated on the cloud for Lambda are transferred to the local environment, so the code has the same permissions as it would executed on the cloud. There could be a difference in packaging, mainly regarding static files, which are probably in different locations. You can use additional environment variables to adjust the code:
+
+- `IS_LOCAL = true` = Lambda is executed locally
+- `LOCAL_PROJECT_DIR` = directory of the project
+
 ### Infrastructure Changes
 
 Lambda Live Debugger makes the following changes to your AWS infrastructure:
