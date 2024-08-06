@@ -35,7 +35,7 @@ Serverless is amazing and solves many issues with traditional systems. However, 
 
 ## How It Works
 
-Lambda Live Debugger connects to your deployed Lambda, routes requests to your computer, and sends responses back to the deployed Lambda. This allows you to debug locally, but the system behaves as if the code is running in the cloud with the same permissions.
+Lambda Live Debugger connects to your deployed Lambda, routes requests to your computer, and sends responses back to the deployed Lambda. This allows you to debug locally, but the system behaves as if the code is running in the cloud with the same permissions. If there are no infrastructure changes, you do not have to redeploy. The code is reloaded automatically without deploying or even restarting the debugger.
 
 The tool attaches Lambda Extensions (via a Layer), intercepts, and relays calls to AWS IoT. AWS IoT transfers messages between your Lambda and local machine. If the Lambda is written in TypeScript, it's transpiled to JavaScript. The code is executed via the Node Worker Thread.
 
@@ -177,6 +177,8 @@ You might want to configure your development tool for debugging. The wizard auto
 }
 ```
 
+Now, you have to press F5 or press Run -> Start Debugging, and you can set breakpoints, step through lines of code, inspect variables... For more information on how to [debug in VSCode, please refer to this link](https://code.visualstudio.com/docs/editor/debugging).
+
 For other tools, please send documentation to include here. WebStorm instructions are especially needed.
 
 ## Monorepo Setup
@@ -229,7 +231,7 @@ Check the [GitHub issues](https://github.com/ServerlessLife/lambda-live-debugger
 
 ## Reporting an Issue
 
-- Make sure the bug hasn't already been reported. If you fount if, add a "+1" comment so I know there are multiple users struggling with the same issue. If possible, add some additional info.
+- Make sure the bug hasn't already been reported. If you fount it has been, add a "+1" comment so I know there are multiple users struggling with the same issue. If possible, add some additional info.
 - Use descriptive titles with prefixes like "bug:", "help:", "feature:", or "discussion:".
 - Enable verbose logging and provide the full log.
 - Describe your setup in detail, or better yet, provide a sample project.
