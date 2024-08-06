@@ -30,20 +30,13 @@ export async function findNpmPath(dir: string, moduleName: string) {
  * @returns
  */
 async function checkModuleInPackageJson(dir: string, moduleName: string) {
-  const packageJsonPath = path.join(dir, "package.json");
-  const packageJson = JSON.parse(await fs.readFile(packageJsonPath, "utf8"));
-  const dependencies = packageJson.dependencies || {};
-  const devDependencies = packageJson.devDependencies || {};
-  if (dependencies[moduleName] || devDependencies[moduleName]) {
-    const modulePath = path.join(dir, "node_modules", moduleName);
+  const modulePath = path.join(dir, "node_modules", moduleName);
 
-    try {
-      await fs.access(modulePath);
-    } catch {
-      return undefined;
-    }
-
-    return modulePath;
+  try {
+    await fs.access(modulePath);
+  } catch {
+    return undefined;
   }
-  return undefined;
+
+  return modulePath;
 }
