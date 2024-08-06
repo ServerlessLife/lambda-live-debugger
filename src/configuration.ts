@@ -53,7 +53,14 @@ async function readConfig() {
       }
     }
 
-    const configMerged = { ...configFromConfigFile, ...configFromCliArgs };
+    const configMerged = {
+      ...configFromConfigFile,
+      ...configFromCliArgs,
+      context:
+        configFromCliArgs.context && configFromCliArgs.context?.length > 0
+          ? configFromCliArgs.context
+          : configFromConfigFile?.context,
+    };
     const debuggerId = await generateDebuggerId(!!configMerged.observable);
     setConfig({
       ...configMerged,
