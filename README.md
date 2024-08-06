@@ -35,7 +35,7 @@ Serverless is amazing and solves many issues with traditional systems. However, 
 
 ## How It Works
 
-Lambda Live Debugger connects to your deployed Lambda, routes requests to your computer, and sends responses back to the deployed Lambda. This allows you to debug locally, but the system behaves as if the code is running in the cloud with the same permissions. If there are no infrastructure changes, you do not have to redeploy. The code is reloaded automatically without deploying or even restarting the debugger.
+Lambda Live Debugger connects to your deployed Lambda, routes requests to your computer, and sends responses back to the deployed Lambda. This allows you to debug locally, but the system behaves as if the code is running in the cloud with the same permissions. In case of code changes, you do not have to redeploy. The code is reloaded automatically without deploying or even restarting the debugger.
 
 The tool attaches Lambda Extensions (via a Layer), intercepts, and relays calls to AWS IoT. AWS IoT transfers messages between your Lambda and local machine. If the Lambda is written in TypeScript, it's transpiled to JavaScript. The code is executed via the Node Worker Thread.
 
