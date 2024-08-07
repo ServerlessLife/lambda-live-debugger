@@ -6,7 +6,7 @@
     "build": "sam build",
     "deploy": "npm run build && sam deploy --config-env test --no-confirm-changeset && npm run export_outputs",
     "export_outputs": "aws cloudformation describe-stacks --stack-name lld-test-sam-basic --output json --query Stacks[0].Outputs > sam-outputs.json",
-    "destroy": "sam delete --config-env test"
+    "destroy": "sam delete --config-env test --no-prompts"
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
