@@ -1,10 +1,7 @@
+// @ts-nocheck
 import { createRequire as topLevelCreateRequire } from "module";
 const require = topLevelCreateRequire(import.meta.url);
 import path from "path";
-import { fileURLToPath } from "node:url";
-const __filename = fileURLToPath(import.meta.url);
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const __dirname = path.dirname(__filename);
 
 import { workerData, parentPort } from "node:worker_threads";
 import fs from "fs/promises";
@@ -12,6 +9,9 @@ import fs from "fs/promises";
 import { Logger } from "../logger.mjs";
 
 Logger.setVerbose(workerData.verbose);
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const __dirname = path.resolve(path.join(workerData.projectDirname, "/x/x"));
+
 Logger.verbose(`[CDK] [Worker] Started`);
 
 parentPort.on("message", async (data) => {

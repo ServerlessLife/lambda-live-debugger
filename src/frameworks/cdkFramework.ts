@@ -324,6 +324,8 @@ export class CdkFramework implements IFramework {
           workerData: {
             verbose: Configuration.config.verbose,
             awsCdkLibPath,
+            projectDirname: getProjectDirname(),
+            moduleDirname: getModuleDirname(),
           },
         },
       );
