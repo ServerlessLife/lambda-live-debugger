@@ -49,6 +49,7 @@ export type LldConfigBase = {
    */
   getLambdas?: (
     foundFunctions?: LambdaResource[],
+    config?: LldConfigBase,
   ) => Promise<LambdaResource[] | undefined>;
 
   /**

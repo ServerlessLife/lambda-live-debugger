@@ -8,6 +8,7 @@ import { promisify } from "util";
 import ts from "typescript";
 import { IFramework } from "./iFrameworks.js";
 import { Logger } from "../logger.js";
+import { LldConfigBase } from "../types/lldConfig.js";
 
 export const execAsync = promisify(exec);
 
@@ -57,10 +58,11 @@ export class TerraformFramework implements IFramework {
 
   /**
    * Get Lambda functions
-   * @param config Configuration
+   * @param _config Configuration
    * @returns Lambda functions
    */
-  public async getLambdas(): Promise<LambdaResource[]> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public async getLambdas(config: LldConfigBase): Promise<LambdaResource[]> {
     const state = await this.readTerraformState();
     const lambdas = this.extractLambdaInfo(state);
 

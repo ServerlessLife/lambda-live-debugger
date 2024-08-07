@@ -142,7 +142,7 @@ async function discoverLambdas() {
   }
 
   if (config.getLambdas) {
-    lambdasListNew = await config.getLambdas(lambdasListNew);
+    lambdasListNew = await config.getLambdas(lambdasListNew, config);
   }
 
   if (!lambdasListNew) {

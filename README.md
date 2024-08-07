@@ -146,15 +146,6 @@ export default {
 
 The setting are the same as for CLI parameters.
 
-### Custom framework implementation and adjustment
-
-```typescript
-getLambdas: async (foundLambdas) => {
-//you can customize the list of lambdas here or create your own
-//return foundLambdas;
-},
-```
-
 ### Debugging
 
 You might want to configure your development tool for debugging. The wizard automatically configures for VsCode in `.vscode/launch.json`. Here is an example:
@@ -221,6 +212,101 @@ Only the basic setup is supported. Check the [test case](https://github.com/Serv
 
 I am not a Terraform developer, so I only know the basics. Please provide a sample project so I can build better support.
 
+### Custom framework implementation and adjustment
+
+Configuration file `lldebugger.config.ts` enables you to modify the list of Lambdas, change the code path, esBuild configuration, or provide your own list of Lambdas, thereby supporting support **any framework**. For this to work, install Lambda Live Debugger locally in the project.
+
+```typescript
+getLambdas: async (foundLambdas, config) => {
+  //you can customize the list of lambdas here or create your own
+  return foundLambdas;
+},
+```
+
+**Filter list of functions:**
+
+```typescript
+getLambdas: async (foundLambdas, config) => {
+  return foundLambdas?.filter((l) =>
+    l.functionName.includes("myfunction"),
+ );
+},
+```
+
+**Modify code path:**\
+For example, when the framework has only a list of JavaScript files, but you transpiled them from TypeScript with your own solution.
+
+```typescript
+getLambdas: async (foundLambdas, config) => {
+  if (foundLambdas) {
+    for (const lambda of foundLambdas) {
+ lambda.codePath = lambda.codePath
+        .replace("/dist/", "/src/")
+        .replace(".js", ".ts");
+ }
+ }
+},
+```
+
+**Modfiy esBuild configuration:**
+
+```typescript
+import { type EsBuildOptions, type LldConfigTs } from "lambda-live-debugger";
+
+export default {
+  ...
+ getLambdas: async (foundLambdas, config) => {
+    if (foundLambdas) {
+      for (const lambda of foundLambdas) {
+ lambda.esBuildOptions = {
+ target: "node14",
+ };
+ }
+ }
+ },
+} satisfies LldConfigTs;
+```
+
+**Provide your own list of Lambdas and support any framework**:
+
+```typescript
+export default {
+  //framework: <-- you do not need this line
+  ...
+ getLambdas: async (foundLambdas, config) => {
+    return [
+ {
+        // function name as deployed on AWS
+ functionName: "mystack-myfunction",
+ codePath: "/src/myLambda.ts",
+ },
+ ];
+ },
+} satisfies LldConfigTs;
+```
+
+**Modify existing framework support:**
+
+```typescript
+import { CdkFramework, type LldConfigBase, type LldConfigTs } from "lambda-live-debugger";
+
+class MyCdkFramework extends CdkFramework {
+  override getCdkContext(
+ cdkConfigPath: string,
+ config: LldConfigBase,
+ ) {
+    // your implementation
+ }
+}
+
+export default {
+  ...
+ getLambdas: async (foundLambdas, config) => {
+    return new MyCdkFramework().getLambdas(config);
+ }
+} satisfies LldConfigTs;s
+```
+
 ## Know issues
 
 Check the [GitHub issues](https://github.com/ServerlessLife/lambda-live-debugger/issues).
@@ -235,7 +321,7 @@ Check the [GitHub issues](https://github.com/ServerlessLife/lambda-live-debugger
 - Use descriptive titles with prefixes like "bug:", "help:", "feature:", or "discussion:".
 - Enable verbose logging and provide the full log.
 - Describe your setup in detail, or better yet, provide a sample project.
-- Specify exact framework version (CDK, SLS, SAM ...) and exact version of Lambda Live Debugger version.
+- Specify the exact framework version (CDK, SLS, SAM ...) and the exact Lambda Live Debugger version.
 
 ## Authors:
 

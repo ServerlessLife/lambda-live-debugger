@@ -11,8 +11,8 @@ import { LldConfigBase } from "../types/lldConfig.js";
 import { Logger } from "../logger.js";
 import { Worker } from "node:worker_threads";
 import { getModuleDirname, getProjectDirname } from "../getDirname.js";
-import { Configuration } from "../configuration.js";
 import { findNpmPath } from "../utils/findNpmPath.js";
+import { type BundlingOptions } from "aws-cdk-lib/aws-lambda-nodejs";
 
 /**
  * Support for AWS CDK framework
@@ -315,6 +315,81 @@ export class CdkFramework implements IFramework {
     );
     Logger.verbose(`[CDK] aws-cdk-lib path: ${awsCdkLibPath}`);
 
+    const lambdas = await this.runCdkCodeAndReturnLambdas({
+      config,
+      awsCdkLibPath,
+      compileCodeFile: compileOutput,
+    });
+
+    const list = await Promise.all(
+      lambdas.map(async (lambda) => {
+        // handler slit into file and file name
+        const handlerSplit = lambda.handler.split(".");
+
+        const handler = handlerSplit.pop();
+        const filename = handlerSplit[0];
+
+        let codePath = lambda.codePath;
+
+        if (!codePath) {
+          const codePathJs = lambda.code?.path
+            ? path.join(lambda.code.path, `${filename}.js`)
+            : undefined;
+          const codePathCjs = lambda.code?.path
+            ? path.join(lambda.code.path, `${filename}.cjs`)
+            : undefined;
+          const codePathMjs = lambda.code?.path
+            ? path.join(lambda.code.path, `${filename}.mjs`)
+            : undefined;
+
+          // get  the first file that exists
+          codePath = [codePathJs, codePathCjs, codePathMjs]
+            .filter((c) => c)
+            .find((file) =>
+              fs
+                .access(file as string)
+                .then(() => true)
+                .catch(() => false),
+            );
+
+          if (!codePath) {
+            throw new Error(
+              `Code file not found for Lambda function ${lambda.code.path}`,
+            );
+          }
+        }
+
+        const packageJsonPath = await findPackageJson(codePath);
+        Logger.verbose(`[CDK] package.json path: ${packageJsonPath}`);
+
+        return {
+          cdkPath: lambda.cdkPath,
+          stackName: lambda.stackName,
+          packageJsonPath,
+          codePath,
+          handler,
+          bundling: lambda.bundling,
+        };
+      }),
+    );
+
+    return list;
+  }
+
+  /**
+   * Run CDK code in a node thread worker and return the Lambda functions
+   * @param param0
+   * @returns
+   */
+  protected async runCdkCodeAndReturnLambdas({
+    config,
+    awsCdkLibPath,
+    compileCodeFile,
+  }: {
+    config: LldConfigBase;
+    awsCdkLibPath: string | undefined;
+    compileCodeFile: string;
+  }) {
     const lambdas: any[] = await new Promise((resolve, reject) => {
       const worker = new Worker(
         path.resolve(
@@ -322,7 +397,7 @@ export class CdkFramework implements IFramework {
         ),
         {
           workerData: {
-            verbose: Configuration.config.verbose,
+            verbose: config.verbose,
             awsCdkLibPath,
             projectDirname: getProjectDirname(),
             moduleDirname: getModuleDirname(),
@@ -350,7 +425,7 @@ export class CdkFramework implements IFramework {
       });
 
       worker.postMessage({
-        compileOutput,
+        compileOutput: compileCodeFile,
       });
     });
 
@@ -359,51 +434,17 @@ export class CdkFramework implements IFramework {
       JSON.stringify(lambdas, null, 2),
     );
 
-    const list = await Promise.all(
-      lambdas.map(async (lambda: any) => {
-        // handler slit into file and file name
-        const handlerSplit = lambda.handler.split(".");
-
-        const handler = handlerSplit.pop();
-        const filename = handlerSplit[0];
-
-        let codePath = lambda.codePath;
-
-        if (!codePath) {
-          const codePathJs = path.join(lambda.code.path, `${filename}.js`);
-          const codePathCjs = path.join(lambda.code.path, `${filename}.cjs`);
-          const codePathMjs = path.join(lambda.code.path, `${filename}.mjs`);
-
-          // get the first file that exists
-          codePath = [codePathJs, codePathCjs, codePathMjs].find((file) =>
-            fs
-              .access(file)
-              .then(() => true)
-              .catch(() => false),
-          );
-
-          if (!codePath) {
-            throw new Error(
-              `Code file not found for Lambda function ${lambda.code.path}`,
-            );
-          }
-        }
-
-        const packageJsonPath = await findPackageJson(codePath);
-        Logger.verbose(`[CDK] package.json path: ${packageJsonPath}`);
-
-        return {
-          cdkPath: lambda.cdkPath,
-          stackName: lambda.stackName,
-          packageJsonPath,
-          codePath,
-          handler,
-          bundling: lambda.bundling,
-        };
-      }),
-    );
-
-    return list;
+    return lambdas as {
+      cdkPath: string;
+      stackName: string;
+      codePath?: string;
+      code: {
+        path?: string;
+      };
+      handler: string;
+      packageJsonPath: string;
+      bundling: BundlingOptions;
+    }[];
   }
 
   /**
