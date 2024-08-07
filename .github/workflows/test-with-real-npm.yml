@@ -25,6 +25,6 @@ jobs:
   test:
     uses: ./.github/workflows/common-test.yml
     with:
-      mode: ${{ github.event.inputs.mode }}
-      testMonorepo: ${{ github.event.inputs.testMonorepo }}
+      mode: ${{ inputs.mode }}
+      testMonorepo: ${{ inputs.testMonorepo }}
     secrets: inherit

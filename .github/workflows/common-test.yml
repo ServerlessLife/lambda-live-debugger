@@ -21,7 +21,7 @@ permissions:
 env:
   DISABLE_PARALLEL_DEPLOY: false
   REAL_NPM: ${{ inputs.mode == 'global' || inputs.mode == 'local' }}
-  TEST_MONOREPO: ${{ github.event.inputs.testMonorepo }}
+  TEST_MONOREPO: ${{ inputs.testMonorepo }}
   node_version: 20
 
 jobs:
