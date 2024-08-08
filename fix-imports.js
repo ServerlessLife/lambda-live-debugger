@@ -21,7 +21,7 @@ async function processFiles(directory) {
         .split('\n')
         .map((line) => {
           if (line.trim().startsWith('import')) {
-            return line.replace(/\.js"/g, '.mjs"');
+            return line.replace(/\.js"/g, '.mjs"').replace(/\.js'/g, ".mjs'");
           }
           return line;
         })
