@@ -3,6 +3,7 @@ import { Construct } from "constructs";
 import * as lambda_nodejs from "aws-cdk-lib/aws-lambda-nodejs";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as log from "aws-cdk-lib/aws-logs";
+import * as path from "path";
 
 export class CdkbasicStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -12,7 +13,8 @@ export class CdkbasicStack extends cdk.Stack {
       this,
       "TestTsCommonJs",
       {
-        entry: "services/testTsCommonJs/lambda.ts",
+        // a different way to get the path
+        entry: path.join(__dirname, "../services/testTsCommonJs/lambda.ts"),
         handler: "lambdaHandler",
         runtime: lambda.Runtime.NODEJS_20_X,
         logRetention: log.RetentionDays.ONE_DAY,

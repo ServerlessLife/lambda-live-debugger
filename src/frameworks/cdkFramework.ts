@@ -401,6 +401,7 @@ export class CdkFramework implements IFramework {
             awsCdkLibPath,
             projectDirname: getProjectDirname(),
             moduleDirname: getModuleDirname(),
+            subfolder: config.subfolder,
           },
         },
       );

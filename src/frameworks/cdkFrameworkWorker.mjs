@@ -10,7 +10,11 @@ import { Logger } from "../logger.mjs";
 
 Logger.setVerbose(workerData.verbose);
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const __dirname = path.resolve(path.join(workerData.projectDirname, "/x/x"));
+const __dirname = path.resolve(
+  path.join(
+    ...[workerData.projectDirname, workerData.subfolder, "x"].filter((p) => p),
+  ),
+);
 
 Logger.verbose(`[CDK] [Worker] Started`);
 
