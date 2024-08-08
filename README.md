@@ -243,12 +243,12 @@ getLambdas: async (foundLambdas, config) => {
  lambda.codePath = lambda.codePath
         .replace("/dist/", "/src/")
         .replace(".js", ".ts");
- }
- }
+    }
+  }
 },
 ```
 
-**Modfiy esBuild configuration:**
+**Modify esBuild configuration:**
 
 ```typescript
 import { type EsBuildOptions, type LldConfigTs } from "lambda-live-debugger";
@@ -258,12 +258,11 @@ export default {
  getLambdas: async (foundLambdas, config) => {
     if (foundLambdas) {
       for (const lambda of foundLambdas) {
- lambda.esBuildOptions = {
- target: "node14",
- };
- }
- }
- },
+        lambda.esBuildOptions = {
+        target: "node14",
+      };
+    }
+  }
 } satisfies LldConfigTs;
 ```
 
@@ -275,13 +274,13 @@ export default {
   ...
  getLambdas: async (foundLambdas, config) => {
     return [
- {
-        // function name as deployed on AWS
- functionName: "mystack-myfunction",
- codePath: "/src/myLambda.ts",
- },
- ];
- },
+      {
+          // function name as deployed on AWS
+          functionName: "mystack-myfunction",
+          codePath: "/src/myLambda.ts",
+      },
+    ];
+  },
 } satisfies LldConfigTs;
 ```
 
@@ -291,19 +290,16 @@ export default {
 import { CdkFramework, type LldConfigBase, type LldConfigTs } from "lambda-live-debugger";
 
 class MyCdkFramework extends CdkFramework {
-  override getCdkContext(
- cdkConfigPath: string,
- config: LldConfigBase,
- ) {
+  override getCdkContext(cdkConfigPath: string, config: LldConfigBase) {
     // your implementation
- }
+  }
 }
 
 export default {
   ...
- getLambdas: async (foundLambdas, config) => {
+  getLambdas: async (foundLambdas, config) => {
     return new MyCdkFramework().getLambdas(config);
- }
+  }
 } satisfies LldConfigTs;s
 ```
 
@@ -328,9 +324,9 @@ Check the [GitHub issues](https://github.com/ServerlessLife/lambda-live-debugger
 - [Marko (ServerlessLife)](https://www.serverlesslife.com/)
 - ⭐ Your name here for big code contributions
 
-## Contributors (alphabetical)
+## Contributors (alphabetical):
 
-- ⭐ Your name here for documentation contributions, minor code additions, or sample projects submitted with bug reports.
+- ⭐ Your name here for notable code or documentation contributions, or sample projects submitted with bug reports.
 
 ## Declarment
 
