@@ -1,16 +1,16 @@
-import { LambdaProps } from "./types/lambdaProps.js";
-import * as path from "path";
-import * as fs from "fs/promises";
-import * as esbuild from "esbuild";
-import { BuildOptions } from "esbuild";
-import { Configuration } from "./configuration.js";
-import { Logger } from "./logger.js";
-import { getProjectDirname } from "./getDirname.js";
-import { outputFolder } from "./constants.js";
-import { combineArray } from "./utils/combineArray.js";
-import { combineObject } from "./utils/combineObject.js";
-import { combineObjectStrings } from "./utils/combineObjectStrings.js";
-import { removeUndefinedProperties } from "./utils/removeUndefinedProperties.js";
+import { LambdaProps } from './types/lambdaProps.js';
+import * as path from 'path';
+import * as fs from 'fs/promises';
+import * as esbuild from 'esbuild';
+import { BuildOptions } from 'esbuild';
+import { Configuration } from './configuration.js';
+import { Logger } from './logger.js';
+import { getProjectDirname } from './getDirname.js';
+import { outputFolder } from './constants.js';
+import { combineArray } from './utils/combineArray.js';
+import { combineObject } from './utils/combineObject.js';
+import { combineObjectStrings } from './utils/combineObjectStrings.js';
+import { removeUndefinedProperties } from './utils/removeUndefinedProperties.js';
 
 type BuiltOutput = {
   result: Promise<esbuild.BuildResult>;
@@ -32,9 +32,9 @@ async function getBuild(functionId: string) {
 
     // if handler is a JavaScript file and not force bundle, just return the file
     if (
-      (func.codePath.endsWith(".js") ||
-        func.codePath.endsWith(".mjs") ||
-        func.codePath.endsWith(".cjs")) &&
+      (func.codePath.endsWith('.js') ||
+        func.codePath.endsWith('.mjs') ||
+        func.codePath.endsWith('.cjs')) &&
       !func.forceBundle
     ) {
       return func.codePath;
@@ -73,7 +73,7 @@ async function getBuild(functionId: string) {
     }
 
     const artifactFile = Object.keys(result.metafile!.outputs!).find((key) =>
-      key.endsWith(".js"),
+      key.endsWith('.js'),
     );
 
     if (!artifactFile) {
@@ -120,12 +120,12 @@ async function build(input: {
   let isESMFromPackageJson = false;
   if (packageJsonPath) {
     const packageJson = JSON.parse(
-      await fs.readFile(packageJsonPath, { encoding: "utf-8" }),
+      await fs.readFile(packageJsonPath, { encoding: 'utf-8' }),
     );
-    isESMFromPackageJson = packageJson.type === "module";
+    isESMFromPackageJson = packageJson.type === 'module';
   }
 
-  const isESMFromBundling = esbuildOptions?.format === "esm" ? true : undefined;
+  const isESMFromBundling = esbuildOptions?.format === 'esm' ? true : undefined;
 
   let isESM: boolean;
 
@@ -136,9 +136,9 @@ async function build(input: {
   ) {
     Logger.warn(
       `WARNING! Mismatch module type between package.json and bundling options for ${handlerCodePath}. Package.json: ${
-        isESMFromPackageJson ? "ESM" : "CJS"
-      }, bundling options: ${isESMFromBundling ? "ESM" : "CJS"}. Using ${
-        isESMFromBundling ? "ESM" : "CJS"
+        isESMFromPackageJson ? 'ESM' : 'CJS'
+      }, bundling options: ${isESMFromBundling ? 'ESM' : 'CJS'}. Using ${
+        isESMFromBundling ? 'ESM' : 'CJS'
       } from bunding otions.`,
     );
     isESM = isESMFromBundling;
@@ -153,38 +153,38 @@ async function build(input: {
   let ctx = input.oldCtx;
 
   Logger.verbose(
-    `[Function ${input.functionId}] Module type: ${isESM ? "ESM" : "CJS"})`,
+    `[Function ${input.functionId}] Module type: ${isESM ? 'ESM' : 'CJS'})`,
   );
 
   if (!ctx) {
     const optionsDefault: BuildOptions = {
       entryPoints: [handlerCodePath],
-      platform: "node",
+      platform: 'node',
       keepNames: true,
       bundle: true,
-      logLevel: "silent",
+      logLevel: 'silent',
 
       metafile: true,
       ...(isESM
         ? {
-            format: "esm",
-            target: "esnext",
-            mainFields: ["module", "main"],
+            format: 'esm',
+            target: 'esnext',
+            mainFields: ['module', 'main'],
             banner: {
               js: [
                 `import { createRequire as topLevelCreateRequire } from 'module';`,
                 `global.require = global.require ?? topLevelCreateRequire(import.meta.url);`,
                 `import { fileURLToPath as topLevelFileUrlToPath, URL as topLevelURL } from "url"`,
                 `global.__dirname = global.__dirname ?? topLevelFileUrlToPath(new topLevelURL(".", import.meta.url))`,
-              ].join("\n"),
+              ].join('\n'),
             },
           }
         : {
-            format: "cjs",
-            target: "node14",
+            format: 'cjs',
+            target: 'node14',
           }),
       outdir: targetFolder,
-      sourcemap: "linked",
+      sourcemap: 'linked',
     };
 
     const options: BuildOptions = {
@@ -243,7 +243,7 @@ async function build(input: {
   if (input.function.packageJsonPath) {
     const from = path.resolve(input.function.packageJsonPath);
     Logger.verbose(`[Function ${input.functionId}] package.json: ${from}`);
-    const to = path.resolve(path.join(targetFolder, "package.json"));
+    const to = path.resolve(path.join(targetFolder, 'package.json'));
 
     await fs.copyFile(from, to);
   } else {

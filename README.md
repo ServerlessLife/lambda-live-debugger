@@ -129,12 +129,12 @@ The configuration is saved to `lldebugger.config.ts`.
 Example `lldebugger.config.ts`:
 
 ```typescript
-import { type LldConfigTs } from "lambda-live-debugger";
+import { type LldConfigTs } from 'lambda-live-debugger';
 
 export default {
-  framework: "cdk",
-  context: ["environment=development"],
-  region: "eu-central-1",
+  framework: 'cdk',
+  context: ['environment=development'],
+  region: 'eu-central-1',
   observable: false,
   verbose: false,
   //getLambdas: async (foundLambdas) => {

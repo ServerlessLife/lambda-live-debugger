@@ -1,5 +1,5 @@
-import { LldConfigBase } from "../types/lldConfig.js";
-import { LambdaResource } from "../types/resourcesDiscovery.js";
+import { LldConfigBase } from '../types/lldConfig.js';
+import { LambdaResource } from '../types/resourcesDiscovery.js';
 
 /**
  * Framework support interface

@@ -1,12 +1,12 @@
-import * as fs from "fs/promises";
-import * as path from "path";
-import { EsBuildOptions, LambdaResource } from "../types/resourcesDiscovery.js";
-import { constants } from "fs";
-import { findPackageJson } from "../utils/findPackageJson.js";
-import type Serverless from "serverless";
-import { IFramework } from "./iFrameworks.js";
-import { LldConfigBase } from "../types/lldConfig.js";
-import { Logger } from "../logger.js";
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import { EsBuildOptions, LambdaResource } from '../types/resourcesDiscovery.js';
+import { constants } from 'fs';
+import { findPackageJson } from '../utils/findPackageJson.js';
+import type Serverless from 'serverless';
+import { IFramework } from './iFrameworks.js';
+import { LldConfigBase } from '../types/lldConfig.js';
+import { Logger } from '../logger.js';
 
 /**
  * Support for Serverless Framework
@@ -16,7 +16,7 @@ export class SlsFramework implements IFramework {
    * Framework name
    */
   public get name(): string {
-    return "sls";
+    return 'sls';
   }
 
   /**
@@ -25,11 +25,11 @@ export class SlsFramework implements IFramework {
    */
   public async canHandle(): Promise<boolean> {
     const serverlessFiles = [
-      path.resolve("serverless.yml"),
-      path.resolve("serverless.yaml"),
-      path.resolve("serverless.js"),
-      path.resolve("serverless.ts"),
-      path.resolve("serverless.json"),
+      path.resolve('serverless.yml'),
+      path.resolve('serverless.yaml'),
+      path.resolve('serverless.js'),
+      path.resolve('serverless.ts'),
+      path.resolve('serverless.json'),
     ];
     for (const file of serverlessFiles) {
       try {
@@ -41,7 +41,7 @@ export class SlsFramework implements IFramework {
     }
 
     Logger.verbose(
-      `[SLS] This is not a Serverless framework project. None of the files found: ${serverlessFiles.join(", ")}`,
+      `[SLS] This is not a Serverless framework project. None of the files found: ${serverlessFiles.join(', ')}`,
     );
 
     return false;
@@ -65,21 +65,21 @@ export class SlsFramework implements IFramework {
       resolveConfigurationPath = (
         await import(
           //@ts-ignore
-          "serverless/lib/cli/resolve-configuration-path.js"
+          'serverless/lib/cli/resolve-configuration-path.js'
         )
       ).default;
       readConfiguration = (
         await import(
           //@ts-ignore
-          "serverless/lib/configuration/read.js"
+          'serverless/lib/configuration/read.js'
         )
       ).default;
 
-      Serverless = (await import("serverless")).default;
+      Serverless = (await import('serverless')).default;
     } catch (error: any) {
-      Logger.error("Error loading serverless modules", error);
+      Logger.error('Error loading serverless modules', error);
       Logger.log(
-        "If you are running Lambda Live Debugger from a global installation, install Serverless Framework globally as well.",
+        'If you are running Lambda Live Debugger from a global installation, install Serverless Framework globally as well.',
       );
       throw new Error(`Error loading serverless modules. ${error.message}`, {
         cause: error,
@@ -165,7 +165,7 @@ export class SlsFramework implements IFramework {
     for (const func in lambdas) {
       const lambda = lambdas[func] as Serverless.FunctionDefinitionHandler;
       const handlerFull = lambda.handler;
-      const handlerParts = handlerFull.split(".");
+      const handlerParts = handlerFull.split('.');
       const handler = handlerParts[1];
 
       const possibleCodePaths = [
@@ -218,11 +218,11 @@ export class SlsFramework implements IFramework {
 
     // 2) Get from serverless-esbuild plugin
     const esBuildPlugin = serverless.service.plugins?.find(
-      (p) => p === "serverless-esbuild",
+      (p) => p === 'serverless-esbuild',
     );
 
     if (esBuildPlugin) {
-      Logger.verbose("[SLS] serverless-esbuild plugin detected");
+      Logger.verbose('[SLS] serverless-esbuild plugin detected');
       const settings = serverless.service.custom?.esbuild;
       if (settings) {
         esBuildOptions = {
@@ -234,11 +234,11 @@ export class SlsFramework implements IFramework {
     } else {
       // 3) Get from serverless-plugin-typescript plugin
       const typeScriptPlugin = serverless.service.plugins?.find(
-        (p) => p === "serverless-plugin-typescript",
+        (p) => p === 'serverless-plugin-typescript',
       );
 
       if (typeScriptPlugin) {
-        Logger.verbose("[SLS] serverless-plugin-typescript plugin detected");
+        Logger.verbose('[SLS] serverless-plugin-typescript plugin detected');
 
         const settings = serverless.service.custom?.serverlessPluginTypescript;
         if (settings) {

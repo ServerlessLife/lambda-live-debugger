@@ -1,28 +1,28 @@
-import * as fs from "fs/promises";
-import * as path from "path";
-import { EsBuildOptions, LambdaResource } from "../types/resourcesDiscovery.js";
-import { constants } from "fs";
-import toml from "toml";
-import * as yaml from "yaml";
-import { findPackageJson } from "../utils/findPackageJson.js";
-import { IFramework } from "./iFrameworks.js";
-import { CloudFormation } from "../cloudFormation.js";
-import { AwsConfiguration } from "../types/awsConfiguration.js";
-import { LldConfigBase } from "../types/lldConfig.js";
-import { Logger } from "../logger.js";
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import { EsBuildOptions, LambdaResource } from '../types/resourcesDiscovery.js';
+import { constants } from 'fs';
+import toml from 'toml';
+import * as yaml from 'yaml';
+import { findPackageJson } from '../utils/findPackageJson.js';
+import { IFramework } from './iFrameworks.js';
+import { CloudFormation } from '../cloudFormation.js';
+import { AwsConfiguration } from '../types/awsConfiguration.js';
+import { LldConfigBase } from '../types/lldConfig.js';
+import { Logger } from '../logger.js';
 
 /**
  * Support for AWS SAM framework
  */
 export class SamFramework implements IFramework {
-  protected samConfigFile = "samconfig.toml";
-  protected samTemplateFile = "template.yaml";
+  protected samConfigFile = 'samconfig.toml';
+  protected samTemplateFile = 'template.yaml';
 
   /**
    * Framework name
    */
   public get name(): string {
-    return "sam";
+    return 'sam';
   }
 
   /**
@@ -63,11 +63,11 @@ export class SamFramework implements IFramework {
       role: config.role,
     };
 
-    const environment = config.configEnv ?? "default";
+    const environment = config.configEnv ?? 'default';
 
     const samConfigContent = await fs.readFile(
       path.resolve(this.samConfigFile),
-      "utf-8",
+      'utf-8',
     );
 
     const samConfig = toml.parse(samConfigContent);
@@ -81,7 +81,7 @@ export class SamFramework implements IFramework {
 
     const samTemplateContent = await fs.readFile(
       path.resolve(this.samTemplateFile),
-      "utf-8",
+      'utf-8',
     );
     const template = yaml.parse(samTemplateContent);
 
@@ -90,7 +90,7 @@ export class SamFramework implements IFramework {
     // get all resources of type AWS::Serverless::Function
     for (const resourceName in template.Resources) {
       const resource = template.Resources[resourceName];
-      if (resource.Type === "AWS::Serverless::Function") {
+      if (resource.Type === 'AWS::Serverless::Function') {
         lambdas.push({
           Name: resourceName,
           ...resource,
@@ -115,10 +115,10 @@ export class SamFramework implements IFramework {
     // get tags for each Lambda
     for (const func of lambdas) {
       const handlerFull = path.join(
-        func.Properties.CodeUri ?? "",
+        func.Properties.CodeUri ?? '',
         func.Properties.Handler,
       );
-      const handlerParts = handlerFull.split(".");
+      const handlerParts = handlerFull.split('.');
       const handler = handlerParts[1];
 
       const functionName = lambdasInStack.find(
@@ -132,10 +132,10 @@ export class SamFramework implements IFramework {
       let esBuildOptions: EsBuildOptions | undefined = undefined;
 
       let codePath: string | undefined;
-      if (func.Metadata?.BuildMethod?.toLowerCase() === "esbuild") {
+      if (func.Metadata?.BuildMethod?.toLowerCase() === 'esbuild') {
         if (func.Metadata?.BuildProperties?.EntryPoints?.length > 0) {
           codePath = path.join(
-            func.Properties.CodeUri ?? "",
+            func.Properties.CodeUri ?? '',
             func.Metadata?.BuildProperties?.EntryPoints[0],
           );
         }

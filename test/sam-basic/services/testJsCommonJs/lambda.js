@@ -1,4 +1,4 @@
-const { STSClient, GetCallerIdentityCommand } = require("@aws-sdk/client-sts");
+const { STSClient, GetCallerIdentityCommand } = require('@aws-sdk/client-sts');
 
 const stsClient = new STSClient({});
 
@@ -6,7 +6,7 @@ const lambdaHandler = async (event, context) => {
   // Check context
   const remainingTime = context.getRemainingTimeInMillis();
   if (remainingTime === undefined) {
-    throw new Error("Remaining time is undefined");
+    throw new Error('Remaining time is undefined');
   }
 
   // check if SDK works
@@ -16,15 +16,15 @@ const lambdaHandler = async (event, context) => {
   const response = {
     inputEvent: event,
     accountId: identity.Account,
-    runningLocally: process.env.IS_LOCAL === "true",
+    runningLocally: process.env.IS_LOCAL === 'true',
   };
 
-  if (process.env.IS_LOCAL === "true") {
-    const fs = require("fs");
-    const path = require("path");
+  if (process.env.IS_LOCAL === 'true') {
+    const fs = require('fs');
+    const path = require('path');
     const filePath = path.join(
-      "..",
-      "local_lambda_responses",
+      '..',
+      'local_lambda_responses',
       `${context.functionName}.json`,
     );
 

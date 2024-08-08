@@ -1,8 +1,8 @@
-import { AwsCredentials } from "./awsCredentials.js";
-import { Configuration } from "./configuration.js";
-import { IoTMessage, IoTService, IoTServiceConnection } from "./ioTService.js";
-import { Logger } from "./logger.js";
-import { NodeHandler } from "./nodeHandler.js";
+import { AwsCredentials } from './awsCredentials.js';
+import { Configuration } from './configuration.js';
+import { IoTMessage, IoTService, IoTServiceConnection } from './ioTService.js';
+import { Logger } from './logger.js';
+import { NodeHandler } from './nodeHandler.js';
 
 let ioTServiceConnection: IoTServiceConnection;
 let topic: string;
@@ -34,7 +34,7 @@ async function onMessageFromLambda(message: IoTMessage) {
     //immediately respond to the ping message to confirm the local debugging is alive
     await ioTServiceConnection.publish(
       <IoTMessage>{
-        type: "PING",
+        type: 'PING',
         data: {
           workerId: message.data.workerId,
           requestId: message.data.requestId,
@@ -45,7 +45,7 @@ async function onMessageFromLambda(message: IoTMessage) {
     );
   }
 
-  if (message.type !== "INVOKE") {
+  if (message.type !== 'INVOKE') {
     throw new Error(`Unexpected message type: ${message.type}`);
   }
 
@@ -76,9 +76,9 @@ async function onMessageFromLambda(message: IoTMessage) {
       // first 50 characters of the response
       const requestPretty = message.data
         ? JSON.stringify(message.data).substring(0, 100)
-        : "";
+        : '';
       Logger.log(
-        `[Function ${message.data.functionId}] Request: ${requestPretty}${requestPretty.length < 50 ? "" : "..."}`,
+        `[Function ${message.data.functionId}] Request: ${requestPretty}${requestPretty.length < 50 ? '' : '...'}`,
       );
     }
 
@@ -93,9 +93,9 @@ async function onMessageFromLambda(message: IoTMessage) {
       // first 50 characters of the response
       const responsePretty = response
         ? JSON.stringify(response).substring(0, 100)
-        : "";
+        : '';
       Logger.log(
-        `[Function ${message.data.functionId}] Response: ${responsePretty}${responsePretty.length < 50 ? "" : "..."}`,
+        `[Function ${message.data.functionId}] Response: ${responsePretty}${responsePretty.length < 50 ? '' : '...'}`,
       );
     }
 
@@ -105,7 +105,7 @@ async function onMessageFromLambda(message: IoTMessage) {
     }
 
     const payload: IoTMessage = {
-      type: "SUCCESS",
+      type: 'SUCCESS',
       data: {
         functionId: message.data.functionId,
         requestId: message.data.requestId,
@@ -124,7 +124,7 @@ async function onMessageFromLambda(message: IoTMessage) {
     Logger.error(`[Function ${message.data.functionId}] Error: `, e);
 
     const payload: IoTMessage = {
-      type: "ERROR",
+      type: 'ERROR',
       data: {
         functionId: message.data.functionId,
         requestId: message.data.requestId,

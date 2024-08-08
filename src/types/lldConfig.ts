@@ -1,5 +1,5 @@
-import { AwsConfiguration } from "./awsConfiguration.js";
-import { LambdaResource } from "./resourcesDiscovery.js";
+import { AwsConfiguration } from './awsConfiguration.js';
+import { LambdaResource } from './resourcesDiscovery.js';
 
 export type LldConfigBase = {
   /**
@@ -59,12 +59,12 @@ export type LldConfigBase = {
 } & AwsConfiguration;
 
 export type LldConfigCliArgs = {
-  remove?: "keep-layer" | "all";
+  remove?: 'keep-layer' | 'all';
   vscode?: boolean;
   gitignore?: boolean;
   config?: string;
   wizard?: boolean;
-} & Omit<LldConfigBase, "getResources">;
+} & Omit<LldConfigBase, 'getResources'>;
 
 export type LldConfigTs = Partial<LldConfigBase>;
 

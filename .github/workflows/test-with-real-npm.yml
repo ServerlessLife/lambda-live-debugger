@@ -1,6 +1,6 @@
 name: Test with real npm
 
-run-name: "Test with real npm: mode=${{ inputs.mode }}, testMonorepo=${{ inputs.testMonorepo }}"
+run-name: 'Test with real npm: mode=${{ inputs.mode }}, testMonorepo=${{ inputs.testMonorepo }}'
 
 on:
   workflow_dispatch:
@@ -13,7 +13,7 @@ on:
           - global
           - local
       testMonorepo:
-        description: "Test monorepo by specifying folder in config"
+        description: 'Test monorepo by specifying folder in config'
         type: boolean
         default: false
 

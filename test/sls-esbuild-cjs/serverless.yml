@@ -1,5 +1,5 @@
 service: lls-sls-esbuild-cjs
-frameworkVersion: "3"
+frameworkVersion: '3'
 
 plugins:
   - serverless-esbuild

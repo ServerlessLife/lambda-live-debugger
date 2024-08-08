@@ -23,7 +23,7 @@ Resources:
       BuildProperties:
         Format: cjs
         Minify: true
-        Target: "es2020"
+        Target: 'es2020'
         Sourcemap: true
         EntryPoints:
           - lambda.ts
@@ -47,7 +47,7 @@ Resources:
         OutExtension:
           - .js=.mjs
         Minify: true
-        Target: "es2020"
+        Target: 'es2020'
         Sourcemap: true
         Banner:
           - js=import { createRequire } from 'module'; const require = createRequire(import.meta.url);

@@ -1,15 +1,15 @@
-import { LambdaProps } from "./types/lambdaProps.js";
-import { LldConfig } from "./types/lldConfig.js";
-import { LambdaResource } from "./types/resourcesDiscovery.js";
-import * as crypto from "crypto";
+import { LambdaProps } from './types/lambdaProps.js';
+import { LldConfig } from './types/lldConfig.js';
+import { LambdaResource } from './types/resourcesDiscovery.js';
+import * as crypto from 'crypto';
 // @ts-ignore // does not have types
-import mid from "node-machine-id";
-import { getConfigFromWizard } from "./configuration/getConfigFromWizard.js";
-import { getConfigFromCliArgs } from "./configuration/getConfigFromCliArgs.js";
-import { getConfigTsFromConfigFile } from "./configuration/getConfigFromTsConfigFile.js";
-import { configFileDefaultName } from "./constants.js";
-import { ResourceDiscovery } from "./resourceDiscovery.js";
-import { Logger } from "./logger.js";
+import mid from 'node-machine-id';
+import { getConfigFromWizard } from './configuration/getConfigFromWizard.js';
+import { getConfigFromCliArgs } from './configuration/getConfigFromCliArgs.js';
+import { getConfigTsFromConfigFile } from './configuration/getConfigFromTsConfigFile.js';
+import { configFileDefaultName } from './constants.js';
+import { ResourceDiscovery } from './resourceDiscovery.js';
+import { Logger } from './logger.js';
 
 let config: LldConfig;
 const lambdas: Record<string, LambdaProps> = {};
@@ -78,11 +78,11 @@ async function readConfig() {
 async function generateDebuggerId(observableMode: boolean) {
   if (observableMode) {
     // if we are in observable mode, we don't need to generate a unique id
-    return "OBSERVABLE_MODE";
+    return 'OBSERVABLE_MODE';
   }
 
   const args: string[] = process.argv;
-  const argsString = args.join(" ");
+  const argsString = args.join(' ');
 
   const deviceId = await mid.machineId();
 
@@ -90,18 +90,18 @@ async function generateDebuggerId(observableMode: boolean) {
   const currentDir = process.cwd();
 
   // combine and hash the args and the device id
-  const hash = crypto.createHash("md5");
+  const hash = crypto.createHash('md5');
   hash.update(argsString);
   hash.update(deviceId);
   hash.update(currentDir);
-  return hash.digest("hex");
+  return hash.digest('hex');
 }
 
 /**
  * Add a Lambda to the configuration
  * @param props
  */
-function addLambda(props: Omit<LambdaProps, "functionId">) {
+function addLambda(props: Omit<LambdaProps, 'functionId'>) {
   lambdas[props.functionName] = {
     functionId: props.functionName,
     ...props,
@@ -176,11 +176,11 @@ function saveDiscoveredLambdas(lambdasListNew: LambdaResource[]) {
       addLambda(lambda);
     }
 
-    Logger.log("Found the following Lambdas to debug:");
+    Logger.log('Found the following Lambdas to debug:');
     Logger.log(
       ` - ${getLambdas()
         .map((f) => `${f.functionName} code: ${f.codePath}`)
-        .join("\n - ")}`,
+        .join('\n - ')}`,
     );
   }
 }
@@ -197,7 +197,7 @@ export const Configuration = {
   readConfig,
   get config() {
     if (!config) {
-      throw new Error("Config not initialized. Call readConfig() first.");
+      throw new Error('Config not initialized. Call readConfig() first.');
     }
     return config;
   },

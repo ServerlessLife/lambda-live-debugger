@@ -1,22 +1,22 @@
-import inquirer from "inquirer";
+import inquirer from 'inquirer';
 import {
   LldConfig,
   LldConfigBase,
   LldConfigCliArgs,
   LldConfigTs,
-} from "../types/lldConfig.js";
+} from '../types/lldConfig.js';
 import {
   defaultObservableInterval,
   configFileDefaultName,
-} from "../constants.js";
-import path from "path";
-import fs from "fs/promises";
-import { LambdaResource } from "../types/resourcesDiscovery.js";
-import { ResourceDiscovery } from "../resourceDiscovery.js";
-import { GitIgnore } from "../gitignore.js";
-import { VsCode } from "../vsCode.js";
-import { Logger } from "../logger.js";
-import { Configuration } from "../configuration.js";
+} from '../constants.js';
+import path from 'path';
+import fs from 'fs/promises';
+import { LambdaResource } from '../types/resourcesDiscovery.js';
+import { ResourceDiscovery } from '../resourceDiscovery.js';
+import { GitIgnore } from '../gitignore.js';
+import { VsCode } from '../vsCode.js';
+import { Logger } from '../logger.js';
+import { Configuration } from '../configuration.js';
 
 const configFileName = path.resolve(configFileDefaultName);
 
@@ -40,10 +40,10 @@ export async function getConfigFromWizard({
 
   let answers = await inquirer.prompt([
     {
-      type: "list",
-      name: "framework",
-      message: `Which framework are you using (detected: ${currentFramework ?? "?"})?`,
-      choices: [...supportedFrameworks, "other"],
+      type: 'list',
+      name: 'framework',
+      message: `Which framework are you using (detected: ${currentFramework ?? '?'})?`,
+      choices: [...supportedFrameworks, 'other'],
       default:
         configFromCliArgs.framework ??
         currentConfig?.framework ??
@@ -51,7 +51,7 @@ export async function getConfigFromWizard({
     },
   ]);
 
-  if (answers.framework === "other") {
+  if (answers.framework === 'other') {
     answers.framework = undefined;
   }
 
@@ -60,18 +60,18 @@ export async function getConfigFromWizard({
     oldContext.push(...configFromCliArgs.context);
   }
 
-  if (answers.framework === "cdk") {
+  if (answers.framework === 'cdk') {
     const cdkAnswers = await inquirer.prompt([
       {
-        type: "input",
-        name: "context",
+        type: 'input',
+        name: 'context',
         message:
-          "Would you like to enter CDK context (example: environment=development)?",
+          'Would you like to enter CDK context (example: environment=development)?',
         default: oldContext.length > 0 ? oldContext.shift() : undefined,
       },
     ]);
 
-    if (cdkAnswers.context && cdkAnswers.context.trim() !== "") {
+    if (cdkAnswers.context && cdkAnswers.context.trim() !== '') {
       answers.context = [cdkAnswers.context.trim()];
     }
 
@@ -79,16 +79,16 @@ export async function getConfigFromWizard({
     while (true) {
       const moreContextAnswers = await inquirer.prompt([
         {
-          type: "input",
-          name: "context",
-          message: "Would you like to enter more CDK context?",
+          type: 'input',
+          name: 'context',
+          message: 'Would you like to enter more CDK context?',
           default: oldContext.length > 0 ? oldContext.shift() : undefined,
         },
       ]);
 
       if (
         moreContextAnswers.context &&
-        moreContextAnswers.context.trim() !== ""
+        moreContextAnswers.context.trim() !== ''
       ) {
         answers.context = [
           ...(answers.context ?? []),
@@ -100,12 +100,12 @@ export async function getConfigFromWizard({
     }
   }
 
-  if (answers.framework === "sls") {
+  if (answers.framework === 'sls') {
     const slsAnswers = await inquirer.prompt([
       {
-        type: "input",
-        name: "stage",
-        message: "Would you like to enter Serverless Framework stage?",
+        type: 'input',
+        name: 'stage',
+        message: 'Would you like to enter Serverless Framework stage?',
         default: configFromCliArgs.stage ?? currentConfig?.stage,
       },
     ]);
@@ -113,12 +113,12 @@ export async function getConfigFromWizard({
     answers = { ...answers, ...slsAnswers };
   }
 
-  if (answers.framework === "sam") {
+  if (answers.framework === 'sam') {
     const samAnswers = await inquirer.prompt([
       {
-        type: "input",
-        name: "configEnv",
-        message: "Would you like to enter SAM environment?",
+        type: 'input',
+        name: 'configEnv',
+        message: 'Would you like to enter SAM environment?',
         default: configFromCliArgs.configEnv ?? currentConfig?.configEnv,
       },
     ]);
@@ -129,10 +129,10 @@ export async function getConfigFromWizard({
   // monorepo subfolder
   const answersSubfolder = await inquirer.prompt([
     {
-      type: "input",
-      name: "subfolder",
+      type: 'input',
+      name: 'subfolder',
       message:
-        "If you are using monorepo, enter subfolder where the framework is instaled.",
+        'If you are using monorepo, enter subfolder where the framework is instaled.',
       default: configFromCliArgs.subfolder ?? currentConfig?.subfolder,
     },
   ]);
@@ -146,10 +146,10 @@ export async function getConfigFromWizard({
   // do you want to use observable mode?
   const answersObservable = await inquirer.prompt([
     {
-      type: "confirm",
-      name: "observable",
+      type: 'confirm',
+      name: 'observable',
       message:
-        "Do you want to use observable mode, which just sends events to the debugger and do not use the respose?",
+        'Do you want to use observable mode, which just sends events to the debugger and do not use the respose?',
       default:
         configFromCliArgs.observable !== undefined
           ? configFromCliArgs.observable
@@ -162,8 +162,8 @@ export async function getConfigFromWizard({
   if (answers.observable) {
     const observableAnswers = await inquirer.prompt([
       {
-        type: "number",
-        name: "interval",
+        type: 'number',
+        name: 'interval',
         message: `Would you like to enter observable mode interval at which events are sent to the debugger? Default is ${defaultObservableInterval}`,
         default:
           configFromCliArgs.observable !== undefined
@@ -186,21 +186,21 @@ export async function getConfigFromWizard({
 
   const answersAws = await inquirer.prompt([
     {
-      type: "input",
-      name: "profile",
-      message: "Would you like to use named AWS profile?",
+      type: 'input',
+      name: 'profile',
+      message: 'Would you like to use named AWS profile?',
       default: configFromCliArgs.profile ?? currentConfig?.profile,
     },
     {
-      type: "input",
-      name: "region",
-      message: "Would you like to specify AWS region?",
+      type: 'input',
+      name: 'region',
+      message: 'Would you like to specify AWS region?',
       default: configFromCliArgs.region ?? currentConfig?.region,
     },
     {
-      type: "input",
-      name: "role",
-      message: "Would you like to specify AWS role?",
+      type: 'input',
+      name: 'role',
+      message: 'Would you like to specify AWS role?',
       default: configFromCliArgs.role ?? currentConfig?.role,
     },
   ]);
@@ -210,20 +210,20 @@ export async function getConfigFromWizard({
   // do you want to filter which Lambdas to debug?
   const answersFilter = await inquirer.prompt([
     {
-      type: "list",
-      name: "function",
-      message: "Would you like to filter which Lambdas to debug?",
-      choices: ["All", "Pick one", "Filter by name"],
+      type: 'list',
+      name: 'function',
+      message: 'Would you like to filter which Lambdas to debug?',
+      choices: ['All', 'Pick one', 'Filter by name'],
       default:
         currentConfig?.function === undefined
-          ? "All"
-          : (currentConfig?.function as string).includes("*")
-            ? "Filter by name"
-            : "Pick one",
+          ? 'All'
+          : (currentConfig?.function as string).includes('*')
+            ? 'Filter by name'
+            : 'Pick one',
     },
   ]);
 
-  if (answersFilter.function === "Pick one") {
+  if (answersFilter.function === 'Pick one') {
     // I need to use congiration settings I accquired so far to get the list of lambdas
     const configTemp = getConfigFromAnswers(answers);
     Configuration.setConfig(configTemp as any); // not complete config
@@ -233,15 +233,15 @@ export async function getConfigFromWizard({
     );
 
     if (!lambdasList) {
-      throw new Error("No Lambdas found");
+      throw new Error('No Lambdas found');
     }
 
     // get list of lambdas
     const lambdas = await inquirer.prompt([
       {
-        type: "list",
-        name: "function",
-        message: "Pick Lambda to debug",
+        type: 'list',
+        name: 'function',
+        message: 'Pick Lambda to debug',
         choices: lambdasList.map((l) => l.functionName),
         default: currentConfig?.function ?? lambdasList[0].functionName,
       },
@@ -252,12 +252,12 @@ export async function getConfigFromWizard({
     lambdasList = [
       lambdasList.find((l) => l.functionName === lambdas.function)!,
     ];
-  } else if (answersFilter.function === "Filter by name") {
+  } else if (answersFilter.function === 'Filter by name') {
     const filter = await inquirer.prompt([
       {
-        type: "input",
-        name: "name",
-        message: "Enter Lambda name to filter. Use * as wildcard",
+        type: 'input',
+        name: 'name',
+        message: 'Enter Lambda name to filter. Use * as wildcard',
         default: configFromCliArgs.function ?? currentConfig?.function,
       },
     ]);
@@ -271,8 +271,8 @@ export async function getConfigFromWizard({
   if (!answers.remove) {
     const answersSave = await inquirer.prompt([
       {
-        type: "confirm",
-        name: "save",
+        type: 'confirm',
+        name: 'save',
         message: `Would you like to save these settings to ${configFileDefaultName}?`,
       },
     ]);
@@ -284,8 +284,8 @@ export async function getConfigFromWizard({
     if (!(await GitIgnore.doesExistInGitIgnore())) {
       const answersGitIgnore = await inquirer.prompt([
         {
-          type: "confirm",
-          name: "gitignore",
+          type: 'confirm',
+          name: 'gitignore',
           message: `Would you like to add ${configFileDefaultName} to .gitignore?`,
         },
       ]);
@@ -296,8 +296,8 @@ export async function getConfigFromWizard({
     if (!(await VsCode.isConfigured())) {
       const answersVsCode = await inquirer.prompt([
         {
-          type: "confirm",
-          name: "vscode",
+          type: 'confirm',
+          name: 'vscode',
           message: `Would you like to add configuration to VsCode?`,
         },
       ]);
@@ -307,10 +307,10 @@ export async function getConfigFromWizard({
 
     const answersVerbose = await inquirer.prompt([
       {
-        type: "confirm",
-        name: "verbose",
+        type: 'confirm',
+        name: 'verbose',
         message:
-          "Do you want to use verbose logging? This will log all events to the console.",
+          'Do you want to use verbose logging? This will log all events to the console.',
         default: currentConfig?.verbose === true,
       },
     ]);
@@ -369,9 +369,9 @@ export default {
   // remove lines that contains undefined or ""
   const configContentCleaned = configContent
     .trim()
-    .split("\n")
-    .filter((l) => !l.includes("undefined") && !l.includes('""'))
-    .join("\n");
+    .split('\n')
+    .filter((l) => !l.includes('undefined') && !l.includes('""'))
+    .join('\n');
 
   await fs.writeFile(configFileName, configContentCleaned);
 }
@@ -401,7 +401,7 @@ function getConfigFromAnswers(answers: any): LldConfigCliArgs {
 
   //remove undefined and empty strings
   Object.keys(config).forEach((key) =>
-    (config as any)[key] === undefined || (config as any)[key] === ""
+    (config as any)[key] === undefined || (config as any)[key] === ''
       ? delete (config as any)[key]
       : {},
   );

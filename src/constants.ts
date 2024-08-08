@@ -1,5 +1,5 @@
 // we drop temporary files in this folder
-export const outputFolder = ".lldebugger";
+export const outputFolder = '.lldebugger';
 
 // we drop compiled files in this folder
 export const assetsFolder = `${outputFolder}/assets`;
@@ -8,4 +8,4 @@ export const assetsFolder = `${outputFolder}/assets`;
 export const defaultObservableInterval = 3000;
 
 // the default name of the configuration file
-export const configFileDefaultName = "lldebugger.config.ts";
+export const configFileDefaultName = 'lldebugger.config.ts';

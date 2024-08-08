@@ -1,6 +1,6 @@
-import * as fs from "fs";
-import * as path from "path";
-import { getModuleDirname } from "./getDirname.js";
+import * as fs from 'fs';
+import * as path from 'path';
+import { getModuleDirname } from './getDirname.js';
 
 let versionStored: string | undefined = undefined;
 
@@ -13,10 +13,10 @@ export async function getVersion(): Promise<string> {
     return versionStored;
   }
 
-  const pachageJsonPath = path.join(getModuleDirname(), "../", "package.json");
+  const pachageJsonPath = path.join(getModuleDirname(), '../', 'package.json');
 
   try {
-    const packageJson = await fs.promises.readFile(pachageJsonPath, "utf-8");
+    const packageJson = await fs.promises.readFile(pachageJsonPath, 'utf-8');
     const { version } = JSON.parse(packageJson);
     versionStored = version;
     return version;

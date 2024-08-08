@@ -1,9 +1,9 @@
 // @ts-ignore
-import { type LldConfigTs } from "lambda-live-debugger";
+import { type LldConfigTs } from 'lambda-live-debugger';
 
 export default {
-  framework: "cdk",
-  context: ["e=1", "e=2", "e=3", "e=4"],
+  framework: 'cdk',
+  context: ['e=1', 'e=2', 'e=3', 'e=4'],
   observable: false,
   verbose: false,
   //getLambdas: async (foundLambdas, config) => {

@@ -1,27 +1,27 @@
-import crypto from "crypto";
-import { IoTMessage, IoTService } from "../ioTService.js";
-import { Logger } from "../logger.js";
+import crypto from 'crypto';
+import { IoTMessage, IoTService } from '../ioTService.js';
+import { Logger } from '../logger.js';
 
-const workerId = crypto.randomBytes(16).toString("hex");
+const workerId = crypto.randomBytes(16).toString('hex');
 const topic = `${process.env.LLD_DEBUGGER_ID}/events/${workerId}`;
 
-const ORIGINAL_HANDLER_KEY = "ORIGINAL_HANDLER";
+const ORIGINAL_HANDLER_KEY = 'ORIGINAL_HANDLER';
 const observableInterval = process.env.LLD_OBSERVABLE_INTERVAL
   ? parseInt(process.env.LLD_OBSERVABLE_INTERVAL!)
   : 0;
 let lastObservableInvoke: number | undefined;
 
-if (process.env.LLD_VERBOSE === "true") {
+if (process.env.LLD_VERBOSE === 'true') {
   Logger.setVerbose(true);
   // verbose logging for handler interceptor
-  process.env.AWS_LAMBDA_RUNTIME_VERBOSE = "3";
+  process.env.AWS_LAMBDA_RUNTIME_VERBOSE = '3';
 }
 
 /**
  * A handler replacement that sends the event to the IoT service
  */
 export async function handler(event: any, context: any) {
-  if (process.env.LLD_OBSERVABLE_MODE === "true") {
+  if (process.env.LLD_OBSERVABLE_MODE === 'true') {
     return await observableMode(context, event);
   } else {
     return await regularMode(context, event);
@@ -49,27 +49,27 @@ async function regularMode(context: any, event: any) {
 
   const ioTService = await IoTService.connect({
     onMessage: async (message: IoTMessage) => {
-      Logger.log("IoT message", message);
+      Logger.log('IoT message', message);
 
-      if (message.type === "PING") {
+      if (message.type === 'PING') {
         if (message.data.workerId === workerId) {
-          Logger.log("Pinged by the debugger");
+          Logger.log('Pinged by the debugger');
           // Pinged by the debugger, so we know the debugger is alive
           clearTimeout(timeout);
         }
       }
 
-      if (["SUCCESS", "ERROR"].includes(message.type)) {
+      if (['SUCCESS', 'ERROR'].includes(message.type)) {
         if (message.data.workerId === workerId) {
           clearTimeout(timeout);
         }
       }
 
-      if (message.type === "SUCCESS") {
+      if (message.type === 'SUCCESS') {
         promiseResolve(message.data.body);
       }
 
-      if (message.type === "ERROR") {
+      if (message.type === 'ERROR') {
         const error = new Error(message.data.errorMessage);
         error.stack = message.data.trace;
         promiseReject(error);
@@ -79,7 +79,7 @@ async function regularMode(context: any, event: any) {
   });
 
   const payload: IoTMessage = {
-    type: "INVOKE",
+    type: 'INVOKE',
     data: {
       workerId: workerId,
       requestId: context.awsRequestId,
@@ -91,7 +91,7 @@ async function regularMode(context: any, event: any) {
     },
   };
   Logger.log(
-    "Publishing to IoT",
+    'Publishing to IoT',
     `${process.env.LLD_DEBUGGER_ID}/events`,
     payload,
   );
@@ -125,7 +125,7 @@ async function observableMode(context: any, event: any) {
     const ioTService = await IoTService.connect();
 
     const payload: IoTMessage = {
-      type: "INVOKE",
+      type: 'INVOKE',
       data: {
         workerId: workerId,
         requestId: context.awsRequestId,
@@ -137,7 +137,7 @@ async function observableMode(context: any, event: any) {
       },
     };
     Logger.log(
-      "Publishing to IoT",
+      'Publishing to IoT',
       `${process.env.LLD_DEBUGGER_ID}/events`,
       payload,
     );
@@ -155,10 +155,10 @@ async function observableMode(context: any, event: any) {
 
 async function getOriginalHandler(): Promise<any> {
   // @ts-ignore
-  const { load } = await import("./aws/UserFunction");
+  const { load } = await import('./aws/UserFunction');
 
   if (process.env[ORIGINAL_HANDLER_KEY] === undefined)
-    throw Error("Missing original handler");
+    throw Error('Missing original handler');
   return load(
     process.env.LAMBDA_TASK_ROOT!,
     process.env[ORIGINAL_HANDLER_KEY],

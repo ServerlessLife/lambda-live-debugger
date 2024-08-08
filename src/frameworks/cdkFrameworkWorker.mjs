@@ -1,38 +1,38 @@
 // @ts-nocheck
-import { createRequire as topLevelCreateRequire } from "module";
+import { createRequire as topLevelCreateRequire } from 'module';
 const require = topLevelCreateRequire(import.meta.url);
-import path from "path";
+import path from 'path';
 
-import { workerData, parentPort } from "node:worker_threads";
-import fs from "fs/promises";
+import { workerData, parentPort } from 'node:worker_threads';
+import fs from 'fs/promises';
 
-import { Logger } from "../logger.mjs";
+import { Logger } from '../logger.mjs';
 
 Logger.setVerbose(workerData.verbose);
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const __dirname = path.resolve(
   path.join(
-    ...[workerData.projectDirname, workerData.subfolder, "x"].filter((p) => p),
+    ...[workerData.projectDirname, workerData.subfolder, 'x'].filter((p) => p),
   ),
 );
 
 Logger.verbose(`[CDK] [Worker] Started`);
 
-parentPort.on("message", async (data) => {
+parentPort.on('message', async (data) => {
   // this is global variable to store the data from the CDK code once it is executed
   global.lambdas = [];
 
   Logger.verbose(`[Worker ${workerData.workerId}] Received message`, data);
 
   // execute code to get the data into global.lambdas
-  const codeFile = await fs.readFile(data.compileOutput, "utf8");
+  const codeFile = await fs.readFile(data.compileOutput, 'utf8');
 
   await fixCdkPaths(workerData.awsCdkLibPath);
 
   eval(codeFile);
 
   if (!global.lambdas || global.lambdas?.length === 0) {
-    throw new Error("No Lambda functions found in the CDK code");
+    throw new Error('No Lambda functions found in the CDK code');
   }
 
   const lambdas = global.lambdas.map((lambda) => ({
@@ -67,15 +67,15 @@ async function fixCdkPaths(awsCdkLibPath) {
   Logger.verbose(`[CDK] [Worker] aws-cdk-lib PATH ${awsCdkLibPath}`);
 
   const pathsFix = {
-    "custom-resource-handlers/": `${awsCdkLibPath}/custom-resource-handlers/`,
+    'custom-resource-handlers/': `${awsCdkLibPath}/custom-resource-handlers/`,
   };
 
   // Create a proxy to intercept calls to the path module so we can fix paths
   const pathProxy = new Proxy(path, {
     get(target, prop) {
-      if (typeof target[prop] === "function") {
+      if (typeof target[prop] === 'function') {
         return function (...args) {
-          if (prop === "resolve") {
+          if (prop === 'resolve') {
             let resolvedPath = target[prop].apply(target, args);
 
             for (const [key, value] of Object.entries(pathsFix)) {
@@ -100,7 +100,7 @@ async function fixCdkPaths(awsCdkLibPath) {
   });
 
   // Override the path module in the require cache
-  require.cache[require.resolve("path")] = {
+  require.cache[require.resolve('path')] = {
     exports: pathProxy,
   };
 }

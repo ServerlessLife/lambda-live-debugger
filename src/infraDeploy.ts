@@ -6,37 +6,37 @@ import {
   UpdateFunctionConfigurationCommand,
   GetFunctionCommand,
   ListLayersCommand,
-} from "@aws-sdk/client-lambda";
+} from '@aws-sdk/client-lambda';
 import {
   IAMClient,
   GetRolePolicyCommand,
   PutRolePolicyCommand,
   DeleteRolePolicyCommand,
-} from "@aws-sdk/client-iam";
-import { getVersion } from "./version.js";
-import fs from "fs/promises";
-import * as path from "path";
-import { Configuration } from "./configuration.js";
-import { AwsCredentials } from "./awsCredentials.js";
-import { getModuleDirname } from "./getDirname.js";
-import { Logger } from "./logger.js";
+} from '@aws-sdk/client-iam';
+import { getVersion } from './version.js';
+import fs from 'fs/promises';
+import * as path from 'path';
+import { Configuration } from './configuration.js';
+import { AwsCredentials } from './awsCredentials.js';
+import { getModuleDirname } from './getDirname.js';
+import { Logger } from './logger.js';
 
 let lambdaClient: LambdaClient | undefined;
 let iamClient: IAMClient | undefined;
 
-const inlinePolicyName = "LambdaLiveDebuggerPolicy";
-const layerName = "LambdaLiveDebugger";
+const inlinePolicyName = 'LambdaLiveDebuggerPolicy';
+const layerName = 'LambdaLiveDebugger';
 
 /**
  * Policy document to attach to the Lambda role
  */
 const policyDocument = {
-  Version: "2012-10-17",
+  Version: '2012-10-17',
   Statement: [
     {
-      Action: "iot:*",
-      Resource: "*",
-      Effect: "Allow",
+      Action: 'iot:*',
+      Resource: '*',
+      Effect: 'Allow',
     },
   ],
 };
@@ -111,7 +111,7 @@ async function findExistingLayerVersion(
     nextMarker = response.NextMarker;
   } while (nextMarker);
 
-  Logger.verbose("No existing layer found.");
+  Logger.verbose('No existing layer found.');
 
   return undefined;
 }
@@ -134,9 +134,9 @@ async function deployLayer() {
     existingLayer.Description === layerDescription // check if the layer version is already deployed
   ) {
     // delete existing layer when developing
-    if ((await getVersion()) === "0.0.1") {
+    if ((await getVersion()) === '0.0.1') {
       Logger.verbose(
-        "Deleting existing layer version, because it is a development mode.",
+        'Deleting existing layer version, because it is a development mode.',
       );
       const deleteLayerVersionCommand = new DeleteLayerVersionCommand({
         LayerName: layerName,
@@ -151,7 +151,7 @@ async function deployLayer() {
 
   // check the ZIP
   let layerZipPathFullPath = path.resolve(
-    path.join(getModuleDirname(), "./extension/extension.zip"),
+    path.join(getModuleDirname(), './extension/extension.zip'),
   );
 
   // get the full path to the ZIP file
@@ -161,7 +161,7 @@ async function deployLayer() {
     // if I am debugging
     const layerZipPathFullPath2 = path.join(
       getModuleDirname(),
-      "../dist/extension/extension.zip",
+      '../dist/extension/extension.zip',
     );
 
     try {
@@ -186,14 +186,14 @@ async function deployLayer() {
     Content: {
       ZipFile: layerContent,
     },
-    CompatibleArchitectures: ["x86_64", "arm64"],
-    CompatibleRuntimes: ["nodejs18.x", "nodejs20.x"],
+    CompatibleArchitectures: ['x86_64', 'arm64'],
+    CompatibleRuntimes: ['nodejs18.x', 'nodejs20.x'],
   });
 
   const response = await getLambdaClient().send(publishLayerVersionCommand);
 
   if (!response.LayerVersionArn) {
-    throw new Error("Failed to retrieve the layer version ARN");
+    throw new Error('Failed to retrieve the layer version ARN');
   }
 
   Logger.verbose(
@@ -300,7 +300,7 @@ async function removeLayerFromLambda(functionName: string) {
       );
     }
 
-    const ddlEnvironmentVariables = getEnvironmentVarablesForDebugger("xxx", 0);
+    const ddlEnvironmentVariables = getEnvironmentVarablesForDebugger('xxx', 0);
 
     // check if environment variables are set for each property
     for (const [key] of Object.entries(ddlEnvironmentVariables)) {
@@ -316,7 +316,7 @@ async function removeLayerFromLambda(functionName: string) {
       );
 
       Logger.verbose(
-        "Existing environment variables",
+        'Existing environment variables',
         JSON.stringify(environmentVariables, null, 2),
       );
 
@@ -328,7 +328,7 @@ async function removeLayerFromLambda(functionName: string) {
       }
 
       Logger.verbose(
-        "New environment variables",
+        'New environment variables',
         JSON.stringify(environmentVariables, null, 2),
       );
 
@@ -442,7 +442,7 @@ async function attachLayerToLambda(
   // check if layers with the wrong version are attached
   if (!needToUpdate && ddlLayerArns.find((arn) => arn !== layerArn)) {
     needToUpdate = true;
-    Logger.verbose("Layer with the wrong version attached to the function");
+    Logger.verbose('Layer with the wrong version attached to the function');
   }
 
   const ddlEnvironmentVariables = getEnvironmentVarablesForDebugger(
@@ -511,7 +511,7 @@ async function addPolicyToLambdaRole(functionName: string) {
   }
 
   // Extract the role name from the role ARN
-  const roleName = roleArn.split("/").pop();
+  const roleName = roleArn.split('/').pop();
 
   if (!roleName) {
     throw new Error(
@@ -561,11 +561,11 @@ function getEnvironmentVarablesForDebugger(
 ): Record<string, string> {
   return {
     LLD_FUNCTION_ID: functionId,
-    AWS_LAMBDA_EXEC_WRAPPER: "/opt/lld-wrapper",
-    NODE_OPTIONS: "--enable-source-maps",
+    AWS_LAMBDA_EXEC_WRAPPER: '/opt/lld-wrapper',
+    NODE_OPTIONS: '--enable-source-maps',
     LLD_DEBUGGER_ID: Configuration.config.debuggerId,
-    LLD_INITIAL_TIMEOUT: timeout ? timeout.toString() : "-1", // should never be negative
-    LLD_OBSERVABLE_MODE: Configuration.config.observable ? "true" : "false",
+    LLD_INITIAL_TIMEOUT: timeout ? timeout.toString() : '-1', // should never be negative
+    LLD_OBSERVABLE_MODE: Configuration.config.observable ? 'true' : 'false',
     LLD_OBSERVABLE_INTERVAL: Configuration.config.interval.toString(),
   };
 }
@@ -591,7 +591,7 @@ async function removePolicyFromLambdaRole(functionName: string) {
     }
 
     // Extract the role name from the role ARN
-    const roleName = roleArn.split("/").pop();
+    const roleName = roleArn.split('/').pop();
 
     if (!roleName) {
       Logger.error(
@@ -655,7 +655,7 @@ async function getPolicyDocument(roleName: string) {
       return undefined;
     }
   } catch (error: any) {
-    if (error.name === "NoSuchEntityException") {
+    if (error.name === 'NoSuchEntityException') {
       return undefined;
     } else {
       throw error;
@@ -677,7 +677,7 @@ async function deployInfrastructure() {
       func.functionId,
       layerVersionArn,
     );
-    if (process.env.DISABLE_PARALLEL_DEPLOY === "true") {
+    if (process.env.DISABLE_PARALLEL_DEPLOY === 'true') {
       await p;
     } else {
       promises.push(p);
@@ -690,7 +690,7 @@ async function deployInfrastructure() {
       await addPolicyToLambdaRole(func.functionName);
     }
   })(); // creates one promise
-  if (process.env.DISABLE_PARALLEL_DEPLOY === "true") {
+  if (process.env.DISABLE_PARALLEL_DEPLOY === 'true') {
     await p;
   } else {
     promises.push(p);
@@ -703,12 +703,12 @@ async function deployInfrastructure() {
  * Remove the infrastructure
  */
 async function removeInfrastructure() {
-  Logger.verbose("Removing Lambda Live Debugger infrastructure.");
+  Logger.verbose('Removing Lambda Live Debugger infrastructure.');
   const promises: Promise<void>[] = [];
 
   for (const func of Configuration.getLambdas()) {
     const p = removeLayerFromLambda(func.functionName);
-    if (process.env.DISABLE_PARALLEL_DEPLOY === "true") {
+    if (process.env.DISABLE_PARALLEL_DEPLOY === 'true') {
       await p;
     } else {
       promises.push(p);
@@ -721,7 +721,7 @@ async function removeInfrastructure() {
       await removePolicyFromLambdaRole(func.functionName);
     }
   })(); // creates one promise
-  if (process.env.DISABLE_PARALLEL_DEPLOY === "true") {
+  if (process.env.DISABLE_PARALLEL_DEPLOY === 'true') {
     await p;
   } else {
     promises.push(p);

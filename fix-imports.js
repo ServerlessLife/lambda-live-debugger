@@ -1,6 +1,6 @@
-import { readdir, readFile, writeFile, rename } from "fs/promises";
-import { join, dirname, parse } from "path";
-import { fileURLToPath } from "url";
+import { readdir, readFile, writeFile, rename } from 'fs/promises';
+import { join, dirname, parse } from 'path';
+import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -15,32 +15,32 @@ async function processFiles(directory) {
     const fullPath = join(directory, entry.name);
     if (entry.isDirectory()) {
       await processFiles(fullPath);
-    } else if (entry.isFile() && entry.name.endsWith(".js")) {
-      const data = await readFile(fullPath, "utf8");
+    } else if (entry.isFile() && entry.name.endsWith('.js')) {
+      const data = await readFile(fullPath, 'utf8');
       const updatedData = data
-        .split("\n")
+        .split('\n')
         .map((line) => {
-          if (line.trim().startsWith("import")) {
+          if (line.trim().startsWith('import')) {
             return line.replace(/\.js"/g, '.mjs"');
           }
           return line;
         })
-        .join("\n");
+        .join('\n');
       const { dir, name } = parse(fullPath);
       const newFullPath = join(dir, `${name}.mjs`);
 
-      await writeFile(fullPath, updatedData, "utf8");
+      await writeFile(fullPath, updatedData, 'utf8');
       await rename(fullPath, newFullPath);
     }
   }
 }
 
-const directoryPath = join(__dirname, "dist");
+const directoryPath = join(__dirname, 'dist');
 
 processFiles(directoryPath)
   .then(() =>
     console.log(
-      "JS files have been converted to MJS and import paths updated.",
+      'JS files have been converted to MJS and import paths updated.',
     ),
   )
-  .catch((err) => console.error("Error processing files:", err));
+  .catch((err) => console.error('Error processing files:', err));

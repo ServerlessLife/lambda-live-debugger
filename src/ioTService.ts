@@ -1,11 +1,11 @@
-import * as iot from "aws-iot-device-sdk";
-import { splitMessageToChunks, MessageChunk } from "./utils/splitIoTMessage.js";
-import { IoTClient, DescribeEndpointCommand } from "@aws-sdk/client-iot";
+import * as iot from 'aws-iot-device-sdk';
+import { splitMessageToChunks, MessageChunk } from './utils/splitIoTMessage.js';
+import { IoTClient, DescribeEndpointCommand } from '@aws-sdk/client-iot';
 import type {
   AwsCredentialIdentityProvider,
   AwsCredentialIdentity,
-} from "@smithy/types";
-import { Logger } from "./logger.js";
+} from '@smithy/types';
+import { Logger } from './logger.js';
 
 let device: iot.device;
 
@@ -43,23 +43,23 @@ export type FunctionPing = IoTMessageBase;
  */
 export type IoTMessage =
   | {
-      type: "INVOKE";
+      type: 'INVOKE';
       data: FuctionRequest;
     }
   | {
-      type: "SUCCESS";
+      type: 'SUCCESS';
       data: FunctionResponse;
     }
   | {
-      type: "ERROR";
+      type: 'ERROR';
       data: FunctionErrorResponse;
     }
   | {
-      type: "PING";
+      type: 'PING';
       data: FunctionPing;
     };
 
-export type IoTMessageTypes = IoTMessage["type"];
+export type IoTMessageTypes = IoTMessage['type'];
 
 /**
  * Get IoT endpoint
@@ -79,12 +79,12 @@ async function getIoTEndpoint({
   });
   const response = await iot.send(
     new DescribeEndpointCommand({
-      endpointType: "iot:Data-ATS",
+      endpointType: 'iot:Data-ATS',
     }),
   );
 
   if (!response.endpointAddress)
-    throw new Error("IoT Endpoint address not found");
+    throw new Error('IoT Endpoint address not found');
 
   return response.endpointAddress;
 }
@@ -123,7 +123,7 @@ async function connect(props?: {
   });
 
   device = new iot.device({
-    protocol: "wss",
+    protocol: 'wss',
     host: endpoint,
     reconnectPeriod: 1,
     keepalive: 60,
@@ -135,24 +135,24 @@ async function connect(props?: {
 
   if (props?.topic) {
     device.subscribe(props.topic, { qos: 1 });
-    Logger.verbose("[IoT] Subscribed to topic ", props.topic);
+    Logger.verbose('[IoT] Subscribed to topic ', props.topic);
   }
 
-  device.on("connect", () => {
-    Logger.verbose("[IoT] Connected");
+  device.on('connect', () => {
+    Logger.verbose('[IoT] Connected');
     connectedPromiseResolve();
   });
 
-  device.on("error", (err) => {
-    Logger.error("[IoT] Error", err);
+  device.on('error', (err) => {
+    Logger.error('[IoT] Error', err);
   });
 
-  device.on("close", () => {
-    Logger.verbose("[IoT] Closed");
+  device.on('close', () => {
+    Logger.verbose('[IoT] Closed');
   });
 
-  device.on("reconnect", () => {
-    Logger.verbose("[IoT] Reconnecting...");
+  device.on('reconnect', () => {
+    Logger.verbose('[IoT] Reconnecting...');
   });
 
   if (props?.onMessage) {
@@ -160,7 +160,7 @@ async function connect(props?: {
       const chunk = JSON.parse(buffer.toString());
 
       if (!chunk.id) {
-        throw new Error("Invalid fragment");
+        throw new Error('Invalid fragment');
       }
 
       let pending = chunks.get(chunk.id);
@@ -174,14 +174,14 @@ async function connect(props?: {
         const data = [...pending.values()]
           .sort((a, b) => a.index - b.index)
           .map((item) => item.data)
-          .join("");
+          .join('');
         chunks.delete(chunk.id);
         const evt = JSON.parse(data);
         props.onMessage!(evt);
       }
     };
 
-    device.on("message", messageReceived);
+    device.on('message', messageReceived);
   }
 
   await connectedPromise;

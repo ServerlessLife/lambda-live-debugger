@@ -1,7 +1,7 @@
-import { spawn } from "child_process";
-import { setTimeout } from "timers/promises";
-import { exec } from "child_process";
-import { promisify } from "util";
+import { spawn } from 'child_process';
+import { setTimeout } from 'timers/promises';
+import { exec } from 'child_process';
+import { promisify } from 'util';
 
 export const execAsync = promisify(exec);
 
@@ -16,35 +16,35 @@ export async function startDebugger(folder: string, args: string[] = []) {
 }
 
 async function startDebuggerInternal(folder: string, args: string[] = []) {
-  console.log("Starting LLD...");
+  console.log('Starting LLD...');
 
   let testMonorepo = false;
-  if (process.env.TEST_MONOREPO === "true") {
+  if (process.env.TEST_MONOREPO === 'true') {
     testMonorepo = true;
     // just the last two part of the folder
-    const folderParts = folder.split("/");
+    const folderParts = folder.split('/');
     const testProjectFolder =
       folderParts[folderParts.length - 2] +
-      "/" +
+      '/' +
       folderParts[folderParts.length - 1];
     args.push(`-m ${testProjectFolder}`);
   }
 
-  if (process.env.OBSERVABLE_MODE === "true") {
-    args.push("-o");
+  if (process.env.OBSERVABLE_MODE === 'true') {
+    args.push('-o');
   }
 
-  args.push("-v");
+  args.push('-v');
 
   let command = `node ${
-    testMonorepo ? "" : "../../"
-  }dist/lldebugger.mjs ${args?.join(" ")}`;
+    testMonorepo ? '' : '../../'
+  }dist/lldebugger.mjs ${args?.join(' ')}`;
 
-  if (process.env.REAL_NPM === "true") {
-    console.log("Running the debugger with the real NPM");
-    command = `lld ${args?.join(" ")}`;
+  if (process.env.REAL_NPM === 'true') {
+    console.log('Running the debugger with the real NPM');
+    command = `lld ${args?.join(' ')}`;
   } else {
-    console.log("Running the debugger with just genereted code");
+    console.log('Running the debugger with just genereted code');
   }
 
   const lldProcess = spawn(command, {
@@ -56,21 +56,21 @@ async function startDebuggerInternal(folder: string, args: string[] = []) {
   await new Promise((resolve, reject) => {
     let errorWhileRunning = false;
     if (!lldProcess) {
-      throw new Error("Failed to start LLD");
+      throw new Error('Failed to start LLD');
     }
 
-    lldProcess.stdout?.on("data", (data) => {
-      console.log("LLD: " + data.toString());
+    lldProcess.stdout?.on('data', (data) => {
+      console.log('LLD: ' + data.toString());
       const line = data.toString();
-      if (line.includes("Debugger started!")) {
+      if (line.includes('Debugger started!')) {
         resolve(true);
       }
     });
-    lldProcess.stderr?.on("data", (data) => {
-      console.log("[LLD] ERROR: " + data.toString());
+    lldProcess.stderr?.on('data', (data) => {
+      console.log('[LLD] ERROR: ' + data.toString());
       errorWhileRunning = true;
     });
-    lldProcess.on("close", (error) => {
+    lldProcess.on('close', (error) => {
       console.log(`[LLD] CLOSED: error=${errorWhileRunning}`);
       if (error) {
         reject(error);

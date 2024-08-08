@@ -1,4 +1,4 @@
-import { STSClient, GetCallerIdentityCommand } from "@aws-sdk/client-sts";
+import { STSClient, GetCallerIdentityCommand } from '@aws-sdk/client-sts';
 
 const stsClient = new STSClient({});
 
@@ -6,7 +6,7 @@ export const lambdaHandler = async (event, context) => {
   // check context
   const remainingTime = context.getRemainingTimeInMillis();
   if (remainingTime === undefined) {
-    throw new Error("Remaining time is undefined");
+    throw new Error('Remaining time is undefined');
   }
 
   // check SDK works
@@ -16,15 +16,15 @@ export const lambdaHandler = async (event, context) => {
   const response = {
     inputEvent: event,
     accountId: identity.Account,
-    runningLocally: process.env.IS_LOCAL === "true",
+    runningLocally: process.env.IS_LOCAL === 'true',
   };
 
-  if (process.env.IS_LOCAL === "true") {
-    const fs = await import("fs");
-    const path = await import("path");
+  if (process.env.IS_LOCAL === 'true') {
+    const fs = await import('fs');
+    const path = await import('path');
     const filePath = path.join(
-      "..",
-      "local_lambda_responses",
+      '..',
+      'local_lambda_responses',
       `${context.functionName}.json`,
     );
 

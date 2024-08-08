@@ -1,4 +1,4 @@
-import { LambdaResource } from "./resourcesDiscovery.js";
+import { LambdaResource } from './resourcesDiscovery.js';
 
 export type LambdaProps = {
   functionId: string;

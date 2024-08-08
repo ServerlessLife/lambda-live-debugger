@@ -1,8 +1,8 @@
-import * as path from "path";
-import * as fs from "fs/promises";
-import { FuctionRequest } from "./ioTService.js";
-import { NodeEsBuild } from "./nodeEsBuild.js";
-import { NodeWorker } from "./nodeWorker.js";
+import * as path from 'path';
+import * as fs from 'fs/promises';
+import { FuctionRequest } from './ioTService.js';
+import { NodeEsBuild } from './nodeEsBuild.js';
+import { NodeWorker } from './nodeWorker.js';
 
 /**
  * Build the Lambda function

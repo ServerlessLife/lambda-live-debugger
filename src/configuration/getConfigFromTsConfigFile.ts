@@ -1,9 +1,9 @@
-import { outputFolder } from "../constants.js";
-import * as esbuild from "esbuild";
-import * as url from "url";
-import * as path from "path";
-import fs from "fs/promises";
-import { LldConfigBase } from "../types/lldConfig.js";
+import { outputFolder } from '../constants.js';
+import * as esbuild from 'esbuild';
+import * as url from 'url';
+import * as path from 'path';
+import fs from 'fs/promises';
+import { LldConfigBase } from '../types/lldConfig.js';
 
 /**
  * Get configuration from ts config file
@@ -28,17 +28,17 @@ export async function getConfigTsFromConfigFile(
       entryPoints: [configFile],
       bundle: false,
       keepNames: true,
-      platform: "node",
+      platform: 'node',
       metafile: true,
-      target: "esnext",
-      format: "esm",
+      target: 'esnext',
+      format: 'esm',
       outfile: compileOutput,
       sourcemap: true,
       banner: {
         js: [
           `import { createRequire as topLevelCreateRequire } from 'module';`,
           `const require = topLevelCreateRequire(import.meta.url);`,
-        ].join(""),
+        ].join(''),
       },
     });
   } catch (error: any) {

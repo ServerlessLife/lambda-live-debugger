@@ -1,7 +1,7 @@
-import { expect } from "vitest";
-import fs from "fs/promises";
-import path from "path";
-import { setTimeout } from "timers/promises";
+import { expect } from 'vitest';
+import fs from 'fs/promises';
+import path from 'path';
+import { setTimeout } from 'timers/promises';
 
 export async function validateLocalResponse(
   lambdaName: any,
@@ -19,10 +19,10 @@ export async function validateLocalResponse(
   const maxRetries = 7; // Try for 7 seconds
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      responseFile = await fs.readFile(filePath, "utf-8");
+      responseFile = await fs.readFile(filePath, 'utf-8');
       break; // If file is read successfully, exit the loop
     } catch (error: any) {
-      if (error.code === "ENOENT" && attempt < maxRetries) {
+      if (error.code === 'ENOENT' && attempt < maxRetries) {
         await setTimeout(1000); // Wait 1 second before retrying
       } else {
         throw error; // If it's not a file-not-found error or retries are exhausted, throw the error

@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: "2010-09-09"
+AWSTemplateFormatVersion: '2010-09-09'
 Description: IAM Role for GitHub Actions
 
 Resources:
@@ -16,7 +16,7 @@ Resources:
     Properties:
       RoleName: lld-deploy-role
       AssumeRolePolicyDocument:
-        Version: "2012-10-17"
+        Version: '2012-10-17'
         Statement:
           - Effect: Allow
             Principal:
@@ -24,13 +24,13 @@ Resources:
             Action: sts:AssumeRoleWithWebIdentity
             Condition:
               StringEquals:
-                token.actions.githubusercontent.com:aud: "sts.amazonaws.com"
+                token.actions.githubusercontent.com:aud: 'sts.amazonaws.com'
               StringLike:
-                token.actions.githubusercontent.com:sub: "repo:ServerlessLife/lambda-live-debugger:*"
+                token.actions.githubusercontent.com:sub: 'repo:ServerlessLife/lambda-live-debugger:*'
       Policies:
         - PolicyName: CloudFormationDeploy
           PolicyDocument:
-            Version: "2012-10-17"
+            Version: '2012-10-17'
             Statement:
               - Effect: Allow
                 Action:
@@ -48,7 +48,7 @@ Resources:
 
         - PolicyName: CDKBootstrapPolicy
           PolicyDocument:
-            Version: "2012-10-17"
+            Version: '2012-10-17'
             Statement:
               - Effect: Allow
                 Action:
@@ -111,36 +111,36 @@ Resources:
               - Effect: Allow
                 Action:
                   - cloudwatch:PutRetentionPolicy
-                Resource: "*"
+                Resource: '*'
 
         - PolicyName: SLSandSAMDeployPolicy
           PolicyDocument:
-            Version: "2012-10-17"
+            Version: '2012-10-17'
             Statement:
               - Effect: Allow
                 Action:
                   - s3:*
-                Resource: "*"
+                Resource: '*'
               - Effect: Allow
                 Action:
                   - cloudformation:*
-                Resource: "*"
+                Resource: '*'
               - Effect: Allow
                 Action:
                   - iam:*
-                Resource: "*"
+                Resource: '*'
               - Effect: Allow
                 Action:
                   - logs:*
-                Resource: "*"
+                Resource: '*'
               - Effect: Allow
                 Action:
                   - lambda:*
-                Resource: "*"
+                Resource: '*'
 
         - PolicyName: IoTPermissionToRunDebugger
           PolicyDocument:
-            Version: "2012-10-17"
+            Version: '2012-10-17'
             Statement:
               - Effect: Allow
                 Action:
@@ -150,11 +150,11 @@ Resources:
                   - iot:Publish
                   - iot:Receive
                 Resource:
-                  - "*"
+                  - '*'
 
         - PolicyName: RunLLDebugger
           PolicyDocument:
-            Version: "2012-10-17"
+            Version: '2012-10-17'
             Statement:
               - Effect: Allow
                 Action:
@@ -166,19 +166,19 @@ Resources:
                   - lambda:PublishLayerVersion
                   - lambda:DeleteLayerVersion
                   - lambda:ListLayers
-                Resource: "*"
+                Resource: '*'
               - Effect: Allow
                 Action:
                   - iam:PutRolePolicy
                   - iam:GetRolePolicy
                   - iam:DeleteRolePolicy
-                Resource: "*"
+                Resource: '*'
               - Effect: Allow
                 Action:
                   - cloudformation:DescribeStackResource
-                Resource: "*"
+                Resource: '*'
 
 Outputs:
   GitHubActionsRoleArn:
-    Description: "ARN of the GitHub Actions IAM Role"
+    Description: 'ARN of the GitHub Actions IAM Role'
     Value: !GetAtt GitHubActionsRole.Arn

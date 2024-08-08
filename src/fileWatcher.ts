@@ -1,9 +1,9 @@
-import * as chokidar from "chokidar";
-import { NodeEsBuild } from "./nodeEsBuild.js";
-import { NodeWorker } from "./nodeWorker.js";
-import { Configuration } from "./configuration.js";
-import { setTimeout } from "node:timers/promises";
-import { Logger } from "./logger.js";
+import * as chokidar from 'chokidar';
+import { NodeEsBuild } from './nodeEsBuild.js';
+import { NodeWorker } from './nodeWorker.js';
+import { Configuration } from './configuration.js';
+import { setTimeout } from 'node:timers/promises';
+import { Logger } from './logger.js';
 
 let processingChange = false;
 
@@ -20,10 +20,10 @@ function watchForFileChanges(folder: string) {
     followSymlinks: false,
     disableGlobbing: false,
     ignored: [
-      "**/node_modules/**",
-      "**/.lldebugger/**",
-      "**/.git/**",
-      "**/debug.log",
+      '**/node_modules/**',
+      '**/.lldebugger/**',
+      '**/.git/**',
+      '**/debug.log',
     ],
     awaitWriteFinish: {
       pollInterval: 100,
@@ -31,7 +31,7 @@ function watchForFileChanges(folder: string) {
     },
   });
 
-  watcher.on("change", async () => {
+  watcher.on('change', async () => {
     if (processingChange) {
       return;
     }

@@ -2,7 +2,7 @@ name: Update NPM Packages
 
 on:
   schedule:
-    - cron: "0 0 * * 0"
+    - cron: '0 0 * * 0'
   workflow_dispatch:
 
 env:
@@ -19,7 +19,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.node_version }}
-          cache: "npm"
+          cache: 'npm'
 
       - name: Install npm-check-updates
         run: npm install -g npm-check-updates
@@ -47,10 +47,10 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.PRIVATE_GITHUB_TOKEN }}
-          commit-message: "fix: Update dependencies"
-          title: "fix: Update NPM dependencies"
-          body: "This is an auto-generated PR with dependency updates."
-          branch: "fix/update-dependencies"
+          commit-message: 'fix: Update dependencies'
+          title: 'fix: Update NPM dependencies'
+          body: 'This is an auto-generated PR with dependency updates.'
+          branch: 'fix/update-dependencies'
           delete-branch: true
 
       - name: Check output

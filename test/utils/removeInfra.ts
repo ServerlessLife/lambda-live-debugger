@@ -1,5 +1,5 @@
-import { ChildProcess, execSync } from "child_process";
-import { setTimeout } from "timers/promises";
+import { ChildProcess, execSync } from 'child_process';
+import { setTimeout } from 'timers/promises';
 
 export async function removeInfra(
   lldProcess: ChildProcess | undefined,
@@ -8,10 +8,10 @@ export async function removeInfra(
 ) {
   lldProcess?.kill();
 
-  let command = `node ../../dist/lldebugger.mjs --remove ${args?.join(" ")}`;
+  let command = `node ../../dist/lldebugger.mjs --remove ${args?.join(' ')}`;
 
-  if (process.env.REAL_NPM === "true") {
-    command = `lld --remove ${args?.join(" ")}`;
+  if (process.env.REAL_NPM === 'true') {
+    command = `lld --remove ${args?.join(' ')}`;
   }
 
   await execSync(command, {

@@ -1,5 +1,5 @@
-import fs from "fs/promises";
-import path from "path";
+import fs from 'fs/promises';
+import path from 'path';
 
 /**
  * Function to find the path of a module in the directory and parent directories
@@ -7,10 +7,10 @@ import path from "path";
  * @param {*} moduleName
  */
 export async function findNpmPath(dir: string, moduleName: string) {
-  if (dir === "/") return undefined;
+  if (dir === '/') return undefined;
 
   try {
-    await fs.access(path.join(dir, "package.json"));
+    await fs.access(path.join(dir, 'package.json'));
 
     const modulePath = await checkModuleInPackageJson(dir, moduleName);
     if (modulePath) {
@@ -20,7 +20,7 @@ export async function findNpmPath(dir: string, moduleName: string) {
     // ignore, no package.json in this directory
   }
 
-  return await findNpmPath(path.resolve(path.join(dir, "..")), moduleName);
+  return await findNpmPath(path.resolve(path.join(dir, '..')), moduleName);
 }
 
 /**
@@ -30,7 +30,7 @@ export async function findNpmPath(dir: string, moduleName: string) {
  * @returns
  */
 async function checkModuleInPackageJson(dir: string, moduleName: string) {
-  const modulePath = path.join(dir, "node_modules", moduleName);
+  const modulePath = path.join(dir, 'node_modules', moduleName);
 
   try {
     await fs.access(modulePath);

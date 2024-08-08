@@ -1,13 +1,13 @@
 #!/usr/bin/env node
-import "source-map-support/register";
-import * as cdk from "aws-cdk-lib";
-import { CdkbasicStack } from "../lib/cdk-basic-stack";
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
+import { CdkbasicStack } from '../lib/cdk-basic-stack';
 
 const app = new cdk.App();
 
-const environment = "test";
+const environment = 'test';
 
-new CdkbasicStack(app, "CdkbasicStack", {
+new CdkbasicStack(app, 'CdkbasicStack', {
   stackName: `${environment}-lld-cdk-basic`,
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,

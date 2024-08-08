@@ -1,16 +1,16 @@
-import { createRequire as topLevelCreateRequire } from "module";
+import { createRequire as topLevelCreateRequire } from 'module';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const require = topLevelCreateRequire(import.meta.url);
 
-import { workerData, parentPort } from "node:worker_threads";
-import { Logger } from "./logger.mjs";
+import { workerData, parentPort } from 'node:worker_threads';
+import { Logger } from './logger.mjs';
 
 Logger.setVerbose(workerData.verbose);
 Logger.verbose(
   `[Function ${workerData.functionId}] [Worker ${workerData.workerId}] Worker started.`,
 );
 
-parentPort.on("message", async (data) => {
+parentPort.on('message', async (data) => {
   Logger.verbose(`[Worker ${workerData.workerId}] Received message`, data);
   const mod = await import(workerData.artifactFile);
   const fn = mod[workerData.handler];
@@ -21,17 +21,17 @@ parentPort.on("message", async (data) => {
       getRemainingTimeInMillis: () => 2147483647, // Max 32-bit signed integer
       done() {
         throw new Error(
-          "`done` function on lambda Context is not implemented in Lambda Live Debugger.",
+          '`done` function on lambda Context is not implemented in Lambda Live Debugger.',
         );
       },
       fail() {
         throw new Error(
-          "`fail` function on lambda Context is not implemented in Lambda Live Debugger.",
+          '`fail` function on lambda Context is not implemented in Lambda Live Debugger.',
         );
       },
       succeed() {
         throw new Error(
-          "`succeed` function on lambda Context is not implemented in Lambda Live Debugger.",
+          '`succeed` function on lambda Context is not implemented in Lambda Live Debugger.',
         );
       },
     };
@@ -47,7 +47,7 @@ parentPort.on("message", async (data) => {
   }
 });
 
-process.on("unhandledRejection", (error) => {
+process.on('unhandledRejection', (error) => {
   Logger.error(
     `[Function ${workerData.functionId}] [Worker ${workerData.workerId}] Unhandled Rejection`,
     error,
@@ -57,7 +57,7 @@ process.on("unhandledRejection", (error) => {
 
 function handleError(error) {
   parentPort.postMessage({
-    errorType: error.name ?? "Error",
+    errorType: error.name ?? 'Error',
     errorMessage: error.message,
     trace: error.stack,
   });

@@ -1,27 +1,27 @@
-import globals from "globals";
-import pluginJs from "@eslint/js";
-import tseslint from "typescript-eslint";
-import pluginPrettier from "eslint-plugin-prettier";
-import prettierConfig from "eslint-config-prettier";
+import globals from 'globals';
+import pluginJs from '@eslint/js';
+import tseslint from 'typescript-eslint';
+import pluginPrettier from 'eslint-plugin-prettier';
+import prettierConfig from 'eslint-config-prettier';
 
 export default [
-  { files: ["**/*.{js,mjs,cjs,ts}"] },
+  { files: ['**/*.{js,mjs,cjs,ts}'] },
   {
     ignores: [
-      "**/dist/**",
-      "**/cdk.out/**",
-      "**/.lldebugger/**",
-      "**/.serverless/**",
-      "**/.aws-sam/**",
-      "src/extension/aws/*.js",
+      '**/dist/**',
+      '**/cdk.out/**',
+      '**/.lldebugger/**',
+      '**/.serverless/**',
+      '**/.aws-sam/**',
+      'src/extension/aws/*.js',
     ],
   },
   {
     languageOptions: {
       globals: globals.node,
-      parser: "@typescript-eslint/parser",
+      parser: '@typescript-eslint/parser',
       parserOptions: {
-        project: "./tsconfig.json",
+        project: './tsconfig.json',
       },
     },
   },
@@ -33,10 +33,10 @@ export default [
     },
     rules: {
       ...pluginPrettier.configs.recommended.rules,
-      "@typescript-eslint/no-floating-promises": "error",
-      "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/no-require-imports": "off",
-      "@typescript-eslint/ban-ts-comment": "off",
+      '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
+      '@typescript-eslint/ban-ts-comment': 'off',
     },
   },
   prettierConfig,

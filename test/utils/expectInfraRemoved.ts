@@ -1,6 +1,6 @@
-import { expect } from "vitest";
-import { getFuntionConfiguration } from "./getFuntionConfiguration.js";
-import { getPolicyDocument } from "./getPolicyDocument.js";
+import { expect } from 'vitest';
+import { getFuntionConfiguration } from './getFuntionConfiguration.js';
+import { getPolicyDocument } from './getPolicyDocument.js';
 
 export async function expectInfraRemoved(fuctionName: string) {
   const lambdaConfiguration = await getFuntionConfiguration(fuctionName);

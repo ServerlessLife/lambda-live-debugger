@@ -1,5 +1,5 @@
-import path from "path";
-import fs from "fs/promises";
+import path from 'path';
+import fs from 'fs/promises';
 
 export async function getTestProjectFolder(projectName: string) {
   const projectFolder = path.resolve(`test/${projectName}`);

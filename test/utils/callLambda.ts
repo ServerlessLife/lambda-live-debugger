@@ -1,4 +1,4 @@
-import { LambdaClient, InvokeCommand } from "@aws-sdk/client-lambda";
+import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 
 const lambdaClient = new LambdaClient({});
 

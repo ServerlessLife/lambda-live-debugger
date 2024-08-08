@@ -1,21 +1,21 @@
 // ******  support require in for CJS modules ******
-import { createRequire } from "module";
+import { createRequire } from 'module';
 // @ts-ignore
 const require = createRequire(import.meta.url);
 global.require = require;
 
-import { InfraDeploy } from "./infraDeploy.js";
-import { getVersion } from "./version.js";
-import { Configuration } from "./configuration.js";
-import { FileWatcher } from "./fileWatcher.js";
-import { GitIgnore } from "./gitignore.js";
-import { VsCode } from "./vsCode.js";
-import path from "path";
-import { getRootFolder } from "./utils/getRootFolder.js";
-import fs from "fs/promises";
-import { Logger } from "./logger.js";
-import { getModuleDirname, getProjectDirname } from "./getDirname.js";
-import { LambdaConnection } from "./lambdaConnection.js";
+import { InfraDeploy } from './infraDeploy.js';
+import { getVersion } from './version.js';
+import { Configuration } from './configuration.js';
+import { FileWatcher } from './fileWatcher.js';
+import { GitIgnore } from './gitignore.js';
+import { VsCode } from './vsCode.js';
+import path from 'path';
+import { getRootFolder } from './utils/getRootFolder.js';
+import fs from 'fs/promises';
+import { Logger } from './logger.js';
+import { getModuleDirname, getProjectDirname } from './getDirname.js';
+import { LambdaConnection } from './lambdaConnection.js';
 
 /**
  * Start the Lambda Live Debugger
@@ -25,7 +25,7 @@ async function run() {
 
   Logger.log(`Welcome to Lambda Live Debugger 🐞 version ${version}.`);
   Logger.log(
-    "To keep the project moving forward, please fill out the feedback form at https://forms.gle/v6ekZtuB45Rv3EyW9. Your input is greatly appreciated!",
+    'To keep the project moving forward, please fill out the feedback form at https://forms.gle/v6ekZtuB45Rv3EyW9. Your input is greatly appreciated!',
   );
 
   await Configuration.readConfig();
@@ -35,7 +35,7 @@ async function run() {
   Logger.verbose(
     `Parameters: \n${Object.entries(Configuration.config)
       .map(([key, value]) => ` - ${key}=${value}`)
-      .join("\n")}`,
+      .join('\n')}`,
   );
   Logger.verbose(`NPM module folder: ${getModuleDirname()}`);
   Logger.verbose(`Project folder: ${getProjectDirname()}`);
@@ -55,7 +55,7 @@ async function run() {
   Logger.log(
     `Starting the debugger ${
       Configuration.config.observable
-        ? "in observable mode"
+        ? 'in observable mode'
         : `(ID ${Configuration.config.debuggerId})`
     }
     ...`,
@@ -72,20 +72,20 @@ async function run() {
 
   if (Configuration.config.remove) {
     Logger.log(
-      `Removing Lambda Live Debugger${Configuration.config.remove === "all" ? " including layer" : ""}...`,
+      `Removing Lambda Live Debugger${Configuration.config.remove === 'all' ? ' including layer' : ''}...`,
     );
     await InfraDeploy.removeInfrastructure();
     // await GitIgnore.removeFromGitIgnore();
     // delete folder .lldebugger
-    const folder = path.join(getProjectDirname(), ".lldebugger");
+    const folder = path.join(getProjectDirname(), '.lldebugger');
     Logger.verbose(`Removing ${folder} folder...`);
     await fs.rm(folder, { recursive: true });
 
-    if (Configuration.config.remove === "all") {
+    if (Configuration.config.remove === 'all') {
       await InfraDeploy.deleteLayer();
     }
 
-    Logger.log("Lambda Live Debugger removed!");
+    Logger.log('Lambda Live Debugger removed!');
 
     return;
   }
@@ -93,7 +93,7 @@ async function run() {
   await InfraDeploy.deployInfrastructure();
 
   const folders = [
-    path.resolve("."),
+    path.resolve('.'),
     ...Configuration.getLambdas().map((l) => l.codePath),
   ];
 
@@ -102,7 +102,7 @@ async function run() {
   FileWatcher.watchForFileChanges(rootFolderForWarchingChanges);
 
   await LambdaConnection.connect();
-  Logger.log("Debugger started!");
+  Logger.log('Debugger started!');
 }
 
 run().catch(Logger.error);

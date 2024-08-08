@@ -1,8 +1,8 @@
-import fs from "fs/promises";
-import { outputFolder } from "./constants.js";
-import { Logger } from "./logger.js";
-import { getProjectDirname } from "./getDirname.js";
-import path from "path";
+import fs from 'fs/promises';
+import { outputFolder } from './constants.js';
+import { Logger } from './logger.js';
+import { getProjectDirname } from './getDirname.js';
+import path from 'path';
 
 /**
  * Check if ".lldebugger" exists in .gitignore
@@ -11,10 +11,10 @@ async function doesExistInGitIgnore() {
   try {
     const gitignoreContent = await fs.readFile(
       getGitIgnoreFileLocation(),
-      "utf-8",
+      'utf-8',
     );
     // split by new line
-    const lines = gitignoreContent.split("\n");
+    const lines = gitignoreContent.split('\n');
     // check if ".lldebugger" exists
     const exists = lines.includes(outputFolder);
     return exists;
@@ -28,7 +28,7 @@ async function doesExistInGitIgnore() {
  * @returns
  */
 function getGitIgnoreFileLocation() {
-  return path.join(getProjectDirname(), ".gitignore");
+  return path.join(getProjectDirname(), '.gitignore');
 }
 
 /**
@@ -58,14 +58,14 @@ async function addToGitIgnore() {
  * Remove ".lldebugger" from .gitignore
  */
 async function removeFromGitIgnore() {
-  Logger.verbose("Removing .gitignore entry...");
+  Logger.verbose('Removing .gitignore entry...');
   const exists = await doesExistInGitIgnore();
   if (exists) {
     const gitignoreContent = await fs.readFile(
       getGitIgnoreFileLocation(),
-      "utf-8",
+      'utf-8',
     );
-    const newContent = gitignoreContent.replace(`${outputFolder}\n`, "");
+    const newContent = gitignoreContent.replace(`${outputFolder}\n`, '');
     await fs.writeFile(getGitIgnoreFileLocation(), newContent);
   } else {
     Logger.log(`${outputFolder} doesn't exist in .gitignore`);

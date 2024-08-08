@@ -1,6 +1,6 @@
-import { fromNodeProviderChain } from "@aws-sdk/credential-providers";
-import type { AwsCredentialIdentityProvider } from "@smithy/types";
-import { AwsConfiguration } from "./types/awsConfiguration.js";
+import { fromNodeProviderChain } from '@aws-sdk/credential-providers';
+import type { AwsCredentialIdentityProvider } from '@smithy/types';
+import { AwsConfiguration } from './types/awsConfiguration.js';
 
 /**
  * Get AWS credentials provider

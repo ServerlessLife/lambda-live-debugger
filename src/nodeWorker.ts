@@ -1,9 +1,9 @@
-import { Worker } from "node:worker_threads";
-import { FuctionRequest } from "./ioTService.js";
-import * as path from "path";
-import { Configuration } from "./configuration.js";
-import { getModuleDirname, getProjectDirname } from "./getDirname.js";
-import { Logger } from "./logger.js";
+import { Worker } from 'node:worker_threads';
+import { FuctionRequest } from './ioTService.js';
+import * as path from 'path';
+import { Configuration } from './configuration.js';
+import { getModuleDirname, getProjectDirname } from './getDirname.js';
+import { Logger } from './logger.js';
 
 const workers = new Map<string, Worker>();
 
@@ -26,7 +26,7 @@ async function runInWorker(input: {
 
     if (!worker) {
       worker = startWorker({
-        handler: func.handler ?? "handler",
+        handler: func.handler ?? 'handler',
         artifactFile: input.artifactFile,
         workerId: input.fuctionRequest.workerId,
         functionId: input.fuctionRequest.functionId,
@@ -39,7 +39,7 @@ async function runInWorker(input: {
       );
     }
 
-    worker.on("message", (msg) => {
+    worker.on('message', (msg) => {
       Logger.verbose(
         `[Function ${input.fuctionRequest.functionId}] [Worker ${input.fuctionRequest.workerId}] Worker message`,
         JSON.stringify(msg),
@@ -50,7 +50,7 @@ async function runInWorker(input: {
         resolve(msg);
       }
     });
-    worker.on("error", (err) => {
+    worker.on('error', (err) => {
       Logger.error(
         `[Function ${input.fuctionRequest.functionId}] [Worker ${input.fuctionRequest.workerId}] Error`,
         err,
@@ -94,10 +94,10 @@ function startWorker(input: WorkerRequest) {
     {
       env: {
         ...input.environment,
-        IS_LOCAL: "true",
+        IS_LOCAL: 'true',
         LOCAL_PROJECT_DIR: localProjectDir,
       },
-      execArgv: ["--enable-source-maps"],
+      execArgv: ['--enable-source-maps'],
       workerData: input,
       stderr: true,
       stdin: true,
@@ -106,19 +106,19 @@ function startWorker(input: WorkerRequest) {
     },
   );
 
-  worker.stdout.on("data", (data: Buffer) => {
+  worker.stdout.on('data', (data: Buffer) => {
     Logger.verbose(
       `[Function ${input.functionId}] [Worker ${input.workerId}] `,
       data.toString(),
     );
   });
-  worker.stderr.on("data", (data: Buffer) => {
+  worker.stderr.on('data', (data: Buffer) => {
     Logger.verbose(
       `[Function ${input.functionId}] [Worker ${input.workerId}] `,
       data.toString(),
     );
   });
-  worker.on("exit", () => {
+  worker.on('exit', () => {
     Logger.verbose(
       `[Function ${input.functionId}] [Worker ${input.workerId}] Worker exited`,
     );
@@ -133,7 +133,7 @@ function startWorker(input: WorkerRequest) {
  * Stop all Node.js Worker Threads
  */
 async function stopAllWorkers() {
-  Logger.verbose("Stopping all workers");
+  Logger.verbose('Stopping all workers');
   const promises: Promise<any>[] = [];
   for (const worker of workers.values()) {
     promises.push(worker.terminate());

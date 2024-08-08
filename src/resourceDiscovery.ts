@@ -1,12 +1,12 @@
-import { IFramework } from "./frameworks/iFrameworks.js";
-import { cdkFramework } from "./frameworks/cdkFramework.js";
-import { slsFramework } from "./frameworks/slsFramework.js";
-import { samFramework } from "./frameworks/samFramework.js";
-import { terraformFramework } from "./frameworks/terraformFramework.js";
-import { LldConfig } from "./types/lldConfig.js";
-import { LambdaResource } from "./types/resourcesDiscovery.js";
-import { Logger } from "./logger.js";
-import path from "node:path";
+import { IFramework } from './frameworks/iFrameworks.js';
+import { cdkFramework } from './frameworks/cdkFramework.js';
+import { slsFramework } from './frameworks/slsFramework.js';
+import { samFramework } from './frameworks/samFramework.js';
+import { terraformFramework } from './frameworks/terraformFramework.js';
+import { LldConfig } from './types/lldConfig.js';
+import { LambdaResource } from './types/resourcesDiscovery.js';
+import { Logger } from './logger.js';
+import path from 'node:path';
 
 /**
  * List of supported frameworks
@@ -39,7 +39,7 @@ async function getLambdas(config: LldConfig) {
   let frameworks = [...frameworksSupported];
 
   if (config.framework) {
-    if (config.framework === "none") {
+    if (config.framework === 'none') {
       frameworks = [];
     } else {
       frameworks = frameworks.filter((f) => f.name === config.framework);
@@ -59,7 +59,7 @@ async function getLambdas(config: LldConfig) {
         // filter by function name, can use * as wildcard
         (l) =>
           l.functionName === functionNameFilter ||
-          new RegExp("^" + functionNameFilter.split("*").join(".*") + "$").test(
+          new RegExp('^' + functionNameFilter.split('*').join('.*') + '$').test(
             l.functionName,
           ),
       );

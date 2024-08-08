@@ -1,4 +1,4 @@
-import { GetFunctionCommand, LambdaClient } from "@aws-sdk/client-lambda";
+import { GetFunctionCommand, LambdaClient } from '@aws-sdk/client-lambda';
 
 export const lambdaClient = new LambdaClient({});
 

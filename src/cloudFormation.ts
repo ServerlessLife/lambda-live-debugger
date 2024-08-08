@@ -1,6 +1,6 @@
-import type { CloudFormationClient } from "@aws-sdk/client-cloudformation";
-import { AwsCredentials } from "./awsCredentials.js";
-import { AwsConfiguration } from "./types/awsConfiguration.js";
+import type { CloudFormationClient } from '@aws-sdk/client-cloudformation';
+import { AwsCredentials } from './awsCredentials.js';
+import { AwsConfiguration } from './types/awsConfiguration.js';
 
 let cloudFormationClient: CloudFormationClient;
 
@@ -14,7 +14,7 @@ async function getCloudFormationStackTemplate(
   stackName: string,
   awsConfiguration: AwsConfiguration,
 ) {
-  const { GetTemplateCommand } = await import("@aws-sdk/client-cloudformation");
+  const { GetTemplateCommand } = await import('@aws-sdk/client-cloudformation');
   const command = new GetTemplateCommand({ StackName: stackName });
   const cloudFormationClient = await getCloudFormationClient(awsConfiguration);
 
@@ -28,7 +28,7 @@ async function getCloudFormationStackTemplate(
     const cfTemplate = JSON.parse(response.TemplateBody);
     return cfTemplate;
   } catch (error: any) {
-    if (error.name === "ValidationError") {
+    if (error.name === 'ValidationError') {
       throw new Error(
         `Stack ${stackName} not found. Try specifying a region. Error: ${error.message}`,
         { cause: error },
@@ -47,7 +47,7 @@ async function getCloudFormationStackTemplate(
 async function getCloudFormationClient(awsConfiguration: AwsConfiguration) {
   if (!cloudFormationClient) {
     const { CloudFormationClient } = await import(
-      "@aws-sdk/client-cloudformation"
+      '@aws-sdk/client-cloudformation'
     );
     cloudFormationClient = new CloudFormationClient({
       region: awsConfiguration.region,
@@ -68,7 +68,7 @@ async function getCloudFormationResources(
   awsConfiguration: AwsConfiguration,
 ) {
   const { ListStackResourcesCommand } = await import(
-    "@aws-sdk/client-cloudformation"
+    '@aws-sdk/client-cloudformation'
   );
   const command = new ListStackResourcesCommand({
     StackName: stackName,
@@ -80,7 +80,7 @@ async function getCloudFormationResources(
 
     return response;
   } catch (error: any) {
-    if (error.name === "ValidationError") {
+    if (error.name === 'ValidationError') {
       throw new Error(
         `Stack ${stackName} not found. Try specifying a region. Error: ${error.message}`,
         { cause: error },
@@ -111,7 +111,7 @@ async function getLambdasInStack(
     awsConfiguration,
   );
   const lambdaResources = response.StackResourceSummaries?.filter(
-    (resource) => resource.ResourceType === "AWS::Lambda::Function",
+    (resource) => resource.ResourceType === 'AWS::Lambda::Function',
   );
 
   return (

@@ -1,4 +1,4 @@
-import { BuildOptions } from "esbuild";
+import { BuildOptions } from 'esbuild';
 
 export type LambdaResource = {
   functionName: string;
@@ -15,19 +15,19 @@ export type LambdaResource = {
 };
 
 export enum BundlingType {
-  ESBUILD = "ESBUILD",
-  NONE = "NONE",
+  ESBUILD = 'ESBUILD',
+  NONE = 'NONE',
 }
 
 export type EsBuildOptions = Omit<
   BuildOptions,
-  | "outfile"
-  | "outdir"
-  | "outbase"
-  | "write"
-  | "allowOverwrite"
-  | "sourcemap"
-  | "keepnames"
-  | "entryPoints"
-  | "stdin"
+  | 'outfile'
+  | 'outdir'
+  | 'outbase'
+  | 'write'
+  | 'allowOverwrite'
+  | 'sourcemap'
+  | 'keepnames'
+  | 'entryPoints'
+  | 'stdin'
 >;

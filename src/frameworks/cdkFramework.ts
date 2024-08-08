@@ -1,18 +1,18 @@
-import * as esbuild from "esbuild";
-import * as fs from "fs/promises";
-import * as path from "path";
-import { BundlingType, LambdaResource } from "../types/resourcesDiscovery.js";
-import { outputFolder } from "../constants.js";
-import { findPackageJson } from "../utils/findPackageJson.js";
-import { IFramework } from "./iFrameworks.js";
-import { CloudFormation } from "../cloudFormation.js";
-import { AwsConfiguration } from "../types/awsConfiguration.js";
-import { LldConfigBase } from "../types/lldConfig.js";
-import { Logger } from "../logger.js";
-import { Worker } from "node:worker_threads";
-import { getModuleDirname, getProjectDirname } from "../getDirname.js";
-import { findNpmPath } from "../utils/findNpmPath.js";
-import { type BundlingOptions } from "aws-cdk-lib/aws-lambda-nodejs";
+import * as esbuild from 'esbuild';
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import { BundlingType, LambdaResource } from '../types/resourcesDiscovery.js';
+import { outputFolder } from '../constants.js';
+import { findPackageJson } from '../utils/findPackageJson.js';
+import { IFramework } from './iFrameworks.js';
+import { CloudFormation } from '../cloudFormation.js';
+import { AwsConfiguration } from '../types/awsConfiguration.js';
+import { LldConfigBase } from '../types/lldConfig.js';
+import { Logger } from '../logger.js';
+import { Worker } from 'node:worker_threads';
+import { getModuleDirname, getProjectDirname } from '../getDirname.js';
+import { findNpmPath } from '../utils/findNpmPath.js';
+import { type BundlingOptions } from 'aws-cdk-lib/aws-lambda-nodejs';
 
 /**
  * Support for AWS CDK framework
@@ -22,7 +22,7 @@ export class CdkFramework implements IFramework {
    * Framework name
    */
   public get name(): string {
-    return "cdk";
+    return 'cdk';
   }
 
   /**
@@ -31,7 +31,7 @@ export class CdkFramework implements IFramework {
    */
   public async canHandle(): Promise<boolean> {
     // check if there is cdk.json
-    const cdkJsonPath = path.resolve("cdk.json");
+    const cdkJsonPath = path.resolve('cdk.json');
 
     try {
       await fs.access(cdkJsonPath, fs.constants.F_OK);
@@ -56,7 +56,7 @@ export class CdkFramework implements IFramework {
       role: config.role,
     };
 
-    const cdkConfigPath = "cdk.json";
+    const cdkConfigPath = 'cdk.json';
     // read cdk.json and extract the entry file
 
     const lambdasInCdk = await this.getLambdasDataFromCdkByCompilingAndRunning(
@@ -77,7 +77,7 @@ export class CdkFramework implements IFramework {
       ),
     ];
     Logger.verbose(
-      `[CDK] Found the following stacks in CDK: ${stackNames.join(", ")}`,
+      `[CDK] Found the following stacks in CDK: ${stackNames.join(', ')}`,
     );
 
     const lambdasDeployed = (
@@ -186,12 +186,12 @@ export class CdkFramework implements IFramework {
     const lambdas = Object.entries(cfTemplate.Resources)
       .filter(
         ([, resource]: [string, any]) =>
-          resource.Type === "AWS::Lambda::Function",
+          resource.Type === 'AWS::Lambda::Function',
       )
       .map(([key, resource]: [string, any]) => {
         return {
           logicalId: key,
-          cdkPath: resource.Metadata["aws:cdk:path"],
+          cdkPath: resource.Metadata['aws:cdk:path'],
         };
       });
 
@@ -211,16 +211,16 @@ export class CdkFramework implements IFramework {
     const entryFile = await this.getCdkEntryFile(cdkConfigPath);
     // Define a plugin to prepend custom code to .ts or .tsx files
     const injectCodePlugin: esbuild.Plugin = {
-      name: "injectCode",
+      name: 'injectCode',
       setup(build: esbuild.PluginBuild) {
         build.onLoad({ filter: /.*/ }, async (args: esbuild.OnLoadArgs) => {
           const absolutePath = path.resolve(args.path);
 
-          let source = await fs.readFile(absolutePath, "utf8");
+          let source = await fs.readFile(absolutePath, 'utf8');
 
-          if (args.path.includes("aws-cdk-lib/aws-lambda/lib/function.")) {
+          if (args.path.includes('aws-cdk-lib/aws-lambda/lib/function.')) {
             const codeToFind =
-              "try{jsiiDeprecationWarnings().aws_cdk_lib_aws_lambda_FunctionProps(props)}";
+              'try{jsiiDeprecationWarnings().aws_cdk_lib_aws_lambda_FunctionProps(props)}';
 
             if (!source.includes(codeToFind)) {
               throw new Error(`Can not find code to inject in ${args.path}`);
@@ -256,10 +256,10 @@ export class CdkFramework implements IFramework {
 
           if (
             args.path.includes(
-              "aws-cdk-lib/aws-s3-deployment/lib/bucket-deployment.",
+              'aws-cdk-lib/aws-s3-deployment/lib/bucket-deployment.',
             )
           ) {
-            const codeToFind = "super(scope,id),this.requestDestinationArn=!1;";
+            const codeToFind = 'super(scope,id),this.requestDestinationArn=!1;';
 
             if (!source.includes(codeToFind)) {
               throw new Error(`Can not find code to inject in ${args.path}`);
@@ -271,7 +271,7 @@ export class CdkFramework implements IFramework {
 
           return {
             contents: source,
-            loader: "default",
+            loader: 'default',
           };
         });
       },
@@ -287,8 +287,8 @@ export class CdkFramework implements IFramework {
       await esbuild.build({
         entryPoints: [entryFile],
         bundle: true,
-        platform: "node",
-        target: "node18",
+        platform: 'node',
+        target: 'node18',
         outfile: compileOutput,
         sourcemap: false,
         plugins: [injectCodePlugin],
@@ -304,14 +304,14 @@ export class CdkFramework implements IFramework {
     const CDK_CONTEXT_JSON = {
       ...context,
       // prevent compiling assets
-      "aws:cdk:bundling-stacks": [],
+      'aws:cdk:bundling-stacks': [],
     };
     process.env.CDK_CONTEXT_JSON = JSON.stringify(CDK_CONTEXT_JSON);
     Logger.verbose(`[CDK] Context:`, JSON.stringify(CDK_CONTEXT_JSON, null, 2));
 
     const awsCdkLibPath = await findNpmPath(
-      path.join(getProjectDirname(), config.subfolder ?? "/"),
-      "aws-cdk-lib",
+      path.join(getProjectDirname(), config.subfolder ?? '/'),
+      'aws-cdk-lib',
     );
     Logger.verbose(`[CDK] aws-cdk-lib path: ${awsCdkLibPath}`);
 
@@ -324,7 +324,7 @@ export class CdkFramework implements IFramework {
     const list = await Promise.all(
       lambdas.map(async (lambda) => {
         // handler slit into file and file name
-        const handlerSplit = lambda.handler.split(".");
+        const handlerSplit = lambda.handler.split('.');
 
         const handler = handlerSplit.pop();
         const filename = handlerSplit[0];
@@ -393,7 +393,7 @@ export class CdkFramework implements IFramework {
     const lambdas: any[] = await new Promise((resolve, reject) => {
       const worker = new Worker(
         path.resolve(
-          path.join(getModuleDirname(), "frameworks/cdkFrameworkWorker.mjs"),
+          path.join(getModuleDirname(), 'frameworks/cdkFrameworkWorker.mjs'),
         ),
         {
           workerData: {
@@ -406,12 +406,12 @@ export class CdkFramework implements IFramework {
         },
       );
 
-      worker.on("message", async (message) => {
+      worker.on('message', async (message) => {
         resolve(message);
         await worker.terminate();
       });
 
-      worker.on("error", (error) => {
+      worker.on('error', (error) => {
         reject(
           new Error(`Error running CDK code in worker: ${error.message}`, {
             cause: error,
@@ -419,7 +419,7 @@ export class CdkFramework implements IFramework {
         );
       });
 
-      worker.on("exit", (code) => {
+      worker.on('exit', (code) => {
         if (code !== 0) {
           reject(new Error(`CDK worker stopped with exit code ${code}`));
         }
@@ -459,7 +459,7 @@ export class CdkFramework implements IFramework {
     // get all "-c" and "--context" arguments from the command line
     const contextFromLldConfig = config.context?.reduce(
       (acc: Record<string, string>, arg: string) => {
-        const [key, value] = arg.split("=");
+        const [key, value] = arg.split('=');
         if (key && value) {
           acc[key] = value;
         }
@@ -471,10 +471,10 @@ export class CdkFramework implements IFramework {
     // get all context from 'cdk.context.json' if it exists
     let contextFromJson = {};
     try {
-      const cdkContextJson = await fs.readFile("cdk.context.json", "utf8");
+      const cdkContextJson = await fs.readFile('cdk.context.json', 'utf8');
       contextFromJson = JSON.parse(cdkContextJson);
     } catch (err: any) {
-      if (err.code !== "ENOENT") {
+      if (err.code !== 'ENOENT') {
         throw new Error(`Error reading cdk.context.json: ${err.message}`);
       }
     }
@@ -482,9 +482,9 @@ export class CdkFramework implements IFramework {
     // get context from cdk.json
     let cdkJson: { context?: Record<string, string> } = {};
     try {
-      cdkJson = JSON.parse(await fs.readFile(cdkConfigPath, "utf8"));
+      cdkJson = JSON.parse(await fs.readFile(cdkConfigPath, 'utf8'));
     } catch (err: any) {
-      if (err.code !== "ENOENT") {
+      if (err.code !== 'ENOENT') {
         throw new Error(`Error reading cdk.json: ${err.message}`);
       }
     }
@@ -498,13 +498,13 @@ export class CdkFramework implements IFramework {
    * @returns
    */
   async getCdkEntryFile(cdkConfigPath: string) {
-    const cdkJson = await fs.readFile(cdkConfigPath, "utf8");
+    const cdkJson = await fs.readFile(cdkConfigPath, 'utf8');
     const cdkConfig = JSON.parse(cdkJson);
     const entry = cdkConfig.app as string | undefined;
     // just file that ends with .ts
     let entryFile = entry
-      ?.split(" ")
-      .find((file: string) => file.endsWith(".ts"))
+      ?.split(' ')
+      .find((file: string) => file.endsWith('.ts'))
       ?.trim();
 
     if (!entryFile) {

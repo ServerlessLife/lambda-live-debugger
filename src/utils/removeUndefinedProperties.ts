@@ -9,7 +9,7 @@ export function removeUndefinedProperties(obj: any) {
   }
 
   for (const key in obj) {
-    if (typeof (obj as any)[key] === "undefined") {
+    if (typeof (obj as any)[key] === 'undefined') {
       delete (obj as any)[key];
     }
   }
