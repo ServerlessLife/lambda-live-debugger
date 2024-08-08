@@ -240,7 +240,7 @@ For example, when the framework has only a list of JavaScript files, but you tra
 getLambdas: async (foundLambdas, config) => {
   if (foundLambdas) {
     for (const lambda of foundLambdas) {
- lambda.codePath = lambda.codePath
+      lambda.codePath = lambda.codePath
         .replace("/dist/", "/src/")
         .replace(".js", ".ts");
     }
@@ -255,7 +255,7 @@ import { type EsBuildOptions, type LldConfigTs } from "lambda-live-debugger";
 
 export default {
   ...
- getLambdas: async (foundLambdas, config) => {
+  getLambdas: async (foundLambdas, config) => {
     if (foundLambdas) {
       for (const lambda of foundLambdas) {
         lambda.esBuildOptions = {
@@ -272,7 +272,7 @@ export default {
 export default {
   //framework: <-- you do not need this line
   ...
- getLambdas: async (foundLambdas, config) => {
+  getLambdas: async (foundLambdas, config) => {
     return [
       {
           // function name as deployed on AWS
@@ -309,7 +309,9 @@ Check the [GitHub issues](https://github.com/ServerlessLife/lambda-live-debugger
 
 ## Missing Features
 
-Check the [GitHub issues](https://github.com/ServerlessLife/lambda-live-debugger/issues). The biggest missing feature right now is MFA authentication and more Terraform configurations.
+For the current list of missing features, please refer to the [GitHub issues](https://github.com/ServerlessLife/lambda-live-debugger/issues) page. The most significant missing features at the moment are MFA authentication and additional Terraform configurations.
+
+If you have a new feature idea, please create and issue.
 
 ## Reporting an Issue
 
