@@ -369,11 +369,11 @@ export default {
   observable: ${config.observable},
   // Observable mode interval
   interval: ${config.interval === defaultObservableInterval ? undefined : config.interval},
-  // Verbose logs
+  // Verbose logging
   verbose: ${config.verbose},
   // Modify Lambda function list or support custom framework
   //getLambdas: async (foundLambdas) => {
-  //  you can customize the list of lambdas here or create your own
+  //  you can customize the list of Lambdas here or create your own
   //  return foundLambdas;
   //},
 } satisfies LldConfigTs;

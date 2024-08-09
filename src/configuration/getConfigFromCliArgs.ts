@@ -28,7 +28,7 @@ export async function getConfigFromCliArgs(
     '-w, --wizard',
     'Program interactively asks for each parameter and saves it to lldebugger.config.ts',
   );
-  program.option('-v, --verbose', 'Verbose logs');
+  program.option('-v, --verbose', 'Verbose logging');
   program.option(
     '-c, --context <context>',
     'AWS CDK context',

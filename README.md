@@ -108,7 +108,7 @@ The configuration is saved to `lldebugger.config.ts`.
  -V, --version                   output the version number
  -r, --remove [option]           Remove Lambda Live Debugger infrastructure. Options: 'keep-layer' (default), 'remove-all'. The latest also removes the Lambda Layer
  -w, --wizard                    Program interactively asks for each parameter and saves it to lldebugger.config.ts
- -v, --verbose                   Verbose logs
+ -v, --verbose                   Verbose logging
  -c, --context <context>         AWS CDK context (default: [])
  -s, --stage <stage>             Serverless Framework stage
  -f, --function <function name>  Filter by function name. You can use * as a wildcard
@@ -138,7 +138,7 @@ export default {
   observable: false,
   verbose: false,
   //getLambdas: async (foundLambdas) => {
-  //  you can customize the list of lambdas here or create your own
+  //  you can customize the list of Lambdas here or create your own
   //  return foundLambdas;
   //},
 } satisfies LldConfigTs;
@@ -218,19 +218,17 @@ Configuration file `lldebugger.config.ts` enables you to modify the list of Lamb
 
 ```typescript
 getLambdas: async (foundLambdas, config) => {
-  //you can customize the list of lambdas here or create your own
+  //you can customize the list of Lambdas here or create your own
   return foundLambdas;
-},
+};
 ```
 
 **Filter list of functions:**
 
 ```typescript
 getLambdas: async (foundLambdas, config) => {
-  return foundLambdas?.filter((l) =>
-    l.functionName.includes("myfunction"),
- );
-},
+  return foundLambdas?.filter((l) => l.functionName.includes('myfunction'));
+};
 ```
 
 **Modify code path:**\
@@ -241,11 +239,11 @@ getLambdas: async (foundLambdas, config) => {
   if (foundLambdas) {
     for (const lambda of foundLambdas) {
       lambda.codePath = lambda.codePath
-        .replace("/dist/", "/src/")
-        .replace(".js", ".ts");
+        .replace('/dist/', '/src/')
+        .replace('.js', '.ts');
     }
   }
-},
+};
 ```
 
 **Modify esBuild configuration:**
@@ -259,8 +257,9 @@ export default {
     if (foundLambdas) {
       for (const lambda of foundLambdas) {
         lambda.esBuildOptions = {
-        target: "node14",
-      };
+          target: "node14",
+        };
+      }
     }
   }
 } satisfies LldConfigTs;
@@ -316,10 +315,10 @@ If you have a new feature idea, please create and issue.
 ## Reporting an Issue
 
 - Make sure the bug hasn't already been reported. If you fount it has been, add a "+1" comment so I know there are multiple users struggling with the same issue. If possible, add some additional info.
-- Use descriptive titles with prefixes like "bug:", "help:", "feature:", or "discussion:".
-- Enable verbose logging and provide the full log.
+- **Enable verbose logging and provide the full log.**
+- **Specify the exact framework version (CDK, SLS, SAM ...) and the exact Lambda Live Debugger version.**
 - Describe your setup in detail, or better yet, provide a sample project.
-- Specify the exact framework version (CDK, SLS, SAM ...) and the exact Lambda Live Debugger version.
+- Use descriptive titles with prefixes like "bug:", "help:", "feature:", or "discussion:".
 
 ## Authors:
 
@@ -328,7 +327,7 @@ If you have a new feature idea, please create and issue.
 
 ## Contributors (alphabetical):
 
-- ⭐ Your name here for notable code or documentation contributions, or sample projects submitted with bug reports.
+- ⭐ Your name here for notable code or documentation contributions, or sample projects submitted with bug report that contributed to the tool improvement.
 
 ## Declarment
 

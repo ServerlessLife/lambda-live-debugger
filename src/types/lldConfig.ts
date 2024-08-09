@@ -3,7 +3,7 @@ import { LambdaResource } from './resourcesDiscovery.js';
 
 export type LldConfigBase = {
   /**
-   * Verbose logs
+   * Verbose logging
    * @default false
    */
   verbose?: boolean;

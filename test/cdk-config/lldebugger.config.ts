@@ -7,7 +7,7 @@ export default {
   observable: false,
   verbose: false,
   //getLambdas: async (foundLambdas, config) => {
-  //  you can customize the list of lambdas here or create your own
+  //  you can customize the list of Lambdas here or create your own
   //  return foundLambdas;
   //},
 } satisfies LldConfigTs;
