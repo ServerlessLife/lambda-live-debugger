@@ -23,7 +23,10 @@ function log(...args: any[]) {
  * @param args The arguments to log
  */
 function important(...args: any[]) {
-  console.log(chalk.hex(orange)(...args));
+  args = args.map((arg) =>
+    typeof arg === 'string' ? chalk.hex(orange)(arg) : arg,
+  );
+  console.log(...args);
 }
 
 /**
@@ -31,7 +34,8 @@ function important(...args: any[]) {
  * @param args The arguments to log
  */
 function error(...args: any[]) {
-  console.error(chalk.red(...args));
+  args = args.map((arg) => (typeof arg === 'string' ? chalk.red(arg) : arg));
+  console.error(...args);
 }
 
 /**
@@ -39,7 +43,10 @@ function error(...args: any[]) {
  * @param args The arguments to log
  */
 function warn(...args: any[]) {
-  console.warn(chalk.hex(orange)(...args));
+  args = args.map((arg) =>
+    typeof arg === 'string' ? chalk.hex(orange)(arg) : arg,
+  );
+  console.warn(...args);
 }
 
 /**
@@ -48,7 +55,8 @@ function warn(...args: any[]) {
  */
 function verbose(...args: any[]) {
   if (verboseEnabled) {
-    console.info(chalk.grey(...args));
+    args = args.map((arg) => (typeof arg === 'string' ? chalk.grey(arg) : arg));
+    console.info(...args);
   }
 }
 

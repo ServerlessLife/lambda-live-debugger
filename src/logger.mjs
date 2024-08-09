@@ -21,21 +21,28 @@ function log(...args) {
  * @param args The arguments to log
  */
 function important(...args) {
-  console.log(chalk.hex(orange)(...args));
+  args = args.map((arg) =>
+    typeof arg === 'string' ? chalk.hex(orange)(arg) : arg,
+  );
+  console.log(...args);
 }
 /**
  * Log an error message in red
  * @param args The arguments to log
  */
 function error(...args) {
-  console.error(chalk.red(...args));
+  args = args.map((arg) => (typeof arg === 'string' ? chalk.red(arg) : arg));
+  console.error(...args);
 }
 /**
  * Log a warning message in orange
  * @param args The arguments to log
  */
 function warn(...args) {
-  console.warn(chalk.hex(orange)(...args));
+  args = args.map((arg) =>
+    typeof arg === 'string' ? chalk.hex(orange)(arg) : arg,
+  );
+  console.warn(...args);
 }
 /**
  * Log a verbose message if verbose is enabled. Log the message in grey.
@@ -43,7 +50,8 @@ function warn(...args) {
  */
 function verbose(...args) {
   if (verboseEnabled) {
-    console.info(chalk.grey(...args));
+    args = args.map((arg) => (typeof arg === 'string' ? chalk.grey(arg) : arg));
+    console.info(...args);
   }
 }
 /**
