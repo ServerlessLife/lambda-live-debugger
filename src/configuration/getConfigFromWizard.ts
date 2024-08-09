@@ -372,18 +372,25 @@ export default {
   // Verbose logging
   verbose: ${config.verbose},
   // Modify Lambda function list or support custom framework
-  //getLambdas: async (foundLambdas) => {
-  //  you can customize the list of Lambdas here or create your own
-  //  return foundLambdas;
-  //},
+  // getLambdas: async (foundLambdas) => {
+  //   you can customize the list of Lambdas here or create your own
+  //   return foundLambdas;
+  // },
 } satisfies LldConfigTs;
     `;
 
-  // remove lines that contains undefined or ""
+  // comment lines that contains undefined or ""
   const configContentCleaned = configContent
     .trim()
     .split('\n')
-    .filter((l) => !l.includes('undefined') && !l.includes('""'))
+    .map((l) =>
+      l.includes('undefined')
+        ? `  // ${l
+            .replace('"undefined",', '')
+            .replace('undefined,', '')
+            .trim()}`
+        : l,
+    )
     .join('\n');
 
   await fs.writeFile(configFileName, configContentCleaned);
