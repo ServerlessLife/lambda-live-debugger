@@ -347,18 +347,31 @@ async function saveConfiguration(config: LldConfigCliArgs) {
 import { type LldConfigTs } from "lambda-live-debugger";
 
 export default {
+  // Framework to use
   framework: "${config.framework}",
+  // AWS CDK context
   context: ${config.context ? JSON.stringify(config.context) : undefined},
+  // Serverless Framework stage
   stage: "${config.stage}",
+  // Monorepo subfolder
   subfolder: "${config.subfolder}",
+  // Filter by function name. You can use * as a wildcard
   function: "${config.function}",
+  // AWS profile
   profile: "${config.profile}",
+  // AWS region
   region: "${config.region}",
+  // AWS role
   role: "${config.role}",
+  // SAM environment
   configEnv: "${config.configEnv}",
+  // Observable mode
   observable: ${config.observable},
+  // Observable mode interval
   interval: ${config.interval === defaultObservableInterval ? undefined : config.interval},
+  // Verbose logs
   verbose: ${config.verbose},
+  // Modify Lambda function list or support custom framework
   //getLambdas: async (foundLambdas) => {
   //  you can customize the list of lambdas here or create your own
   //  return foundLambdas;

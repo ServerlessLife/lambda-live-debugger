@@ -68,7 +68,7 @@ async function onMessageFromLambda(message: IoTMessage) {
     }
 
     if (Configuration.config.verbose) {
-      Logger.verbose(
+      Logger.log(
         `[Function ${message.data.functionId}] Response: `,
         JSON.stringify(message.data, null, 2),
       );
@@ -85,7 +85,7 @@ async function onMessageFromLambda(message: IoTMessage) {
     const response = await NodeHandler.invokeLambda(message.data);
 
     if (Configuration.config.verbose) {
-      Logger.verbose(
+      Logger.log(
         `[Function ${message.data.functionId}] Response: `,
         JSON.stringify(response, null, 2),
       );

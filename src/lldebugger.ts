@@ -24,7 +24,7 @@ async function run() {
   const version = await getVersion();
 
   Logger.log(`Welcome to Lambda Live Debugger 🐞 version ${version}.`);
-  Logger.log(
+  Logger.important(
     'To keep the project moving forward, please fill out the feedback form at https://forms.gle/v6ekZtuB45Rv3EyW9. Your input is greatly appreciated!',
   );
 
@@ -57,8 +57,7 @@ async function run() {
       Configuration.config.observable
         ? 'in observable mode'
         : `(ID ${Configuration.config.debuggerId})`
-    }
-    ...`,
+    }...`,
   );
 
   if (Configuration.config.subfolder) {
