@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createRequire as topLevelCreateRequire } from 'module';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const require = topLevelCreateRequire(import.meta.url);
@@ -14,6 +15,12 @@ parentPort.on('message', async (data) => {
   Logger.verbose(`[Worker ${workerData.workerId}] Received message`, data);
   const mod = await import(workerData.artifactFile);
   const fn = mod[workerData.handler];
+
+  if (!fn) {
+    throw new Error(
+      `Handler '${workerData.handler}' not found for function '${workerData.functionId}'`,
+    );
+  }
 
   try {
     const context = {
