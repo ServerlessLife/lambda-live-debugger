@@ -471,7 +471,7 @@ async function attachLayerToLambda(
             },
           },
           //Timeout: LlDebugger.argOptions.observable ? undefined : 300, // Increase the timeout to 5 minutes
-          Timeout: 300,
+          Timeout: Math.max(initialTimeout, 300), // Increase the timeout to min. 5 minutes
         });
 
       await getLambdaClient().send(updateFunctionConfigurationCommand);
