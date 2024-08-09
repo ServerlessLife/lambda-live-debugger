@@ -47,7 +47,7 @@ async function getVsCodeLaunchConfig() {
     Logger.verbose('Lambda Live Debugger is installed locally');
     // check if file exists
     try {
-      Logger.log(
+      Logger.verbose(
         'Checking local folder for runtimeExecutable setting for VsCode configuration',
         localFolder,
       );
