@@ -29,6 +29,8 @@ Contact me via:
 - [GitHub Issues](https://github.com/ServerlessLife/lambda-live-debugger/issues)
 - [LinkedIn](http://www.linkedin.com/in/marko-serverlesslife)
 
+Also, check out my blog: [www.serverlesslife.com](https://www.serverlesslife.com) and follow me on [X (Twitter)](https://twitter.com/ServerlessL).
+
 ## The Problem Statement
 
 Serverless is amazing and solves many issues with traditional systems. However, writing code for Lambda functions can be challenging. The cycle of writing, deploying, running, fixing, and redeploying is time-consuming and tedious. You could use tools to run Lambda locally or use unit/integration tests; those approaches often don't replicate the actual environment closely enough.

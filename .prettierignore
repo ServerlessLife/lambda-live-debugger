@@ -4,3 +4,4 @@ cdk.out
 .serverless
 .aws-sam
 src/extension/aws
+*.html
