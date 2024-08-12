@@ -107,16 +107,10 @@ function startWorker(input: WorkerRequest) {
   );
 
   worker.stdout.on('data', (data: Buffer) => {
-    Logger.verbose(
-      `[Function ${input.functionId}] [Worker ${input.workerId}] `,
-      data.toString(),
-    );
+    Logger.log(`[Function ${input.functionId}]`, data.toString());
   });
   worker.stderr.on('data', (data: Buffer) => {
-    Logger.verbose(
-      `[Function ${input.functionId}] [Worker ${input.workerId}] `,
-      data.toString(),
-    );
+    Logger.log(`[Function ${input.functionId}]`, data.toString());
   });
   worker.on('exit', () => {
     Logger.verbose(
