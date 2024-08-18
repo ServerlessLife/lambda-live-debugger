@@ -10,12 +10,12 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.137"
+    "@types/aws-lambda": "^8.10.143"
   },
   "dependencies": {
-    "@aws-sdk/client-iot": "^3.515.0",
-    "@aws-sdk/client-lambda": "^3.515.0",
-    "@aws-sdk/client-s3": "^3.515.0",
-    "aws-iot-device-sdk": "^2.2.13"
+    "@aws-sdk/client-iot": "^3.632.0",
+    "@aws-sdk/client-lambda": "^3.632.0",
+    "@aws-sdk/client-s3": "^3.633.0",
+    "aws-iot-device-sdk": "^2.2.15"
   }
 }
