@@ -68,6 +68,7 @@ async function fixCdkPaths(awsCdkLibPath) {
 
   const pathsFix = {
     'custom-resource-handlers/': `${awsCdkLibPath}/custom-resource-handlers/`,
+    'aws-custom-resource-handler': `${awsCdkLibPath}/custom-resource-handlers/dist/custom-resources/aws-custom-resource-handler`,
   };
 
   // Create a proxy to intercept calls to the path module so we can fix paths
