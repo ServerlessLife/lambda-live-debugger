@@ -183,19 +183,22 @@ export class CdkFramework implements IFramework {
       awsConfiguration,
     );
     // get all Lambda functions in the template
-    const lambdas = Object.entries(cfTemplate.Resources)
-      .filter(
-        ([, resource]: [string, any]) =>
-          resource.Type === 'AWS::Lambda::Function',
-      )
-      .map(([key, resource]: [string, any]) => {
-        return {
-          logicalId: key,
-          cdkPath: resource.Metadata['aws:cdk:path'],
-        };
-      });
+    if (cfTemplate) {
+      const lambdas = Object.entries(cfTemplate.Resources)
+        .filter(
+          ([, resource]: [string, any]) =>
+            resource.Type === 'AWS::Lambda::Function',
+        )
+        .map(([key, resource]: [string, any]) => {
+          return {
+            logicalId: key,
+            cdkPath: resource.Metadata['aws:cdk:path'],
+          };
+        });
+      return lambdas;
+    }
 
-    return lambdas;
+    return [];
   }
 
   /**
