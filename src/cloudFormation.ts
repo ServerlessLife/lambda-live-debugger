@@ -1,6 +1,7 @@
 import type { CloudFormationClient } from '@aws-sdk/client-cloudformation';
 import { AwsCredentials } from './awsCredentials.js';
 import { AwsConfiguration } from './types/awsConfiguration.js';
+import { Logger } from './logger.js';
 
 let cloudFormationClient: CloudFormationClient;
 
@@ -29,10 +30,11 @@ async function getCloudFormationStackTemplate(
     return cfTemplate;
   } catch (error: any) {
     if (error.name === 'ValidationError') {
-      throw new Error(
+      Logger.error(
         `Stack ${stackName} not found. Try specifying a region. Error: ${error.message}`,
-        { cause: error },
+        error,
       );
+      return undefined;
     } else {
       throw error;
     }
@@ -81,10 +83,11 @@ async function getCloudFormationResources(
     return response;
   } catch (error: any) {
     if (error.name === 'ValidationError') {
-      throw new Error(
+      Logger.error(
         `Stack ${stackName} not found. Try specifying a region. Error: ${error.message}`,
-        { cause: error },
+        error,
       );
+      return undefined;
     } else {
       throw error;
     }
@@ -110,7 +113,7 @@ async function getLambdasInStack(
     stackName,
     awsConfiguration,
   );
-  const lambdaResources = response.StackResourceSummaries?.filter(
+  const lambdaResources = response?.StackResourceSummaries?.filter(
     (resource) => resource.ResourceType === 'AWS::Lambda::Function',
   );
 
