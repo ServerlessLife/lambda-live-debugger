@@ -46,8 +46,8 @@ export default defineConfig({
     },
     siteTitle: 'Lambda Live Debugger',
     logo: {
-      light: '/logo_light.svg',
-      dark: '/logo_dark.svg',
+      light: './logo_light.svg',
+      dark: './logo_dark.svg',
     },
     sidebar: [
       {
