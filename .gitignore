@@ -1,3 +1,5 @@
 node_modules
 dist
 .lldebugger
+.vitepress/dist
+.vitepress/cache

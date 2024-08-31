@@ -5,3 +5,5 @@ cdk.out
 .aws-sam
 src/extension/aws
 *.html
+.vitepress/dist
+.vitepress/cache
