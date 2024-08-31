@@ -1,4 +1,4 @@
-# ![Lambda Live Debugger](logo_landscape_light.svg)
+# ![Lambda Live Debugger](public/logo_landscape_light.svg)
 
 Lambda Live Debugger is an indispensable tool for debugging AWS Lambda functions from your computer, even though they are deployed in the cloud. It supports Lambdas written in JavaScript or TypeScript.
 
@@ -23,7 +23,7 @@ Lambda Live Debugger connects to your deployed Lambda, routes requests to your c
 
 The tool attaches Lambda Extensions (via a Layer), intercepts, and relays calls to AWS IoT. AWS IoT transfers messages between your Lambda and the local machine. If the Lambda is written in TypeScript, it's transpiled to JavaScript. The code is executed via the Node Worker Thread.
 
-![Architecture](./architecture.drawio.png)
+![Architecture](./public/architecture.drawio.png)
 
 AWS keys generated on the cloud for Lambda are transferred to the local environment, so the code has the same permissions as it would executed on the cloud. There could be a difference in packaging, mainly regarding static files, which are probably in different locations. You can use additional environment variables to adjust the code:
 
