@@ -1,0 +1,20 @@
+:root {
+  --vp-c-indigo-1: #dc143c;
+  --vp-c-indigo-2: #dc143c;
+  --vp-c-indigo-3: #dc143c;
+}
+
+.VPDoc .container .aside {
+  display: none;
+}
+.pager {
+  display: none;
+}
+
+:root:not(.dark) img[src$='/logo_landscape_dark.svg'] {
+  display: none;
+}
+
+:root:is(.dark) img[src$='/logo_landscape_light.svg'] {
+  display: none;
+}

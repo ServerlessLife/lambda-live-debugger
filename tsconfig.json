@@ -6,6 +6,6 @@
     "outDir": "./dist",
     "rootDir": "./src"
   },
-  "include": ["src/**/*", "test/**/*", "*.*"],
+  "include": ["src/**/*", "test/**/*", "*.*", ".vitepress/**/*"],
   "exclude": ["node_modules", "dist"]
 }
