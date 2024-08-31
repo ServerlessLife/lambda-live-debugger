@@ -11,10 +11,10 @@
   display: none;
 }
 
-:root:not(.dark) img[src$='/logo_landscape_dark.svg'] {
+:root:not(.dark) img[alt$='Lambda Live Debugger_'] {
   display: none;
 }
 
-:root:is(.dark) img[src$='/logo_landscape_light.svg'] {
+:root:is(.dark) img[alt$='Lambda Live Debugger'] {
   display: none;
 }

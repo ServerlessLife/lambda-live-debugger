@@ -1,3 +1,3 @@
-# ![Lambda Live Debugger](logo_landscape_dark.svg)
+# ![Lambda Live Debugger_](logo_landscape_dark.svg)
 
 <!--@include: ./README.md-->

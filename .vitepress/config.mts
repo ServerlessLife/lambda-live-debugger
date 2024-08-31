@@ -18,7 +18,7 @@ export default defineConfig({
     ['meta', { property: 'og:locale', content: 'en' }],
     ['meta', { property: 'og:title', content: 'Lambda Live Debugger | Remote debugging AWS Lambda functions' }],
     ['meta', { property: 'og:site_name', content: 'Lambda Live Debugger' }],
-    ['meta', { property: 'og:image', content: 'https://lldebugger.com/logo_landscape_light.svg' }],
+    ['meta', { property: 'og:image', content: 'https://lldebugger.com/logo_landscape_light.png' }],
     ['meta', { property: 'og:url', content: 'https://lldebugger.com/' }],
 
     ['meta', { property: 'twitter:card', content: 'summary' }],
