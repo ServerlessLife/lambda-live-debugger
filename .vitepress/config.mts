@@ -11,14 +11,14 @@ export default defineConfig({
     ['meta', { name: 'language', content: 'English' }],
     ['meta', { name: 'revisit-after', content: '1 days' }],
     ['meta', { name: 'author', content: 'Marko (ServerlessLife)' }],
-    ['keywords', {}, 'aws, lambda, debugger, serverless, aws-lambda, javascript, typescript, dev-tools, lambda-debugger, aws-cdk, serverless-framework, sls, aws-sam, sam, terraform, local-debugging, cloud-development'],
-    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/public/favicon.svg' }],
-    ['link', { rel: 'icon', type: 'image/png', href: '/public/favicon.png' }],
+    ['meta', { name: 'keywords', content: 'aws, lambda, debugger, serverless, aws-lambda, javascript, typescript, dev-tools, lambda-debugger, aws-cdk, serverless-framework, sls, aws-sam, sam, terraform, local-debugging, cloud-development' }],
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
+    ['link', { rel: 'icon', type: 'image/png', href: '/favicon.png' }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:locale', content: 'en' }],
     ['meta', { property: 'og:title', content: 'Lambda Live Debugger | Remote debugging AWS Lambda functions' }],
     ['meta', { property: 'og:site_name', content: 'Lambda Live Debugger' }],
-    ['meta', { property: 'og:image', content: 'https://lldebugger.com/public/logo_landscape_light.png' }],
+    ['meta', { property: 'og:image', content: 'https://lldebugger.com/lambda_live_debugger.png' }],
     ['meta', { property: 'og:url', content: 'https://lldebugger.com/' }],
 
     ['meta', { property: 'twitter:card', content: 'summary' }],
@@ -46,8 +46,8 @@ export default defineConfig({
     },
     siteTitle: 'Lambda Live Debugger',
     logo: {
-      light: './public/logo_light.svg',
-      dark: './public/logo_dark.svg',
+      light: '/logo_light.svg',
+      dark: '/logo_dark.svg',
     },
     sidebar: [
       {
