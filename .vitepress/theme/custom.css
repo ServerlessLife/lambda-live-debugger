@@ -10,6 +10,9 @@
 .pager {
   display: none;
 }
+.VPLocalNavOutlineDropdown {
+  display: none;
+}
 
 :root:not(.dark) img[alt$='Lambda Live Debugger_'] {
   display: none;
@@ -17,4 +20,8 @@
 
 :root:is(.dark) img[alt$='Lambda Live Debugger'] {
   display: none;
+}
+
+.VPSidebar {
+  padding-bottom: 20px !important;
 }

@@ -37,9 +37,9 @@ export default defineConfig({
       gtag('config', 'G-DWK00ZDX76');`
     ]
   ],
-  sitemap: {
-    hostname: 'https://www.lldebugger.com',
-  },
+  // sitemap: {
+  //   hostname: 'https://www.lldebugger.com',
+  // },
   themeConfig: {
     search: {
       provider: 'local',
@@ -68,12 +68,6 @@ export default defineConfig({
           { text: 'Configuration file', link: '#configuration-file' },
           { text: 'Debugging', link: '#debugging' },
           { text: 'Development Process', link: '#development-process' },
-        ],
-      },
-      {
-        text: 'Advanced',
-        collapsed: false,
-        items: [
           { text: 'Observability Mode', link: '#observability-mode' },
           { text: 'Monorepo', link: '#monorepo-setup' },
           { text: 'Removing', link: '#removing' },
