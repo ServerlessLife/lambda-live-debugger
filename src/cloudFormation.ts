@@ -1,4 +1,8 @@
-import type { CloudFormationClient } from '@aws-sdk/client-cloudformation';
+import {
+  type ListStackResourcesCommand as ListStackResourcesCommandType,
+  type StackResourceSummary,
+  type CloudFormationClient,
+} from '@aws-sdk/client-cloudformation';
 import { AwsCredentials } from './awsCredentials.js';
 import { AwsConfiguration } from './types/awsConfiguration.js';
 import { Logger } from './logger.js';
@@ -72,15 +76,28 @@ async function getCloudFormationResources(
   const { ListStackResourcesCommand } = await import(
     '@aws-sdk/client-cloudformation'
   );
-  const command = new ListStackResourcesCommand({
-    StackName: stackName,
-  });
-  const cloudFormationClient = await getCloudFormationClient(awsConfiguration);
+
+  const cloudFormationClient: CloudFormationClient =
+    await getCloudFormationClient(awsConfiguration);
 
   try {
-    const response = await cloudFormationClient.send(command);
+    let nextToken: string | undefined = undefined;
+    const items: StackResourceSummary[] = [];
+    do {
+      const command: ListStackResourcesCommandType =
+        new ListStackResourcesCommand({
+          StackName: stackName,
+          NextToken: nextToken,
+        });
 
-    return response;
+      const response = await cloudFormationClient.send(command);
+
+      if (response.StackResourceSummaries) {
+        items.push(...response.StackResourceSummaries);
+      }
+      nextToken = response.NextToken;
+    } while (nextToken);
+    return items;
   } catch (error: any) {
     if (error.name === 'ValidationError') {
       Logger.error(
@@ -113,7 +130,7 @@ async function getLambdasInStack(
     stackName,
     awsConfiguration,
   );
-  const lambdaResources = response?.StackResourceSummaries?.filter(
+  const lambdaResources = response?.filter(
     (resource) => resource.ResourceType === 'AWS::Lambda::Function',
   );
 
