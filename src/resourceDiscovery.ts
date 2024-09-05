@@ -53,7 +53,8 @@ async function getLambdas(config: LldConfig) {
     Logger.verbose(`Getting resources with '${framework.name}' framework`);
     resources = await framework.getLambdas(config);
 
-    if (config.function) {
+    if (config.function && !config.remove) {
+      // if we are removing the debugger, we don't want to filter by function name
       const functionNameFilter = config.function.trim();
       resources = resources.filter(
         // filter by function name, can use * as wildcard

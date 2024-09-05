@@ -52,13 +52,17 @@ async function run() {
     return;
   }
 
-  Logger.log(
-    `Starting the debugger ${
-      Configuration.config.observable
-        ? 'in observable mode'
-        : `(ID ${Configuration.config.debuggerId})`
-    }...`,
-  );
+  let message = `Starting the debugger ${
+    Configuration.config.observable
+      ? 'in observable mode'
+      : `(ID ${Configuration.config.debuggerId})`
+  }...`;
+
+  if (Configuration.config.remove) {
+    message = `Removing Lambda Live Debugger${Configuration.config.remove === 'all' ? ' including layer' : ''}...`;
+  }
+
+  Logger.log(message);
 
   if (Configuration.config.subfolder) {
     // change the current working directory to the subfolder for monorepos
@@ -70,9 +74,6 @@ async function run() {
   await Configuration.discoverLambdas();
 
   if (Configuration.config.remove) {
-    Logger.log(
-      `Removing Lambda Live Debugger${Configuration.config.remove === 'all' ? ' including layer' : ''}...`,
-    );
     await InfraDeploy.removeInfrastructure();
     // await GitIgnore.removeFromGitIgnore();
     // delete folder .lldebugger
@@ -86,6 +87,11 @@ async function run() {
 
     Logger.log('Lambda Live Debugger removed!');
 
+    return;
+  }
+
+  if (!Configuration.getLambdas().length) {
+    Logger.error('No Lambdas found. Exiting...');
     return;
   }
 
