@@ -28,7 +28,7 @@ export default defineConfig({
     ['meta', { property: 'og:image', content: 'https://lldebugger.com/lambda_live_debugger.png' }],
     ['meta', { property: 'og:url', content: 'https://lldebugger.com/' }],
 
-    ['meta', { property: 'twitter:card', content: 'summary' }],
+    ['meta', { property: 'twitter:card', content: 'summary_large_image' }],
     ['meta', { property: 'twitter:site', content: '@serverlessl' }],
 
     [
