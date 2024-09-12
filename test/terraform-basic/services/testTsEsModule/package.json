@@ -1,5 +1,5 @@
 {
-  "name": "cdk-basic-test-ts-esmodule",
+  "name": "terraform-basic-test-ts-esmodule",
   "version": "1.0.0",
   "type": "module",
   "devDependencies": {

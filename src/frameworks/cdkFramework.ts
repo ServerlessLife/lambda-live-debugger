@@ -280,21 +280,61 @@ export class CdkFramework implements IFramework {
       },
     };
 
+    let isESM = false;
+    // get packgage.json
+    const packageJsonPath = await findPackageJson(entryFile);
+
+    if (packageJsonPath) {
+      try {
+        const packageJson = JSON.parse(
+          await fs.readFile(packageJsonPath, { encoding: 'utf-8' }),
+        );
+        if (packageJson.type === 'module') {
+          isESM = true;
+          Logger.verbose(`[CDK] Using ESM format`);
+        }
+      } catch (err: any) {
+        Logger.error(
+          `Error reading CDK package.json (${packageJsonPath}): ${err.message}`,
+          err,
+        );
+      }
+    }
+
     const compileOutput = path.join(
       getProjectDirname(),
       outputFolder,
-      `compiledCdk.js`,
+      `compiledCdk.${isESM ? 'mjs' : 'cjs'}`,
     );
+
     try {
       // Build CDK code
       await esbuild.build({
         entryPoints: [entryFile],
         bundle: true,
         platform: 'node',
-        target: 'node18',
+        keepNames: true,
         outfile: compileOutput,
         sourcemap: false,
         plugins: [injectCodePlugin],
+        ...(isESM
+          ? {
+              format: 'esm',
+              target: 'esnext',
+              mainFields: ['module', 'main'],
+              banner: {
+                js: [
+                  `import { createRequire as topLevelCreateRequire } from 'module';`,
+                  `global.require = global.require ?? topLevelCreateRequire(import.meta.url);`,
+                  `import { fileURLToPath as topLevelFileUrlToPath, URL as topLevelURL } from "url"`,
+                  `global.__dirname = global.__dirname ?? topLevelFileUrlToPath(new topLevelURL(".", import.meta.url))`,
+                ].join('\n'),
+              },
+            }
+          : {
+              format: 'cjs',
+              target: 'node18',
+            }),
       });
     } catch (error: any) {
       throw new Error(`Error building CDK code: ${error.message}`, {

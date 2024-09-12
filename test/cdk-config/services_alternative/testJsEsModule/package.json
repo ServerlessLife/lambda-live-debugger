@@ -1,5 +1,5 @@
 {
-  "name": "cdk-basic-test-js-esmodule",
+  "name": "cdk-config-test-js-esmodule",
   "version": "1.0.0",
   "type": "module",
   "dependencies": {

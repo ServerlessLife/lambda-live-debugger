@@ -4,7 +4,6 @@ const require = topLevelCreateRequire(import.meta.url);
 import path from 'path';
 
 import { workerData, parentPort } from 'node:worker_threads';
-import fs from 'fs/promises';
 
 import { Logger } from '../logger.mjs';
 
@@ -25,11 +24,10 @@ parentPort.on('message', async (data) => {
   Logger.verbose(`[Worker ${workerData.workerId}] Received message`, data);
 
   // execute code to get the data into global.lambdas
-  const codeFile = await fs.readFile(data.compileOutput, 'utf8');
-
+  //const codeFile = await fs.readFile(data.compileOutput, 'utf8');
   await fixCdkPaths(workerData.awsCdkLibPath);
-
-  eval(codeFile);
+  // eval(codeFile);
+  await import(data.compileOutput);
 
   if (!global.lambdas || global.lambdas?.length === 0) {
     throw new Error('No Lambda functions found in the CDK code');
