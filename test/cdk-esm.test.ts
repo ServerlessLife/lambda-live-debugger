@@ -36,7 +36,7 @@ describe('cdk-esm', async () => {
   test('check infra', async () => {
     const lambdaName = await getFunctionName(
       folder,
-      'FunctionNameTestTsCommonJs',
+      'FunctionNameTestTsEsModule',
     );
     await expectInfraDeployed(lambdaName);
   });
@@ -62,7 +62,7 @@ describe('cdk-esm', async () => {
       await removeInfra(lldProcess, folder);
       const lambdaName = await getFunctionName(
         folder,
-        'FunctionNameTestTsCommonJs',
+        'FunctionNameTestTsEsModule',
       );
       await expectInfraRemoved(lambdaName);
     }
