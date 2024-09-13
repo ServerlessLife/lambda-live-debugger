@@ -331,9 +331,10 @@ export class CdkFramework implements IFramework {
               banner: {
                 js: [
                   `import { createRequire as topLevelCreateRequire } from 'module';`,
+                  `import.meta.url = 'file:///${dirname}/cdkFrameworkWorker.mjs';`,
                   `global.require = global.require ?? topLevelCreateRequire(import.meta.url);`,
                   `import { fileURLToPath as topLevelFileUrlToPath, URL as topLevelURL } from "url"`,
-                  `global.__dirname = '${dirname}'`,
+                  `global.__dirname = global.__dirname ?? topLevelFileUrlToPath(new topLevelURL(".", import.meta.url))`,
                 ].join('\n'),
               },
             }
