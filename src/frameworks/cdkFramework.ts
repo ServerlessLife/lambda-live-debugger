@@ -307,6 +307,12 @@ export class CdkFramework implements IFramework {
       `compiledCdk.${isESM ? 'mjs' : 'cjs'}`,
     );
 
+    const dirname = path.join(
+      ...([getProjectDirname(), config.subfolder, 'x'].filter(
+        (p) => p,
+      ) as string[]),
+    );
+
     try {
       // Build CDK code
       await esbuild.build({
@@ -327,7 +333,7 @@ export class CdkFramework implements IFramework {
                   `import { createRequire as topLevelCreateRequire } from 'module';`,
                   `global.require = global.require ?? topLevelCreateRequire(import.meta.url);`,
                   `import { fileURLToPath as topLevelFileUrlToPath, URL as topLevelURL } from "url"`,
-                  `global.__dirname = global.__dirname ?? topLevelFileUrlToPath(new topLevelURL(".", import.meta.url))`,
+                  `global.__dirname = '${dirname}'`,
                 ].join('\n'),
               },
             }
@@ -335,13 +341,7 @@ export class CdkFramework implements IFramework {
               format: 'cjs',
               target: 'node18',
               banner: {
-                js: [
-                  `__dirname = '${path.join(
-                    ...([getProjectDirname(), config.subfolder, 'x'].filter(
-                      (p) => p,
-                    ) as string[]),
-                  )}';`,
-                ].join('\n'),
+                js: [`__dirname = '${dirname}';`].join('\n'),
               },
             }),
       });
