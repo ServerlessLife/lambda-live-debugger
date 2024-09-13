@@ -66,6 +66,24 @@ async function fixCdkPaths(awsCdkLibPath) {
   const pathsFix = {
     'custom-resource-handlers/': `${awsCdkLibPath}/custom-resource-handlers/`,
     'aws-custom-resource-handler': `${awsCdkLibPath}/custom-resource-handlers/dist/custom-resources/aws-custom-resource-handler`,
+    'auto-delete-objects-handler': `${awsCdkLibPath}/custom-resource-handlers/dist/aws-s3/auto-delete-objects-handler`,
+    'notifications-resource-handler': `${awsCdkLibPath}/custom-resource-handlers/dist/aws-s3/notifications-resource-handler`,
+    'drop-spam-handler': `${awsCdkLibPath}/custom-resource-handlers/dist/aws-ses/drop-spam-handler`,
+    'aws-stepfunctions-tasks/role-policy-handler': `${awsCdkLibPath}/custom-resource-handlers/dist/aws-stepfunctions-tasks/role-policy-handler`,
+    'eval-nodejs-handler': `${awsCdkLibPath}/custom-resource-handlers/dist/aws-stepfunctions-tasks/eval-nodejs-handler`,
+    'cross-account-zone-delegation-handler': `${awsCdkLibPath}/custom-resource-handlers/dist/aws-route53/cross-account-zone-delegation-handler`,
+    'delete-existing-record-set-handler': `${awsCdkLibPath}/custom-resource-handlers/dist/aws-route53/delete-existing-record-set-handler`,
+    'aws-api-handler': `${awsCdkLibPath}/custom-resource-handlers/dist/aws-events-targets/aws-api-handler`,
+    'log-retention-handler': `${awsCdkLibPath}/custom-resource-handlers/dist/aws-logs/log-retention-handler`,
+    'cluster-resource-handler': `${awsCdkLibPath}/custom-resource-handlers/dist/aws-eks/cluster-resource-handler`,
+    'auto-delete-images-handler': `${awsCdkLibPath}/custom-resource-handlers/dist/aws-ecr/auto-delete-images-handler`,
+    'bucket-deployment-handler': `${awsCdkLibPath}/custom-resource-handlers/dist/aws-s3-deployment/bucket-deployment-handler`,
+    'nodejs-entrypoint-handler': `${awsCdkLibPath}/custom-resource-handlers/dist/core/nodejs-entrypoint-handler`,
+    'restrict-default-security-group-handler': `${awsCdkLibPath}/custom-resource-handlers/dist/aws-ec2/restrict-default-security-group-handler`,
+    'dns-validated-certificate-handler': `${awsCdkLibPath}/custom-resource-handlers/dist/aws-certificatemanager/dns-validated-certificate-handler`,
+    'auto-delete-underlying-resources-handler': `${awsCdkLibPath}/custom-resource-handlers/dist/aws-synthetics/auto-delete-underlying-resources-handler`,
+    'replica-handler': `${awsCdkLibPath}/custom-resource-handlers/dist/aws-dynamodb/replica-handler`,
+    'oidc-handler': `${awsCdkLibPath}/custom-resource-handlers/dist/aws-iam/oidc-handler`,
   };
 
   // Create a proxy to intercept calls to the path module so we can fix paths
@@ -74,6 +92,23 @@ async function fixCdkPaths(awsCdkLibPath) {
       if (typeof target[prop] === 'function') {
         return function (...args) {
           if (prop === 'resolve') {
+            let resolvedPath = target[prop].apply(target, args);
+
+            for (const [key, value] of Object.entries(pathsFix)) {
+              if (resolvedPath.includes(key)) {
+                // replace the beginning of the path with the value
+                const i = resolvedPath.indexOf(key);
+                const newResolvedPath = `${value}${resolvedPath.substring(i + key.length)}`;
+                Logger.verbose(
+                  `[CDK] [Worker] Fixing path ${resolvedPath} -> ${newResolvedPath}`,
+                );
+                resolvedPath = newResolvedPath;
+              }
+            }
+
+            return resolvedPath;
+          }
+          if (prop === 'join') {
             let resolvedPath = target[prop].apply(target, args);
 
             for (const [key, value] of Object.entries(pathsFix)) {

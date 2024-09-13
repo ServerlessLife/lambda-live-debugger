@@ -4,10 +4,19 @@ import * as lambda_nodejs from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as log from 'aws-cdk-lib/aws-logs';
 import * as path from 'path';
+import * as ec2 from 'aws-cdk-lib/aws-ec2';
 
 export class CdkbasicStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
+
+    // to test internal CDK internal handler restrict-default-security-group-handler/index.js
+    new ec2.Vpc(this, 'vpc', {
+      ipAddresses: ec2.IpAddresses.cidr('10.0.0.0/24'),
+      ipProtocol: ec2.IpProtocol.DUAL_STACK,
+      restrictDefaultSecurityGroup: true,
+      natGateways: 0,
+    });
 
     const functionTestTsCommonJs = new lambda_nodejs.NodejsFunction(
       this,
