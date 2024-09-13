@@ -25,6 +25,26 @@
       "cwd": "${workspaceRoot}/test/cdk-basic"
     },
     {
+      "name": "LLDebugger - CDK ESM",
+      "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
+      "args": ["../../src/lldebugger.ts", "-c environment=test"],
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal",
+      "type": "node",
+      "cwd": "${workspaceRoot}/test/cdk-esm"
+    },
+    {
+      "name": "LLDebugger - CDK ESM - observable",
+      "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
+      "args": ["../../src/lldebugger.ts", "-c environment=test", "-o"],
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal",
+      "type": "node",
+      "cwd": "${workspaceRoot}/test/cdk-esm"
+    },
+    {
       "name": "LLDebugger - SLS basic",
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": ["../../src/lldebugger.ts", "--stage=test"],

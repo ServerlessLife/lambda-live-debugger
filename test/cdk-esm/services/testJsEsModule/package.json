@@ -1,10 +1,7 @@
 {
-  "name": "terraform-basic-test-ts-esmodule",
+  "name": "cdk-esm-test-js-esmodule",
   "version": "1.0.0",
   "type": "module",
-  "devDependencies": {
-    "@tsconfig/node20": "^20.1.4"
-  },
   "dependencies": {
     "@aws-sdk/client-sts": "^3.577.0"
   }

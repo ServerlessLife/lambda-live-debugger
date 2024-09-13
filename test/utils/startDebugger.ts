@@ -79,6 +79,6 @@ async function startDebuggerInternal(folder: string, args: string[] = []) {
       }
     });
   });
-  await setTimeout(5000);
+  await setTimeout(7000);
   return lldProcess;
 }

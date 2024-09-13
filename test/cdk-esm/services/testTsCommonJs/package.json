@@ -1,5 +1,5 @@
 {
-  "name": "terraform-basic-test-ts-commonjs",
+  "name": "cdk-esm-test-ts-commonjs",
   "version": "1.0.0",
   "type": "commonjs",
   "devDependencies": {

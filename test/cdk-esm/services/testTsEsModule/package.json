@@ -1,7 +1,7 @@
 {
-  "name": "terraform-basic-test-ts-commonjs",
+  "name": "cdk-esm-test-ts-esmodule",
   "version": "1.0.0",
-  "type": "commonjs",
+  "type": "module",
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4"
   },

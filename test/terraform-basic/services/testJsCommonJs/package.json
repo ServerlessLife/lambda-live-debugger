@@ -1,5 +1,5 @@
 {
-  "name": "cdk-basic-test-js-commonjs",
+  "name": "terraform-basic-test-js-commonjs",
   "version": "1.0.0",
   "type": "commonjs",
   "dependencies": {
