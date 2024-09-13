@@ -4,16 +4,12 @@ const require = topLevelCreateRequire(import.meta.url);
 import path from 'path';
 
 import { workerData, parentPort } from 'node:worker_threads';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import fs from 'fs/promises'; // do not delete this line
 
 import { Logger } from '../logger.mjs';
 
 Logger.setVerbose(workerData.verbose);
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const __dirname = path.resolve(
-  path.join(
-    ...[workerData.projectDirname, workerData.subfolder, 'x'].filter((p) => p),
-  ),
-);
 
 Logger.verbose(`[CDK] [Worker] Started`);
 
@@ -24,9 +20,7 @@ parentPort.on('message', async (data) => {
   Logger.verbose(`[Worker ${workerData.workerId}] Received message`, data);
 
   // execute code to get the data into global.lambdas
-  //const codeFile = await fs.readFile(data.compileOutput, 'utf8');
   await fixCdkPaths(workerData.awsCdkLibPath);
-  // eval(codeFile);
   await import(data.compileOutput);
 
   if (!global.lambdas || global.lambdas?.length === 0) {
