@@ -14,38 +14,43 @@ Logger.setVerbose(workerData.verbose);
 Logger.verbose(`[CDK] [Worker] Started`);
 
 parentPort.on('message', async (data) => {
-  // this is global variable to store the data from the CDK code once it is executed
-  global.lambdas = [];
+  try {
+    // this is global variable to store the data from the CDK code once it is executed
+    global.lambdas = [];
 
-  Logger.verbose(`[Worker ${workerData.workerId}] Received message`, data);
+    Logger.verbose(`[Worker ${workerData.workerId}] Received message`, data);
 
-  // execute code to get the data into global.lambdas
-  await fixCdkPaths(workerData.awsCdkLibPath);
-  await import(data.compileOutput);
+    // execute code to get the data into global.lambdas
+    await fixCdkPaths(workerData.awsCdkLibPath);
+    await import(data.compileOutput);
 
-  if (!global.lambdas || global.lambdas?.length === 0) {
-    throw new Error('No Lambda functions found in the CDK code');
+    if (!global.lambdas || global.lambdas?.length === 0) {
+      throw new Error('No Lambda functions found in the CDK code');
+    }
+
+    const lambdas = global.lambdas.map((lambda) => ({
+      handler: lambda.handler,
+      stackName: lambda.stackName,
+      codePath: lambda.codePath,
+      code: {
+        path: lambda.code?.path,
+      },
+      cdkPath: lambda.node.defaultChild.node.path,
+      bundling: {
+        ...lambda.bundling,
+        commandHooks: undefined, // can not be serialized
+      },
+    }));
+
+    Logger.verbose(
+      `[CDK] [Worker] Sending found lambdas`,
+      JSON.stringify(lambdas, null, 2),
+    );
+    parentPort.postMessage(lambdas);
+  } catch (error) {
+    Logger.error(`[CDK] [Worker] Error`, error);
+    throw error;
   }
-
-  const lambdas = global.lambdas.map((lambda) => ({
-    handler: lambda.handler,
-    stackName: lambda.stackName,
-    codePath: lambda.codePath,
-    code: {
-      path: lambda.code?.path,
-    },
-    cdkPath: lambda.node.defaultChild.node.path,
-    bundling: {
-      ...lambda.bundling,
-      commandHooks: undefined, // can not be serialized
-    },
-  }));
-
-  Logger.verbose(
-    `[CDK] [Worker] Sending found lambdas`,
-    JSON.stringify(lambdas, null, 2),
-  );
-  parentPort.postMessage(lambdas);
 });
 
 /**
@@ -97,3 +102,7 @@ async function fixCdkPaths(awsCdkLibPath) {
     exports: pathProxy,
   };
 }
+
+process.on('unhandledRejection', (error) => {
+  Logger.error(`[CDK] [Worker] Unhandled Rejection`, error);
+});

@@ -110,7 +110,7 @@ function startWorker(input: WorkerRequest) {
     Logger.log(`[Function ${input.functionId}]`, data.toString());
   });
   worker.stderr.on('data', (data: Buffer) => {
-    Logger.log(`[Function ${input.functionId}]`, data.toString());
+    Logger.error(`[Function ${input.functionId}]`, data.toString());
   });
   worker.on('exit', () => {
     Logger.verbose(

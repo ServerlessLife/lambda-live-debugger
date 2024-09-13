@@ -477,6 +477,14 @@ export class CdkFramework implements IFramework {
         }
       });
 
+      // worker.stdout.on('data', (data: Buffer) => {
+      //   Logger.log(`[CDK]`, data.toString());
+      // });
+
+      // worker.stderr.on('data', (data: Buffer) => {
+      //   Logger.error(`[CDK]`, data.toString());
+      // });
+
       worker.postMessage({
         compileOutput: compileCodeFile,
       });
