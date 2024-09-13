@@ -336,7 +336,11 @@ export class CdkFramework implements IFramework {
               target: 'node18',
               banner: {
                 js: [
-                  `__dirname = '${path.join(getProjectDirname(), config.subfolder, 'x')}';`,
+                  `__dirname = '${path.join(
+                    ...([getProjectDirname(), config.subfolder, 'x'].filter(
+                      (p) => p,
+                    ) as string[]),
+                  )}';`,
                 ].join('\n'),
               },
             }),
