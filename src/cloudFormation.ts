@@ -73,9 +73,13 @@ async function getCloudFormationResources(
   stackName: string,
   awsConfiguration: AwsConfiguration,
 ) {
+  // temporary disable console.error because SAM framework outputs useless errors
+  const originalConsoleError = console.error;
+  console.error = function () {};
   const { ListStackResourcesCommand } = await import(
     '@aws-sdk/client-cloudformation'
   );
+  console.error = originalConsoleError;
 
   const cloudFormationClient: CloudFormationClient =
     await getCloudFormationClient(awsConfiguration);
