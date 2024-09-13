@@ -36,9 +36,25 @@ describe('cdk-esm', async () => {
   test('check infra', async () => {
     const lambdaName = await getFunctionName(
       folder,
-      'FunctionNameTestTsEsModule',
+      'FunctionNameTestTsCommonJs',
     );
     await expectInfraDeployed(lambdaName);
+  });
+
+  test('call Lambda - testTsCommonJs', async () => {
+    const lambdaName = await getFunctionName(
+      folder,
+      'FunctionNameTestTsCommonJs',
+    );
+
+    const payload = getSamplePayload(lambdaName);
+    const response = await callLambda(lambdaName, payload);
+
+    expect(response.inputEvent).toEqual(payload);
+    expect(response.runningLocally).toEqual(!observableMode);
+    if (observableMode) {
+      await validateLocalResponse(lambdaName, payload);
+    }
   });
 
   test('call Lambda - testTsEsModule', async () => {
@@ -57,12 +73,76 @@ describe('cdk-esm', async () => {
     }
   });
 
+  test('call Lambda - testJsCommonJs', async () => {
+    const lambdaName = await getFunctionName(
+      folder,
+      'FunctionNameTestJsCommonJs',
+    );
+
+    const payload = getSamplePayload(lambdaName);
+    const response = await callLambda(lambdaName, payload);
+
+    expect(response.runningLocally).toEqual(!observableMode);
+    expect(response.inputEvent).toEqual(payload);
+    if (observableMode) {
+      await validateLocalResponse(lambdaName, payload);
+    }
+  });
+
+  test('call Lambda - testJsEsModule', async () => {
+    const lambdaName = await getFunctionName(
+      folder,
+      'FunctionNameTestJsEsModule',
+    );
+
+    const payload = getSamplePayload(lambdaName);
+    const response = await callLambda(lambdaName, payload);
+
+    expect(response.inputEvent).toEqual(payload);
+    expect(response.runningLocally).toEqual(!observableMode);
+    if (observableMode) {
+      await validateLocalResponse(lambdaName, payload);
+    }
+  });
+
+  test('call Lambda - testJsCommonJsBase', async () => {
+    const lambdaName = await getFunctionName(
+      folder,
+      'FunctionNameTestJsCommonJsBase',
+    );
+
+    const payload = getSamplePayload(lambdaName);
+    const response = await callLambda(lambdaName, payload);
+
+    expect(response.inputEvent).toEqual(payload);
+    expect(response.runningLocally).toEqual(!observableMode);
+    if (observableMode) {
+      await validateLocalResponse(lambdaName, payload);
+    }
+  });
+
+  test('call Lambda - testJsEsModuleBase', async () => {
+    const lambdaName = await getFunctionName(
+      folder,
+      'FunctionNameTestJsEsModuleBase',
+    );
+
+    const payload = getSamplePayload(lambdaName);
+    const response = await callLambda(lambdaName, payload);
+
+    expect(response.inputEvent).toEqual(payload);
+    expect(response.runningLocally).toEqual(!observableMode);
+    if (observableMode) {
+      await validateLocalResponse(lambdaName, payload);
+    }
+  });
+
   test('remove infra', async () => {
     if (process.env.CI === 'true' || process.env.RUN_TEST_FROM_CLI === 'true') {
       await removeInfra(lldProcess, folder);
       const lambdaName = await getFunctionName(
         folder,
-        'FunctionNameTestTsEsModule',
+        'FunctionNameTestTsCommonJs',
       );
       await expectInfraRemoved(lambdaName);
     }

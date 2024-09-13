@@ -1,0 +1,11 @@
+{
+  "name": "cdk-esm-test-ts-commonjs",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "devDependencies": {
+    "@tsconfig/node20": "^20.1.4"
+  },
+  "dependencies": {
+    "@aws-sdk/client-sts": "^3.577.0"
+  }
+}

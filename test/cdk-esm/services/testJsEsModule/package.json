@@ -1,0 +1,8 @@
+{
+  "name": "cdk-esm-test-js-esmodule",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@aws-sdk/client-sts": "^3.577.0"
+  }
+}
