@@ -1,0 +1,18 @@
+{
+  "name": "sam-alt",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "sam build --config-file alt-samconfig.yaml --template-file alt-template.yaml",
+    "deploy": "npm run build && sam deploy --config-env test --no-confirm-changeset --config-file alt-samconfig.yaml --template-file alt-template.yaml && npm run export_outputs",
+    "export_outputs": "aws cloudformation describe-stacks --stack-name lld-test-sam-alt --output json --query Stacks[0].Outputs > sam-outputs.json",
+    "destroy": "sam delete --config-env test --no-prompts"
+  },
+  "devDependencies": {
+    "@tsconfig/node20": "^20.1.4",
+    "@types/aws-lambda": "^8.10.137"
+  },
+  "dependencies": {
+    "@aws-sdk/client-sts": "^3.577.0"
+  }
+}

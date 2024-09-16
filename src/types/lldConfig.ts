@@ -19,10 +19,7 @@ export type LldConfigBase = {
    * Filter by function name
    */
   function?: string;
-  /**
-   * SAM environment
-   */
-  configEnv?: string;
+
   /**
    * Observable mode
    * @default false
@@ -43,6 +40,21 @@ export type LldConfigBase = {
    * Start debugger
    */
   start?: boolean;
+
+  /**
+   * SAM framework cli parameter config-env
+   */
+  configEnv?: string;
+
+  /**
+   * SAM framework cli parameter config-file
+   */
+  samConfigFile?: string;
+
+  /**
+   * SAM framework cli parameter template-file
+   */
+  samTemplateFile?: string;
 
   /**
    * Resources discovery function

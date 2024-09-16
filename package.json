@@ -59,6 +59,8 @@
     "test-sls-esbuild-esm-observable": "npm run build && RUN_TEST_FROM_CLI=true OBSERVABLE_MODE=true vitest run test/sls-esbuild-esm.test.ts",
     "test-sam-basic": "npm run build && RUN_TEST_FROM_CLI=true vitest run test/sam-basic.test.ts",
     "test-sam-basic-observable": "npm run build && RUN_TEST_FROM_CLI=true OBSERVABLE_MODE=true vitest run test/sam-basic.test.ts",
+    "test-sam-alt": "npm run build && RUN_TEST_FROM_CLI=true vitest run test/sam-alt.test.ts",
+    "test-sam-alt-observable": "npm run build && RUN_TEST_FROM_CLI=true OBSERVABLE_MODE=true vitest run test/sam-alt.test.ts",
     "test-terraform-basic": "npm run build && RUN_TEST_FROM_CLI=true vitest run test/terraform-basic.test.ts",
     "test-terraform-basic-observable": "npm run build && RUN_TEST_FROM_CLI=true OBSERVABLE_MODE=true vitest run test/terraform-basic.test.ts",
     "docs:dev": "vitepress dev",
@@ -137,6 +139,7 @@
     "test/sls-basic",
     "test/sls-esbuild",
     "test/sam-basic",
+    "test/sam-alt",
     "test/terraform-basic"
   ]
 }

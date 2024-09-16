@@ -121,6 +121,22 @@ export async function getConfigFromWizard({
         message: 'Would you like to enter SAM environment?',
         default: configFromCliArgs.configEnv ?? currentConfig?.configEnv,
       },
+      {
+        type: 'input',
+        name: 'samConfigFile',
+        message:
+          'Would you like to enter SAM configuration file (default = samconfig.toml)?',
+        default:
+          configFromCliArgs.samConfigFile ?? currentConfig?.samConfigFile,
+      },
+      {
+        type: 'input',
+        name: 'samTemplateFile',
+        message:
+          'Would you like to enter SAM template file (default = template.yaml)?',
+        default:
+          configFromCliArgs.samTemplateFile ?? currentConfig?.samTemplateFile,
+      },
     ]);
 
     answers = { ...answers, ...samAnswers };
@@ -150,10 +166,9 @@ export async function getConfigFromWizard({
       name: 'observable',
       message:
         'Do you want to use observable mode, which just sends events to the debugger and do not use the respose?',
-      default:
-        configFromCliArgs.observable !== undefined
-          ? configFromCliArgs.observable
-          : currentConfig?.observable,
+      default: !!(configFromCliArgs.observable !== undefined
+        ? configFromCliArgs.observable
+        : currentConfig?.observable),
     },
   ]);
 
@@ -349,7 +364,7 @@ import { type LldConfigTs } from "lambda-live-debugger";
 export default {
   // Framework to use
   framework: "${config.framework}",
-  // AWS CDK context
+  // AWS CDK framework context
   context: ${config.context ? JSON.stringify(config.context) : undefined},
   // Serverless Framework stage
   stage: "${config.stage}",
@@ -363,8 +378,12 @@ export default {
   region: "${config.region}",
   // AWS role
   role: "${config.role}",
-  // SAM environment
+  // SAM framework environment
   configEnv: "${config.configEnv}",
+  // SAM framework configuration file
+  samConfigFile: "${config.samConfigFile}",
+  // SAM framework template file
+  samTemplateFile: "${config.samTemplateFile}",
   // Observable mode
   observable: ${config.observable},
   // Observable mode interval
@@ -408,6 +427,8 @@ function getConfigFromAnswers(answers: any): LldConfigCliArgs {
     region: answers.region,
     role: answers.role,
     configEnv: answers.configEnv,
+    samConfigFile: answers.samConfigFile,
+    samTemplateFile: answers.samTemplateFile,
     observable: answers.observable,
     interval:
       answers.interval !== undefined

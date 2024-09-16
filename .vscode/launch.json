@@ -126,6 +126,37 @@
       "cwd": "${workspaceRoot}/test/sam-basic"
     },
     {
+      "name": "LLDebugger - SAM alt",
+      "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
+      "args": [
+        "../../src/lldebugger.ts",
+        "--config-env=test",
+        "--sam-config-file=alt-samconfig.yaml",
+        "--sam-template-file=alt-template.yaml"
+      ],
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal",
+      "type": "node",
+      "cwd": "${workspaceRoot}/test/sam-alt"
+    },
+    {
+      "name": "LLDebugger - SAM alt - observable",
+      "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
+      "args": [
+        "../../src/lldebugger.ts",
+        "--config-env=test",
+        "-o",
+        "--sam-config-file=alt-samconfig.yaml",
+        "--sam-template-file=alt-template.yaml"
+      ],
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal",
+      "type": "node",
+      "cwd": "${workspaceRoot}/test/sam-alt"
+    },
+    {
       "name": "LLDebugger - Terraform basic",
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": ["../../src/lldebugger.ts", "--config-env=test"],
