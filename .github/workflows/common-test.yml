@@ -314,6 +314,57 @@ jobs:
       - name: Test - observable mode
         run: OBSERVABLE_MODE=true npx vitest --retry 1 test/sam-basic.test.ts
 
+  test-sam-alt:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: test-sam-alt
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.node_version }}
+          registry-url: 'https://registry.npmjs.org'
+      - name: Install dependencies
+        run: npm ci
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        if: ${{ inputs.mode == 'build' }}
+        with:
+          name: dist
+          path: dist
+      - name: Install lambda-live-debugger globally
+        if: ${{ inputs.mode == 'global' }}
+        run: |
+          npm i lambda-live-debugger -g
+        working-directory: test
+      - name: Install lambda-live-debugger locally
+        if: ${{ inputs.mode == 'local' }}
+        run: |
+          npm i lambda-live-debugger
+        working-directory: test
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-west-1
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: GitHubActions
+      - name: Destroy
+        run: npm run destroy
+        working-directory: test/sam-alt
+        continue-on-error: true
+      - name: Deploy
+        run: npm run deploy
+        working-directory: test/sam-alt
+      - name: Test
+        run: npx vitest --retry 1 test/sam-alt.test.ts
+      - name: Test - observable mode
+        run: OBSERVABLE_MODE=true npx vitest --retry 1 test/sam-alt.test.ts
+
   test-terraform-basic:
     runs-on: ubuntu-latest
     concurrency:

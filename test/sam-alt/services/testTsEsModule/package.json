@@ -1,0 +1,11 @@
+{
+  "name": "sam-alt-test-ts-esmodule",
+  "version": "1.0.0",
+  "type": "module",
+  "devDependencies": {
+    "@tsconfig/node20": "^20.1.4"
+  },
+  "dependencies": {
+    "@aws-sdk/client-sts": "^3.577.0"
+  }
+}

@@ -48,6 +48,8 @@ export async function getConfigFromCliArgs(
     defaultObservableInterval.toString(),
   );
   program.option('--config-env <evironment>', 'SAM environment');
+  program.option('--sam-config-file <file>', 'SAM configuration file');
+  program.option('--sam-template-file <file>', 'SAM template file');
   program.option('--profile <profile>', 'AWS profile to use');
   program.option('--region <region>', 'AWS region to use');
   program.option('--role <role>', 'AWS role to use');

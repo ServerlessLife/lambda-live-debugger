@@ -15,9 +15,6 @@ import { Logger } from '../logger.js';
  * Support for AWS SAM framework
  */
 export class SamFramework implements IFramework {
-  protected samConfigFile = 'samconfig.toml';
-  protected samTemplateFile = 'template.yaml';
-
   /**
    * Framework name
    */
@@ -29,26 +26,42 @@ export class SamFramework implements IFramework {
    * Can this class handle the current project
    * @returns
    */
-  public async canHandle(): Promise<boolean> {
+  public async canHandle(config: LldConfigBase): Promise<boolean> {
+    const { samConfigFile, samTemplateFile } = this.getConfigFiles(config);
+
     try {
-      await fs.access(path.resolve(this.samConfigFile), constants.F_OK);
+      await fs.access(samConfigFile, constants.F_OK);
     } catch {
       Logger.verbose(
-        `[SAM] This is not a SAM framework project. ${path.resolve(this.samConfigFile)} not found.`,
+        `[SAM] This is not a SAM framework project. ${samConfigFile} not found.`,
       );
       return false;
     }
 
     try {
-      await fs.access(path.resolve(this.samTemplateFile), constants.F_OK);
+      await fs.access(samTemplateFile, constants.F_OK);
     } catch {
       Logger.verbose(
-        `[SAM] This is not a SAM framework project. ${path.resolve(this.samTemplateFile)} not found.`,
+        `[SAM] This is not a SAM framework project. ${samTemplateFile} not found.`,
       );
       return false;
     }
 
     return true;
+  }
+
+  /**
+   * Get configuration files
+   * @param config Configuration
+   * @returns Configuration files
+   */
+  private getConfigFiles(config: LldConfigBase) {
+    const samConfigFile = config.samConfigFile ?? 'samconfig.toml';
+    const samTemplateFile = config.samTemplateFile ?? 'template.yaml';
+    return {
+      samConfigFile: path.resolve(samConfigFile),
+      samTemplateFile: path.resolve(samTemplateFile),
+    };
   }
 
   /**
@@ -63,24 +76,28 @@ export class SamFramework implements IFramework {
       role: config.role,
     };
 
+    const { samConfigFile, samTemplateFile } = this.getConfigFiles(config);
+
     const environment = config.configEnv ?? 'default';
 
-    const samConfigContent = await fs.readFile(
-      path.resolve(this.samConfigFile),
-      'utf-8',
-    );
+    const samConfigContent = await fs.readFile(samConfigFile, 'utf-8');
 
-    const samConfig = toml.parse(samConfigContent);
+    let samConfig: any;
+    // is toml extension
+    if (samConfigFile.endsWith('.toml')) {
+      samConfig = toml.parse(samConfigContent);
+    } else {
+      samConfig = yaml.parse(samConfigContent);
+    }
+
     const stackName = samConfig[environment]?.global?.parameters?.stack_name;
 
     if (!stackName) {
-      throw new Error(
-        `Stack name not found in ${path.resolve(this.samConfigFile)}`,
-      );
+      throw new Error(`Stack name not found in ${samConfigFile}`);
     }
 
     const samTemplateContent = await fs.readFile(
-      path.resolve(this.samTemplateFile),
+      path.resolve(samTemplateFile),
       'utf-8',
     );
     const template = yaml.parse(samTemplateContent);

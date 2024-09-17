@@ -1,0 +1,57 @@
+version: 0.1
+default:
+  global:
+    parameters:
+      stack_name: lld-sam-alt
+  build:
+    parameters:
+      cached: true
+      parallel: true
+  validate:
+    parameters:
+      lint: true
+  deploy:
+    parameters:
+      capabilities: CAPABILITY_IAM
+      confirm_changeset: true
+      resolve_s3: true
+  package:
+    parameters:
+      resolve_s3: true
+  sync:
+    parameters:
+      watch: true
+  local_start_api:
+    parameters:
+      warm_containers: EAGER
+  local_start_lambda:
+    parameters:
+      warm_containers: EAGER
+test:
+  global:
+    parameters:
+      stack_name: lld-test-sam-alt
+  build:
+    parameters:
+      cached: true
+      parallel: true
+  validate:
+    parameters:
+      lint: true
+  deploy:
+    parameters:
+      capabilities: CAPABILITY_IAM
+      confirm_changeset: true
+      resolve_s3: true
+  package:
+    parameters:
+      resolve_s3: true
+  sync:
+    parameters:
+      watch: true
+  local_start_api:
+    parameters:
+      warm_containers: EAGER
+  local_start_lambda:
+    parameters:
+      warm_containers: EAGER

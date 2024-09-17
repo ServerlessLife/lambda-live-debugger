@@ -14,7 +14,7 @@ export interface IFramework {
    * Can this class handle the current project
    * @returns
    */
-  canHandle(): Promise<boolean>;
+  canHandle(config: LldConfigBase): Promise<boolean>;
 
   /**
    * Get Lambda functions

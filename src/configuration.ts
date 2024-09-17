@@ -23,7 +23,9 @@ async function readConfig() {
   const configFromCliArgs = await getConfigFromCliArgs(supportedFrameworks);
   Configuration.setConfig(configFromCliArgs as any); // not complete config
 
-  const currentFramework = await ResourceDiscovery.getCurrentFrameworkName();
+  const currentFramework = await ResourceDiscovery.getCurrentFrameworkName(
+    configFromCliArgs as LldConfig,
+  );
 
   Logger.setVerbose(configFromCliArgs.verbose === true);
 

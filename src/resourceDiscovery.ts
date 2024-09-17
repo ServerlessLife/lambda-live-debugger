@@ -28,8 +28,8 @@ function getSupportedFrameworksNames() {
 /**
  * Get the name of the current framework
  */
-async function getCurrentFrameworkName() {
-  const framework = await getCurrentFramework(frameworksSupported);
+async function getCurrentFrameworkName(config: LldConfig) {
+  const framework = await getCurrentFramework(frameworksSupported, config);
   return framework?.name;
 }
 
@@ -46,8 +46,10 @@ async function getLambdas(config: LldConfig) {
     }
   }
 
-  const framework: IFramework | undefined =
-    await getCurrentFramework(frameworks);
+  const framework: IFramework | undefined = await getCurrentFramework(
+    frameworks,
+    config,
+  );
 
   if (framework) {
     Logger.verbose(`Getting resources with '${framework.name}' framework`);
@@ -79,10 +81,11 @@ async function getLambdas(config: LldConfig) {
  */
 async function getCurrentFramework(
   frameworks: IFramework[],
+  config: LldConfig,
 ): Promise<IFramework | undefined> {
   let framework: IFramework | undefined;
   for (const f of frameworks) {
-    if (await f.canHandle()) {
+    if (await f.canHandle(config)) {
       framework = f;
       break;
     }
