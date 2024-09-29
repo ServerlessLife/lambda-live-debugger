@@ -5,7 +5,12 @@ import { Configuration } from './configuration.js';
 import { getModuleDirname, getProjectDirname } from './getDirname.js';
 import { Logger } from './logger.js';
 
-const workers = new Map<string, Worker>();
+interface MyWorker extends Worker {
+  used?: boolean;
+  toKill?: boolean;
+}
+
+const workers = new Map<string, MyWorker>();
 
 /**
  * Run the function in a Node.js Worker Thread
@@ -22,7 +27,9 @@ async function runInWorker(input: {
   const func = await Configuration.getLambda(input.fuctionRequest.functionId);
 
   return new Promise<void>((resolve, reject) => {
-    let worker = workers.get(input.fuctionRequest.workerId);
+    let worker: MyWorker | undefined = workers.get(
+      input.fuctionRequest.workerId,
+    );
 
     if (!worker) {
       worker = startWorker({
@@ -33,6 +40,8 @@ async function runInWorker(input: {
         environment: input.environment,
         verbose: Configuration.config.verbose,
       });
+      worker.used = false;
+      worker.toKill = false;
     } else {
       Logger.verbose(
         `[Function ${input.fuctionRequest.functionId}] [Worker ${input.fuctionRequest.workerId}] Reusing worker`,
@@ -44,10 +53,17 @@ async function runInWorker(input: {
         `[Function ${input.fuctionRequest.functionId}] [Worker ${input.fuctionRequest.workerId}] Worker message`,
         JSON.stringify(msg),
       );
+
+      worker.used = false;
       if (msg?.errorType) {
         reject(msg);
       } else {
         resolve(msg);
+      }
+
+      if (worker.toKill) {
+        worker.toKill = false;
+        void worker.terminate();
       }
     });
     worker.on('error', (err) => {
@@ -58,6 +74,7 @@ async function runInWorker(input: {
       reject(err);
     });
 
+    worker.used = true;
     worker.postMessage({
       env: input.fuctionRequest.env,
       event: input.fuctionRequest.event,
@@ -118,6 +135,7 @@ function startWorker(input: WorkerRequest) {
     );
     workers.delete(input.workerId);
   });
+
   workers.set(input.workerId, worker);
 
   return worker;
@@ -130,7 +148,18 @@ async function stopAllWorkers() {
   Logger.verbose('Stopping all workers');
   const promises: Promise<any>[] = [];
   for (const worker of workers.values()) {
-    promises.push(worker.terminate());
+    if (worker.used) {
+      worker.toKill = true;
+      // set timout for 5 minutes and kill the worker if it is still running
+      setTimeout(() => {
+        if (worker.toKill) {
+          worker.toKill = false;
+          void worker.terminate();
+        }
+      }, 300000);
+    } else {
+      promises.push(worker.terminate());
+    }
   }
   workers.clear();
   await Promise.all(promises);
