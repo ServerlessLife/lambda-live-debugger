@@ -8,6 +8,8 @@ import { Logger } from './logger.js';
 interface MyWorker extends Worker {
   used?: boolean;
   toKill?: boolean;
+  onMessage?: (msg: any) => void;
+  onError?: (err: any) => void;
 }
 
 const workers = new Map<string, MyWorker>();
@@ -48,7 +50,7 @@ async function runInWorker(input: {
       );
     }
 
-    worker.on('message', (msg) => {
+    worker.onMessage = (msg) => {
       Logger.verbose(
         `[Function ${input.fuctionRequest.functionId}] [Worker ${input.fuctionRequest.workerId}] Worker message`,
         JSON.stringify(msg),
@@ -65,14 +67,14 @@ async function runInWorker(input: {
         worker.toKill = false;
         void worker.terminate();
       }
-    });
-    worker.on('error', (err) => {
+    };
+    worker.onError = (err) => {
       Logger.error(
         `[Function ${input.fuctionRequest.functionId}] [Worker ${input.fuctionRequest.workerId}] Error`,
         err,
       );
       reject(err);
-    });
+    };
 
     worker.used = true;
     worker.postMessage({
@@ -106,7 +108,7 @@ function startWorker(input: WorkerRequest) {
 
   const localProjectDir = getProjectDirname();
 
-  const worker = new Worker(
+  const worker: MyWorker = new Worker(
     path.resolve(path.join(getModuleDirname(), `./nodeWorkerRunner.mjs`)),
     {
       env: {
@@ -137,6 +139,13 @@ function startWorker(input: WorkerRequest) {
   });
 
   workers.set(input.workerId, worker);
+
+  worker.on('message', (msg) => {
+    worker?.onMessage?.(msg);
+  });
+  worker.on('error', (err) => {
+    worker?.onError?.(err);
+  });
 
   return worker;
 }
