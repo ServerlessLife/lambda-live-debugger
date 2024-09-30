@@ -13,16 +13,16 @@ Logger.verbose(
 
 parentPort.on('message', async (data) => {
   Logger.verbose(`[Worker ${workerData.workerId}] Received message`, data);
-  const mod = await import(workerData.artifactFile);
-  const fn = mod[workerData.handler];
-
-  if (!fn) {
-    throw new Error(
-      `Handler '${workerData.handler}' not found for function '${workerData.functionId}'`,
-    );
-  }
-
   try {
+    const mod = await import(workerData.artifactFile);
+    const fn = mod[workerData.handler];
+
+    if (!fn) {
+      throw new Error(
+        `Handler '${workerData.handler}' not found for function '${workerData.functionId}'`,
+      );
+    }
+
     const context = {
       ...data.context,
       getRemainingTimeInMillis: () => 2147483647, // Max 32-bit signed integer

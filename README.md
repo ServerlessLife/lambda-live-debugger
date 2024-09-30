@@ -324,6 +324,7 @@ If you have a new feature idea, please create and issue.
 
 (alphabetical)
 
+- [Roger Chi](https://rogerchi.com/)
 - ⭐ Your name here for notable code or documentation contributions or sample projects submitted with a bug report that resulted in tool improvement.
 
 ## Disclaimer

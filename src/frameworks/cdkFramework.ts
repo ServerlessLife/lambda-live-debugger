@@ -212,26 +212,83 @@ export class CdkFramework implements IFramework {
     config: LldConfigBase,
   ) {
     const entryFile = await this.getCdkEntryFile(cdkConfigPath);
-    // Define a plugin to prepend custom code to .ts or .tsx files
+    let isESM = false;
+    const packageJsonPath = await findPackageJson(entryFile);
+
+    if (packageJsonPath) {
+      try {
+        const packageJson = JSON.parse(
+          await fs.readFile(packageJsonPath, { encoding: 'utf-8' }),
+        );
+        if (packageJson.type === 'module') {
+          isESM = true;
+          Logger.verbose(`[CDK] Using ESM format`);
+        }
+      } catch (err: any) {
+        Logger.error(
+          `Error reading CDK package.json (${packageJsonPath}): ${err.message}`,
+          err,
+        );
+      }
+    }
+
+    const rootDir = process.cwd();
+
+    // Plugin that:
+    // - Fixes __dirname issues
+    // - Injects code to get the file path of the Lambda function and CDK hierarchy
     const injectCodePlugin: esbuild.Plugin = {
       name: 'injectCode',
       setup(build: esbuild.PluginBuild) {
         build.onLoad({ filter: /.*/ }, async (args: esbuild.OnLoadArgs) => {
-          const absolutePath = path.resolve(args.path);
+          // fix __dirname issues
+          const isWindows = /^win/.test(process.platform);
+          const esc = (p: string) => (isWindows ? p.replace(/\\/g, '/') : p);
 
-          let source = await fs.readFile(absolutePath, 'utf8');
+          const variables = `
+              const __fileloc = {
+                filename: "${esc(args.path)}",
+                dirname: "${esc(path.dirname(args.path))}",
+                relativefilename: "${esc(path.relative(rootDir, args.path))}",
+                relativedirname: "${esc(
+                  path.relative(rootDir, path.dirname(args.path)),
+                )}",
+                import: { meta: { url: "file://${esc(args.path)}" } }
+              };
+            `;
 
+          let fileContent = new TextDecoder().decode(
+            await fs.readFile(args.path),
+          );
+
+          // remove shebang
+          if (fileContent.startsWith('#!')) {
+            const firstNewLine = fileContent.indexOf('\n');
+            fileContent = fileContent.slice(firstNewLine + 1);
+          }
+
+          let contents: string;
+          if (args.path.endsWith('.ts') || args.path.endsWith('.js')) {
+            // add the variables at the top of the file, that contains the file location
+            contents = `${variables}\n${fileContent}`;
+          } else {
+            contents = fileContent;
+          }
+
+          const loader = args.path.split('.').pop() as esbuild.Loader;
+
+          // Inject code to get the file path of the Lambda function and CDK hierarchy
           if (args.path.includes('aws-cdk-lib/aws-lambda/lib/function.')) {
             const codeToFind =
               'try{jsiiDeprecationWarnings().aws_cdk_lib_aws_lambda_FunctionProps(props)}';
 
-            if (!source.includes(codeToFind)) {
+            if (!contents.includes(codeToFind)) {
               throw new Error(`Can not find code to inject in ${args.path}`);
             }
 
             // Inject code to get the file path of the Lambda function and CDK hierarchy
             // path to match it with the Lambda function. Store data in the global variable.
-            source = source.replace(
+            contents = contents.replace(
               codeToFind,
               `;
               global.lambdas = global.lambdas ?? [];
@@ -264,53 +321,26 @@ export class CdkFramework implements IFramework {
           ) {
             const codeToFind = 'super(scope,id),this.requestDestinationArn=!1;';
 
-            if (!source.includes(codeToFind)) {
+            if (!contents.includes(codeToFind)) {
               throw new Error(`Can not find code to inject in ${args.path}`);
             }
 
             // Inject code to prevent deploying the assets
-            source = source.replace(codeToFind, codeToFind + `return;`);
+            contents = contents.replace(codeToFind, codeToFind + `return;`);
           }
 
           return {
-            contents: source,
-            loader: 'default',
+            contents,
+            loader,
           };
         });
       },
     };
 
-    let isESM = false;
-    // get packgage.json
-    const packageJsonPath = await findPackageJson(entryFile);
-
-    if (packageJsonPath) {
-      try {
-        const packageJson = JSON.parse(
-          await fs.readFile(packageJsonPath, { encoding: 'utf-8' }),
-        );
-        if (packageJson.type === 'module') {
-          isESM = true;
-          Logger.verbose(`[CDK] Using ESM format`);
-        }
-      } catch (err: any) {
-        Logger.error(
-          `Error reading CDK package.json (${packageJsonPath}): ${err.message}`,
-          err,
-        );
-      }
-    }
-
     const compileOutput = path.join(
       getProjectDirname(),
       outputFolder,
       `compiledCdk.${isESM ? 'mjs' : 'cjs'}`,
-    );
-
-    const dirname = path.join(
-      ...([getProjectDirname(), config.subfolder, 'x'].filter(
-        (p) => p,
-      ) as string[]),
     );
 
     try {
@@ -331,7 +361,6 @@ export class CdkFramework implements IFramework {
               banner: {
                 js: [
                   `import { createRequire as topLevelCreateRequire } from 'module';`,
-                  `import.meta.url = 'file:///${dirname}/cdkFrameworkWorker.mjs';`,
                   `global.require = global.require ?? topLevelCreateRequire(import.meta.url);`,
                   `import { fileURLToPath as topLevelFileUrlToPath, URL as topLevelURL } from "url"`,
                   `global.__dirname = global.__dirname ?? topLevelFileUrlToPath(new topLevelURL(".", import.meta.url))`,
@@ -341,10 +370,15 @@ export class CdkFramework implements IFramework {
           : {
               format: 'cjs',
               target: 'node18',
-              banner: {
-                js: [`__dirname = '${dirname}';`].join('\n'),
-              },
             }),
+        define: {
+          // replace __dirname,... with the a variable that contains the file location
+          __filename: '__fileloc.filename',
+          __dirname: '__fileloc.dirname',
+          __relativefilename: '__fileloc.relativefilename',
+          __relativedirname: '__fileloc.relativedirname',
+          'import.meta.url': '__fileloc.import.meta.url',
+        },
       });
     } catch (error: any) {
       throw new Error(`Error building CDK code: ${error.message}`, {

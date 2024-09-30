@@ -153,6 +153,17 @@ async function getFunctionName(folder: string, functionName: string) {
   const cdkOutputs = JSON.parse(
     await fs.readFile(path.join(folder, 'cdk-outputs.json'), 'utf-8'),
   );
-  const lambdaName = cdkOutputs['test-lld-cdk-basic'][functionName];
+  let lambdaName = cdkOutputs['test-lld-cdk-basic'][functionName];
+
+  if (!lambdaName) {
+    lambdaName = cdkOutputs['test-lld-cdk-basic2'][functionName];
+  }
+
+  if (!lambdaName) {
+    throw new Error(
+      `Lambda name not found for ${functionName} in cdk-outputs.json`,
+    );
+  }
+
   return lambdaName;
 }
