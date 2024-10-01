@@ -24,9 +24,6 @@ async function run() {
   const version = await getVersion();
 
   Logger.log(`Welcome to Lambda Live Debugger 🐞 version ${version}.`);
-  Logger.important(
-    'To keep the project moving forward, please fill out the feedback form at https://forms.gle/v6ekZtuB45Rv3EyW9. Your input is greatly appreciated!',
-  );
 
   await Configuration.readConfig();
 
