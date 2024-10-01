@@ -54,7 +54,7 @@ async function run() {
 
   let message = `Starting the debugger ${
     Configuration.config.observable
-      ? 'in observable mode'
+      ? 'in Observability mode'
       : `(ID ${Configuration.config.debuggerId})`
   }...`;
 

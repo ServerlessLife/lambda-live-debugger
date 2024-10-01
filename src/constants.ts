@@ -4,7 +4,7 @@ export const outputFolder = '.lldebugger';
 // we drop compiled files in this folder
 export const assetsFolder = `${outputFolder}/assets`;
 
-// the period in which we receive events in observable mode
+// the period in which we receive events in Observability mode
 export const defaultObservableInterval = 3000;
 
 // the default name of the configuration file

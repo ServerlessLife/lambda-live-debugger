@@ -41,10 +41,10 @@ export async function getConfigFromCliArgs(
     'Filter by function name. You can use * as a wildcard',
   );
   program.option('-m, --subfolder <subfolder>', 'Monorepo subfolder');
-  program.option('-o, --observable', 'Observable mode');
+  program.option('-o, --observable', 'Observability mode');
   program.option(
     '-i --interval <interval>',
-    'Observable mode interval',
+    'Observability mode interval',
     defaultObservableInterval.toString(),
   );
   program.option('--config-env <evironment>', 'SAM environment');

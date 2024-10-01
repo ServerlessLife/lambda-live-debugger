@@ -69,7 +69,7 @@ jobs:
         working-directory: test/cdk-basic
       - name: Test
         run: npx vitest --retry 1 test/cdk-basic.test.ts
-      - name: Test - observable mode
+      - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 1 test/cdk-basic.test.ts
 
   test-cdk-esm:
@@ -116,7 +116,7 @@ jobs:
         working-directory: test/cdk-esm
       - name: Test
         run: npx vitest --retry 1 test/cdk-esm.test.ts
-      - name: Test - observable mode
+      - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 1 test/cdk-esm.test.ts
 
   test-sls-basic:
@@ -164,7 +164,7 @@ jobs:
         working-directory: test/sls-basic
       - name: Test
         run: npx vitest --retry 1 test/sls-basic.test.ts
-      - name: Test - observable mode
+      - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 1 test/sls-basic.test.ts
 
   test-sls-esbuild-cjs:
@@ -212,7 +212,7 @@ jobs:
         working-directory: test/sls-esbuild-cjs
       - name: Test
         run: npx vitest --retry 1 test/sls-esbuild-cjs.test.ts
-      - name: Test - observable mode
+      - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 1 test/sls-esbuild-cjs.test.ts
 
   test-sls-esbuild-esm:
@@ -260,7 +260,7 @@ jobs:
         working-directory: test/sls-esbuild-esm
       - name: Test
         run: npx vitest --retry 1 test/sls-esbuild-esm.test.ts
-      - name: Test - observable mode
+      - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 1 test/sls-esbuild-esm.test.ts
 
   test-sam-basic:
@@ -311,7 +311,7 @@ jobs:
         working-directory: test/sam-basic
       - name: Test
         run: npx vitest --retry 1 test/sam-basic.test.ts
-      - name: Test - observable mode
+      - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 1 test/sam-basic.test.ts
 
   test-sam-alt:
@@ -362,7 +362,7 @@ jobs:
         working-directory: test/sam-alt
       - name: Test
         run: npx vitest --retry 1 test/sam-alt.test.ts
-      - name: Test - observable mode
+      - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 1 test/sam-alt.test.ts
 
   test-terraform-basic:
@@ -416,5 +416,5 @@ jobs:
         working-directory: test/terraform-basic
       - name: Test
         run: npx vitest --retry 1 test/terraform-basic.test.ts
-      - name: Test - observable mode
+      - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 1 test/terraform-basic.test.ts
