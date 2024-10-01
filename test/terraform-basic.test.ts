@@ -22,7 +22,7 @@ describe('terraform-basic', async () => {
 
   beforeAll(async () => {
     if (process.env.CI === 'true' || process.env.RUN_TEST_FROM_CLI === 'true') {
-      lldProcess = await startDebugger(folder, ['-c=environment=test']);
+      lldProcess = await startDebugger(folder);
     }
   });
 
