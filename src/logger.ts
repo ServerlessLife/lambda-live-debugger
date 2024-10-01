@@ -24,7 +24,9 @@ function log(...args: any[]) {
  */
 function important(...args: any[]) {
   args = args.map((arg) =>
-    typeof arg === 'string' ? chalk.hex(orange)(arg) : arg,
+    typeof arg === 'string'
+      ? chalk.bold(chalk.bgMagenta(chalk.black(arg)))
+      : arg,
   );
   console.log(...args);
 }
