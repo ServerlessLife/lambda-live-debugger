@@ -556,7 +556,7 @@ export class CdkFramework implements IFramework {
       (acc: Record<string, string>, arg: string) => {
         const [key, value] = arg.split('=');
         if (key && value) {
-          acc[key] = value;
+          acc[key.trim()] = value.trim();
         }
         return acc;
       },
