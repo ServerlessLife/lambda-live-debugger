@@ -1,6 +1,5 @@
 import chalk from 'chalk';
 
-const orange = '#D24E01';
 let verboseEnabled = false;
 
 /**
@@ -23,11 +22,7 @@ function log(...args: any[]) {
  * @param args The arguments to log
  */
 function important(...args: any[]) {
-  args = args.map((arg) =>
-    typeof arg === 'string'
-      ? chalk.bold(chalk.bgMagenta(chalk.black(arg)))
-      : arg,
-  );
+  args = args.map((arg) => (typeof arg === 'string' ? chalk.yellow(arg) : arg));
   console.log(...args);
 }
 
@@ -45,9 +40,7 @@ function error(...args: any[]) {
  * @param args The arguments to log
  */
 function warn(...args: any[]) {
-  args = args.map((arg) =>
-    typeof arg === 'string' ? chalk.hex(orange)(arg) : arg,
-  );
+  args = args.map((arg) => (typeof arg === 'string' ? chalk.yellow(arg) : arg));
   console.warn(...args);
 }
 
