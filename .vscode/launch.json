@@ -25,6 +25,21 @@
       "cwd": "${workspaceRoot}/test/cdk-basic"
     },
     {
+      "name": "LLDebugger - CDK basic - monorepo",
+      "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
+      "args": [
+        "../src/lldebugger.ts",
+        "-c environment=test",
+        "--subfolder=cdk-basic"
+      ],
+      // "args": ["../src/lldebugger.ts", "-w"],
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal",
+      "type": "node",
+      "cwd": "${workspaceRoot}/test"
+    },
+    {
       "name": "LLDebugger - CDK ESM",
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": ["../../src/lldebugger.ts", "-c environment=test"],

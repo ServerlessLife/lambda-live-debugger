@@ -8,7 +8,11 @@ import { CdkEsmStack2 } from '../lib/subfolder/cdk-esm-stack2';
 
 const app = new cdk.App();
 
-const environment = 'test';
+const environment = app.node.tryGetContext('environment');
+
+if (!environment) {
+  throw new Error('Environment is not set in the context');
+}
 
 new CdkEsmStack(app, 'CdkEsmStack', {
   stackName: `${environment}-lld-cdk-esm`,

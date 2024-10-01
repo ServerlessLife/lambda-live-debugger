@@ -11,7 +11,7 @@ parentPort.on('message', async (data) => {
     // this is global variable to store the data from the CDK code once it is executed
     global.lambdas = [];
 
-    Logger.verbose(`[Worker ${workerData.workerId}] Received message`, data);
+    Logger.verbose(`[Worker] Received message`, data);
 
     // execute code to get the data into global.lambdas
     await import(data.compileOutput);

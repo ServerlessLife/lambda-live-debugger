@@ -24,7 +24,7 @@ describe('cdk-basic', async () => {
 
   beforeAll(async () => {
     if (process.env.CI === 'true' || process.env.RUN_TEST_FROM_CLI === 'true') {
-      lldProcess = await startDebugger(folder, ['-c=environment=test']);
+      lldProcess = await startDebugger(folder, ['-c environment=test']);
     }
   });
 
@@ -139,7 +139,7 @@ describe('cdk-basic', async () => {
 
   test('remove infra', async () => {
     if (process.env.CI === 'true' || process.env.RUN_TEST_FROM_CLI === 'true') {
-      await removeInfra(lldProcess, folder);
+      await removeInfra(lldProcess, folder, ['-c environment=test']);
       const lambdaName = await getFunctionName(
         folder,
         'FunctionNameTestTsCommonJs',
