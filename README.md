@@ -106,8 +106,8 @@ The configuration is saved to `lldebugger.config.ts`.
  -s, --stage <stage>             Serverless Framework stage
  -f, --function <function name>  Filter by function name. You can use * as a wildcard
  -m, --subfolder <subfolder>     Monorepo subfolder
- -o, --observable                Observable mode
- -i --interval <interval>        Observable mode interval (default: "3000")
+ -o, --observable                Observability mode
+ -i --interval <interval>        Observability mode interval (default: "3000")
  --config-env <evironment>       SAM environment
  --sam-config-file <file>        SAM configuration file
  --sam-template-file <file>      SAM template file

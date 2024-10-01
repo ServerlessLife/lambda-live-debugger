@@ -15,7 +15,7 @@
       "cwd": "${workspaceRoot}/test/cdk-basic"
     },
     {
-      "name": "LLDebugger - CDK basic - observable",
+      "name": "LLDebugger - CDK basic - observability",
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": ["../../src/lldebugger.ts", "-c environment=test", "-o"],
       "request": "launch",
@@ -35,7 +35,7 @@
       "cwd": "${workspaceRoot}/test/cdk-esm"
     },
     {
-      "name": "LLDebugger - CDK ESM - observable",
+      "name": "LLDebugger - CDK ESM - observability",
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": ["../../src/lldebugger.ts", "-c environment=test", "-o"],
       "request": "launch",
@@ -55,7 +55,7 @@
       "cwd": "${workspaceRoot}/test/sls-basic"
     },
     {
-      "name": "LLDebugger - SLS basic - observable",
+      "name": "LLDebugger - SLS basic - observability",
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": ["../../src/lldebugger.ts", "--stage=test", "-o"],
       "request": "launch",
@@ -75,7 +75,7 @@
       "cwd": "${workspaceRoot}/test/sls-esbuild-cjs"
     },
     {
-      "name": "LLDebugger - SLS EsBuild CJS - observable",
+      "name": "LLDebugger - SLS EsBuild CJS - observability",
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": ["../../src/lldebugger.ts", "-o"],
       "request": "launch",
@@ -96,7 +96,7 @@
       "cwd": "${workspaceRoot}/test/sls-esbuild-esm"
     },
     {
-      "name": "LLDebugger - SLS EsBuild ESM - observable",
+      "name": "LLDebugger - SLS EsBuild ESM - observability",
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": ["../../src/lldebugger.ts", "-o"],
       "request": "launch",
@@ -116,7 +116,7 @@
       "cwd": "${workspaceRoot}/test/sam-basic"
     },
     {
-      "name": "LLDebugger - SAM basic - observable",
+      "name": "LLDebugger - SAM basic - observability",
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": ["../../src/lldebugger.ts", "--config-env=test", "-o"],
       "request": "launch",
@@ -141,7 +141,7 @@
       "cwd": "${workspaceRoot}/test/sam-alt"
     },
     {
-      "name": "LLDebugger - SAM alt - observable",
+      "name": "LLDebugger - SAM alt - observability",
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": [
         "../../src/lldebugger.ts",
@@ -167,7 +167,7 @@
       "cwd": "${workspaceRoot}/test/terraform-basic"
     },
     {
-      "name": "LLDebugger - Terraform basic - observable",
+      "name": "LLDebugger - Terraform basic - observability",
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": ["../../src/lldebugger.ts", "--config-env=test", "-o"],
       "request": "launch",

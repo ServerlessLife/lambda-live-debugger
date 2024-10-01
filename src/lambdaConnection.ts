@@ -141,7 +141,7 @@ async function onMessageFromLambda(message: IoTMessage) {
         `${topic}/${message.data.workerId}`,
       );
     } else {
-      // if we are in observable mode, mark the worker as processed
+      // if we are in Observability mode, mark the worker as processed
       lambdasProcessingObservableMode.delete(message.data.functionId);
     }
   }

@@ -148,7 +148,7 @@ export async function getConfigFromWizard({
       type: 'input',
       name: 'subfolder',
       message:
-        'If you are using monorepo, enter subfolder where the framework is instaled.',
+        'If you are using monorepo, enter the subfolder where the framework is installed.',
       default: configFromCliArgs.subfolder ?? currentConfig?.subfolder,
     },
   ]);
@@ -159,13 +159,13 @@ export async function getConfigFromWizard({
     process.chdir(answers.subfolder);
   }
 
-  // do you want to use observable mode?
+  // do you want to use Observability mode?
   const answersObservable = await inquirer.prompt([
     {
       type: 'confirm',
       name: 'observable',
       message:
-        'Do you want to use observable mode, which just sends events to the debugger and do not use the respose?',
+        'Do you want to use Observability mode, which just sends events to the debugger and does not use the response?',
       default: !!(configFromCliArgs.observable !== undefined
         ? configFromCliArgs.observable
         : currentConfig?.observable),
@@ -179,7 +179,7 @@ export async function getConfigFromWizard({
       {
         type: 'number',
         name: 'interval',
-        message: `Would you like to enter observable mode interval at which events are sent to the debugger? Default is ${defaultObservableInterval}`,
+        message: `Would you like to enter Observability mode interval at which events are sent to the debugger? Default is ${defaultObservableInterval}`,
         default:
           configFromCliArgs.observable !== undefined
             ? configFromCliArgs.observable
