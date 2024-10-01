@@ -198,6 +198,10 @@ export class SamFramework implements IFramework {
         handler,
         packageJsonPath,
         esBuildOptions,
+        metadata: {
+          framework: 'sam',
+          stackName,
+        },
       };
 
       lambdasDiscovered.push(lambdaResource);

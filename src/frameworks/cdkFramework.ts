@@ -156,6 +156,11 @@ export class CdkFramework implements IFramework {
             define: lambdaInCdk.bundling?.define,
             external: external.length > 0 ? external : undefined,
           },
+          metadata: {
+            framework: 'cdk',
+            stackName: lambdaInCdk.stackName,
+            cdkPath: lambdaInCdk.cdkPath,
+          },
         });
       }
     }
