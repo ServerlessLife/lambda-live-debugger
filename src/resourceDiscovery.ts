@@ -33,7 +33,9 @@ async function getCurrentFrameworkName(config: LldConfig) {
   return framework?.name;
 }
 
-async function getLambdas(config: LldConfig) {
+async function getLambdas(
+  config: LldConfig,
+): Promise<LambdaResource[] | undefined> {
   let resources: LambdaResource[] | undefined = undefined;
 
   let frameworks = [...frameworksSupported];
@@ -73,6 +75,10 @@ async function getLambdas(config: LldConfig) {
   return resources.map((r) => ({
     ...r,
     codePath: path.resolve(r.codePath),
+    esBuildOptions: {
+      ...r.esBuildOptions,
+      metafile: true,
+    },
   }));
 }
 
