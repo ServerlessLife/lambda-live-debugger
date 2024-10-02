@@ -203,6 +203,9 @@ export class SlsFramework implements IFramework {
         handler,
         packageJsonPath,
         esBuildOptions,
+        metadata: {
+          framework: 'sls',
+        },
       };
 
       lambdasDiscovered.push(lambdaResource);

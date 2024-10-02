@@ -140,6 +140,9 @@ export class TerraformFramework implements IFramework {
         handler,
         packageJsonPath,
         esBuildOptions: undefined,
+        metadata: {
+          framework: 'terraform',
+        },
       };
 
       lambdasDiscovered.push(lambdaResource);

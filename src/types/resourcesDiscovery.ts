@@ -12,6 +12,22 @@ export type LambdaResource = {
   forceBundle?: boolean;
   bundlingType?: BundlingType;
   esBuildOptions?: EsBuildOptions;
+  metadata: {
+    /**
+     * Framework name
+     */
+    framework: string;
+
+    /**
+     * If framework is CDK or SAM, this is the stack name
+     */
+    stackName?: string;
+
+    /**
+     * If framework is CDK, this is the construct path
+     */
+    cdkPath?: string;
+  };
 };
 
 export enum BundlingType {
