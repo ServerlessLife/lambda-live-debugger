@@ -159,13 +159,6 @@ async function stopAllWorkers() {
   for (const worker of workers.values()) {
     if (worker.used) {
       worker.toKill = true;
-      // set timout for 5 minutes and kill the worker if it is still running
-      setTimeout(() => {
-        if (worker.toKill) {
-          worker.toKill = false;
-          void worker.terminate();
-        }
-      }, 300000);
     } else {
       promises.push(worker.terminate());
     }
