@@ -65,7 +65,7 @@ process.on('unhandledRejection', (error) => {
 function handleError(error) {
   parentPort.postMessage({
     errorType: error.name ?? 'Error',
-    errorMessage: error.message,
+    errorMessage: error.message ?? error.toString(),
     trace: error.stack,
   });
 }
