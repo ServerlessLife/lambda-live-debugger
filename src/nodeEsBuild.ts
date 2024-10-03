@@ -153,7 +153,7 @@ async function build(input: {
   let ctx = input.oldCtx;
 
   Logger.verbose(
-    `[Function ${input.functionId}] Module type: ${isESM ? 'ESM' : 'CJS'})`,
+    `[Function ${input.functionId}] Module type: ${isESM ? 'ESM' : 'CJS'}`,
   );
 
   if (!ctx) {
