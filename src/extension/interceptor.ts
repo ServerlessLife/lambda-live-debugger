@@ -70,8 +70,10 @@ async function regularMode(context: any, event: any) {
       }
 
       if (message.type === 'ERROR') {
-        const error = new Error(message.data.errorMessage);
-        error.stack = message.data.trace;
+        const error = new Error(message.data?.errorMessage ?? 'Unknown error');
+        if (message.data?.trace) {
+          error.stack = message.data.trace;
+        }
         promiseReject(error);
       }
     },
