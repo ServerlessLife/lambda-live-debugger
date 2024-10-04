@@ -79,7 +79,7 @@ export class SlsFramework implements IFramework {
     } catch (error: any) {
       Logger.error('Error loading serverless modules', error);
       Logger.log(
-        'If you are running Lambda Live Debugger from a global installation, install Serverless Framework globally as well.',
+        'If you are running Lambda Live Debugger from a global installation, install Serverless Framework globally as well. If you are using monorepo, install Serverless Framework also in the project root folder.',
       );
       throw new Error(`Error loading serverless modules. ${error.message}`, {
         cause: error,
@@ -155,8 +155,10 @@ export class SlsFramework implements IFramework {
 
     const lambdasDiscovered: LambdaResource[] = [];
 
-    const esBuildOptions: EsBuildOptions | undefined =
-      this.getEsBuildOptions(serverless);
+    const esBuildOptions: EsBuildOptions | undefined = this.getEsBuildOptions(
+      serverless,
+      config,
+    );
 
     const lambdas = serverless.service.functions;
 
@@ -214,7 +216,8 @@ export class SlsFramework implements IFramework {
     return lambdasDiscovered;
   }
 
-  protected getEsBuildOptions(serverless: Serverless) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  protected getEsBuildOptions(serverless: Serverless, config: LldConfigBase) {
     // 1) Get from from LLD specific options in custom.lldEsBuild
     let esBuildOptions: EsBuildOptions | undefined =
       serverless.service.custom?.lldEsBuild;
@@ -246,7 +249,7 @@ export class SlsFramework implements IFramework {
         const settings = serverless.service.custom?.serverlessPluginTypescript;
         if (settings) {
           esBuildOptions = {
-            tsconfig: settings.tsConfigFileLocation,
+            tsconfig: path.resolve(settings.tsConfigFileLocation),
           };
         }
       }
