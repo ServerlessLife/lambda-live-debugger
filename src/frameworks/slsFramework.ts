@@ -58,6 +58,9 @@ export class SlsFramework implements IFramework {
 
     let resolveConfigurationPath: any;
     let readConfiguration: any;
+    let resolveVariables: any;
+    let resolveVariablesMeta: any;
+    let sources: any;
     let Serverless: any;
 
     try {
@@ -74,6 +77,51 @@ export class SlsFramework implements IFramework {
           'serverless/lib/configuration/read.js'
         )
       ).default;
+      resolveVariables = (
+        await import(
+          //@ts-ignore
+          'serverless/lib/configuration/variables/resolve.js'
+        )
+      ).default;
+      resolveVariablesMeta = (
+        await import(
+          //@ts-ignore
+          'serverless/lib/configuration/variables/resolve-meta.js'
+        )
+      ).default;
+      const env = await import(
+        //@ts-ignore
+        'serverless/lib/configuration/variables/sources/env.js'
+      );
+      const file = await import(
+        //@ts-ignore
+        'serverless/lib/configuration/variables/sources/file.js'
+      );
+      const opt = await import(
+        //@ts-ignore
+        'serverless/lib/configuration/variables/sources/opt.js'
+      );
+      const self = await import(
+        //@ts-ignore
+        'serverless/lib/configuration/variables/sources/self.js'
+      );
+      const strToBool = await import(
+        //@ts-ignore
+        'serverless/lib/configuration/variables/sources/str-to-bool.js'
+      );
+      const sls = await import(
+        //@ts-ignores
+        'serverless/lib/configuration/variables/sources/instance-dependent/get-sls.js'
+      );
+
+      sources = {
+        env: env.default,
+        file: file.default,
+        opt: opt.default,
+        self: self.default,
+        strToBool: strToBool.default,
+        sls: sls.default(),
+      };
 
       Serverless = (await import('serverless')).default;
     } catch (error: any) {
@@ -118,8 +166,16 @@ export class SlsFramework implements IFramework {
       options.profile = config.profile;
     }
 
-    const variablesMeta = {};
+    const variablesMeta = resolveVariablesMeta(configuration);
 
+    await resolveVariables({
+      serviceDir,
+      configuration,
+      variablesMeta,
+      sources,
+      options,
+      fulfilledSources: new Set(),
+    });
     let serverless: Serverless;
 
     try {
