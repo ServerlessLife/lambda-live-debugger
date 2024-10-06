@@ -200,6 +200,17 @@
       "console": "integratedTerminal",
       "type": "node",
       "cwd": "${workspaceRoot}/test/cdk-config"
+    },
+    {
+      "name": "SLS deploy",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/sls",
+      "runtimeArgs": ["deploy"],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "env": {},
+      "cwd": "${workspaceRoot}/test/sls-basic"
     }
   ]
 }

@@ -7,8 +7,5 @@ provider:
   region: eu-west-1
 
 functions:
-  testJsCommonJs:
-    handler: services/testJsCommonJs/lambda.lambdaHandler
-
-  testJsEsModule:
-    handler: services/testJsEsModule/lambda.lambdaHandler
+  - ${file(./functions1.yml)}
+  - ${file(./functions2.yml)}
