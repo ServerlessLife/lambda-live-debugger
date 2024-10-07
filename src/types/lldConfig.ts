@@ -68,6 +68,11 @@ export type LldConfigBase = {
    * Monorepo subfolder
    */
   subfolder?: string;
+
+  /**
+   * Additional Node options
+   */
+  additionalNodeOptions?: string;
 } & AwsConfiguration;
 
 export type LldConfigCliArgs = {

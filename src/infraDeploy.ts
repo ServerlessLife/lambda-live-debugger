@@ -559,10 +559,19 @@ function getEnvironmentVarablesForDebugger(
   functionId: string,
   timeout: number | undefined,
 ): Record<string, string> {
+  const baseNodeOptions = '--enable-source-maps';
+  const additionalNodeOptions =
+    Configuration.config.additionalNodeOptions || '';
+  const nodeOptions = [baseNodeOptions, additionalNodeOptions]
+    .filter(Boolean)
+    .join(' ');
+
+  console.log('nodeOptions', nodeOptions);
+
   return {
     LLD_FUNCTION_ID: functionId,
     AWS_LAMBDA_EXEC_WRAPPER: '/opt/lld-wrapper',
-    NODE_OPTIONS: '--enable-source-maps',
+    NODE_OPTIONS: nodeOptions,
     LLD_DEBUGGER_ID: Configuration.config.debuggerId,
     LLD_INITIAL_TIMEOUT: timeout ? timeout.toString() : '-1', // should never be negative
     LLD_OBSERVABLE_MODE: Configuration.config.observable ? 'true' : 'false',
