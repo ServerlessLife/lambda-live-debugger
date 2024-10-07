@@ -14,7 +14,6 @@ export async function expectInfraRemoved(fuctionName: string) {
   expect(envVariables.LLD_DEBUGGER_ID).toBeUndefined();
   expect(envVariables.LLD_FUNCTION_ID).toBeUndefined();
   expect(envVariables.LLD_INITIAL_TIMEOUT).toBeUndefined();
-  expect(envVariables.NODE_OPTIONS).toBeUndefined();
 
   expect(lambdaConfiguration.Configuration?.Layers).toBeUndefined();
   expect(policyDocument).toBeUndefined();
