@@ -15,7 +15,6 @@ export async function expectInfraDeployed(lambdaName: any) {
       LLD_DEBUGGER_ID: expect.any(String),
       LLD_FUNCTION_ID: expect.any(String),
       LLD_INITIAL_TIMEOUT: expect.any(String),
-      NODE_OPTIONS: '--enable-source-maps',
     });
 
     const initialTimeout = parseInt(

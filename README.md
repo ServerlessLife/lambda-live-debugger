@@ -167,21 +167,9 @@ Now, you have to press F5 or press Run -> Start Debugging, and you can set break
 
 For other tools, please send documentation to include here. WebStorm instructions are especially needed.
 
-## Development Process
-
-Since you deploy code to a real AWS account, it's best to have a dedicated environment only for yourself. It could be your personal environment or an environment created for a feature. That is [common practice when developing serverless systems](https://theburningmonk.com/2019/09/why-you-should-use-temporary-stacks-when-you-do-serverless/). If that's not feasible due to organizational or technical reasons, use Observability Mode.
-
-## Observability Mode
-
-In Observability Mode, Lambda Live Debugger intercepts requests and sends them to your computer without waiting for a response. The Lambda continues as usual. The response from your machine is ignored. This mode can be used in the development, testing, or even, if you are adventurous, production environment. It samples requests every 3 seconds by default (configurable with an `interval` setting) to avoid overloading the system.
-
-## Monorepo Setup
-
-Set the `subfolder` parameter if your framework is in a subfolder.
-
 ## Removing
 
-To remove Lambda Live Debugger from your AWS account
+When you no longer want to debug and want Lambda to execute the code deployed to the cloud, you need to remove the Lambda Live Debugger:
 
 ```
 lld -r
@@ -194,6 +182,18 @@ To also remove the Layer:
 ```
 lld -r=all
 ```
+
+## Development Process
+
+Since you deploy code to a real AWS account, it's best to have a dedicated environment only for yourself. It could be your personal environment or an environment created for a feature. That is [common practice when developing serverless systems](https://theburningmonk.com/2019/09/why-you-should-use-temporary-stacks-when-you-do-serverless/). If that's not feasible due to organizational or technical reasons, use Observability Mode.
+
+## Observability Mode
+
+In Observability Mode, Lambda Live Debugger intercepts requests and sends them to your computer without waiting for a response. The Lambda continues as usual. The response from your machine is ignored. This mode can be used in the development, testing, or even, if you are adventurous, production environment. It samples requests every 3 seconds by default (configurable with an `interval` setting) to avoid overloading the system.
+
+## Monorepo Setup
+
+Set the `subfolder` parameter if your framework is in a subfolder.
 
 ## Frameworks
 
