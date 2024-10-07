@@ -74,10 +74,10 @@ export default defineConfig({
           { text: 'CLI Parameters', link: '#cli-parameters' },
           { text: 'Configuration file', link: '#configuration-file' },
           { text: 'Debugging', link: '#debugging' },
+          { text: 'Removing', link: '#removing' },
           { text: 'Development Process', link: '#development-process' },
           { text: 'Observability Mode', link: '#observability-mode' },
           { text: 'Monorepo', link: '#monorepo-setup' },
-          { text: 'Removing', link: '#removing' },
         ],
       },
       {
