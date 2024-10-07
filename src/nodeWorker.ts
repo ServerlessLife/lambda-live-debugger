@@ -34,12 +34,15 @@ async function runInWorker(input: {
     );
 
     if (!worker) {
+      const environment = input.environment;
+      addEnableSourceMapsToEnv(environment);
+
       worker = startWorker({
         handler: func.handler ?? 'handler',
         artifactFile: input.artifactFile,
         workerId: input.fuctionRequest.workerId,
         functionId: input.fuctionRequest.functionId,
-        environment: input.environment,
+        environment,
         verbose: Configuration.config.verbose,
       });
       worker.used = false;
@@ -83,6 +86,20 @@ async function runInWorker(input: {
       context: input.fuctionRequest.context,
     });
   });
+}
+
+/**
+ * Add NODE_OPTIONS: --enable-source-maps to the environment variables
+ * @param environment
+ */
+function addEnableSourceMapsToEnv(environment: {
+  [key: string]: string | undefined;
+}) {
+  const nodeOptions = environment.NODE_OPTIONS || '';
+  if (!nodeOptions.includes('--enable-source-maps')) {
+    environment.NODE_OPTIONS =
+      nodeOptions + (nodeOptions ? ' ' : '') + '--enable-source-maps';
+  }
 }
 
 type WorkerRequest = {
