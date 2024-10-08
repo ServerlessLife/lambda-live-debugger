@@ -467,6 +467,7 @@ async function attachLayerToLambda(
     Logger.verbose('Layer with the wrong version attached to the function');
   }
 
+  // support for multiple internal Lambda extensions
   const initalExecWraper =
     environmentVariables.AWS_LAMBDA_EXEC_WRAPPER !== lldWrapperPath
       ? environmentVariables.AWS_LAMBDA_EXEC_WRAPPER
