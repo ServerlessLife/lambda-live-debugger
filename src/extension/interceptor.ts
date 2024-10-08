@@ -6,6 +6,7 @@ const workerId = crypto.randomBytes(16).toString('hex');
 const topic = `${process.env.LLD_DEBUGGER_ID}/events/${workerId}`;
 
 const ORIGINAL_HANDLER_KEY = 'ORIGINAL_HANDLER';
+const originalHandlerName = process.env[ORIGINAL_HANDLER_KEY];
 const observableInterval = process.env.LLD_OBSERVABLE_INTERVAL
   ? parseInt(process.env.LLD_OBSERVABLE_INTERVAL!)
   : 0;
@@ -106,10 +107,65 @@ async function regularMode(context: any, event: any) {
  * Observable mode, which sends the event to the IoT service and doesn't wait for a response. It executes the original handler.
  */
 async function observableMode(context: any, event: any) {
-  const regularHandler = async () => {
-    const handler = await getOriginalHandler();
-    return await handler(event, context);
-  };
+  let regularHandler: undefined | (() => Promise<any>) = undefined;
+
+  if (process.env.LLD_INITIAL_AWS_LAMBDA_EXEC_WRAPPER) {
+    try {
+      Logger.log(
+        `Another extensions exists ${process.env.LLD_INITIAL_AWS_LAMBDA_EXEC_WRAPPER}.`,
+      );
+
+      const { promisify } = require('util');
+      const exec = require('child_process').exec;
+      const execAsync = promisify(exec);
+
+      // read the content of the script
+      const fs = require('fs/promises');
+      const originalScript = await fs.readFile(
+        process.env.LLD_INITIAL_AWS_LAMBDA_EXEC_WRAPPER,
+        'utf8',
+      );
+
+      Logger.verbose('Original script', originalScript);
+
+      // - set original handler
+      // - run second extension script
+      // - print environment variables
+      const script = `export _HANDLER=${process.env.ORIGINAL_HANDLER}
+                      ${originalScript}
+                      echo _HANDLER=$_HANDLER`;
+
+      Logger.verbose('Execute script', script);
+
+      const response = await execAsync(script);
+
+      Logger.verbose(`Output of the script: ${response.stdout}`);
+      // parse environment variables I got from the script
+      const handlerLine = response.stdout
+        .split('\n')
+        .find((line: string) => line.startsWith('_HANDLER'));
+      const oldHandler = handlerLine.split('=')[1];
+
+      Logger.verbose(`Getting handler "${oldHandler}" for another extension`);
+
+      regularHandler = async () => {
+        const handler = await getOriginalHandler(oldHandler);
+        return await handler(event, context);
+      };
+    } catch (e: any) {
+      Logger.error(
+        `Error while running the initial AWS_LAMBDA_EXEC_WRAPPER: ${e.message}`,
+        e,
+      );
+    }
+  }
+
+  if (!regularHandler) {
+    regularHandler = async () => {
+      const handler = await getOriginalHandler(originalHandlerName);
+      return await handler(event, context);
+    };
+  }
 
   const observableHandler = async () => {
     // prevent sending too many events
@@ -155,14 +211,18 @@ async function observableMode(context: any, event: any) {
   return response;
 }
 
-async function getOriginalHandler(): Promise<any> {
+async function getOriginalHandler(
+  originalHandlerName: string | undefined,
+): Promise<any> {
+  Logger.verbose('Original handler:', originalHandlerName);
+
   // @ts-ignore
   const { load } = await import('./aws/UserFunction');
 
-  if (process.env[ORIGINAL_HANDLER_KEY] === undefined)
+  if (originalHandlerName === undefined)
     throw Error('Missing original handler');
   return load(
     process.env.LAMBDA_TASK_ROOT!,
-    process.env[ORIGINAL_HANDLER_KEY],
+    originalHandlerName,
   ) as Promise<any>;
 }

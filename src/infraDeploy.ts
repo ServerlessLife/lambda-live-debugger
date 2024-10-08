@@ -26,6 +26,7 @@ let iamClient: IAMClient | undefined;
 
 const inlinePolicyName = 'LambdaLiveDebuggerPolicy';
 const layerName = 'LambdaLiveDebugger';
+const lldWrapperPath = '/opt/lld-wrapper';
 
 /**
  * Policy document to attach to the Lambda role
@@ -300,7 +301,16 @@ async function removeLayerFromLambda(functionName: string) {
       );
     }
 
-    const ddlEnvironmentVariables = getEnvironmentVarablesForDebugger('xxx', 0);
+    const initalExecWraper =
+      environmentVariables.LLD_INITIAL_AWS_LAMBDA_EXEC_WRAPPER;
+
+    const ddlEnvironmentVariables = getEnvironmentVarablesForDebugger({
+      // set dummy data, so we just get the list of environment variables
+      functionId: 'xxx',
+      timeout: 0,
+      verbose: true,
+      initalExecWraper: 'test',
+    });
 
     // check if environment variables are set for each property
     for (const [key] of Object.entries(ddlEnvironmentVariables)) {
@@ -323,8 +333,20 @@ async function removeLayerFromLambda(functionName: string) {
       //remove environment variables
       for (const [key] of Object.entries(ddlEnvironmentVariables)) {
         if (environmentVariables && environmentVariables[key]) {
-          delete environmentVariables[key];
+          if (key === 'AWS_LAMBDA_EXEC_WRAPPER') {
+            if (environmentVariables[key] === lldWrapperPath) {
+              delete environmentVariables[key];
+            } else {
+              // do not remove the original AWS_LAMBDA_EXEC_WRAPPER that was set before LLD
+            }
+          } else {
+            delete environmentVariables[key];
+          }
         }
+      }
+
+      if (initalExecWraper) {
+        environmentVariables.AWS_LAMBDA_EXEC_WRAPPER = initalExecWraper;
       }
 
       Logger.verbose(
@@ -445,10 +467,23 @@ async function attachLayerToLambda(
     Logger.verbose('Layer with the wrong version attached to the function');
   }
 
-  const ddlEnvironmentVariables = getEnvironmentVarablesForDebugger(
+  const initalExecWraper =
+    environmentVariables.AWS_LAMBDA_EXEC_WRAPPER !== lldWrapperPath
+      ? environmentVariables.AWS_LAMBDA_EXEC_WRAPPER
+      : undefined;
+
+  if (initalExecWraper) {
+    Logger.warn(
+      `[Function ${functionName}] Another internal Lambda extension is already attached to the function, which might cause unpredictable behavior.`,
+    );
+  }
+
+  const ddlEnvironmentVariables = getEnvironmentVarablesForDebugger({
     functionId,
-    initialTimeout,
-  );
+    timeout: initialTimeout,
+    verbose: Configuration.config.verbose,
+    initalExecWraper,
+  });
 
   // check if environment variables are already set for each property
   for (const [key, value] of Object.entries(ddlEnvironmentVariables)) {
@@ -551,22 +586,36 @@ async function addPolicyToLambdaRole(functionName: string) {
 
 /**
  * Get the environment variables for the Lambda function
- * @param functionId
- * @param timeout
- * @returns
  */
-function getEnvironmentVarablesForDebugger(
-  functionId: string,
-  timeout: number | undefined,
-): Record<string, string> {
-  return {
+function getEnvironmentVarablesForDebugger({
+  functionId,
+  timeout,
+  verbose,
+  initalExecWraper,
+}: {
+  functionId: string;
+  timeout: number | undefined;
+  verbose: boolean | undefined;
+  initalExecWraper: string | undefined;
+}): Record<string, string> {
+  const env: Record<string, string> = {
     LLD_FUNCTION_ID: functionId,
-    AWS_LAMBDA_EXEC_WRAPPER: '/opt/lld-wrapper',
+    AWS_LAMBDA_EXEC_WRAPPER: lldWrapperPath,
     LLD_DEBUGGER_ID: Configuration.config.debuggerId,
     LLD_INITIAL_TIMEOUT: timeout ? timeout.toString() : '-1', // should never be negative
     LLD_OBSERVABLE_MODE: Configuration.config.observable ? 'true' : 'false',
     LLD_OBSERVABLE_INTERVAL: Configuration.config.interval.toString(),
   };
+
+  if (initalExecWraper) {
+    env.LLD_INITIAL_AWS_LAMBDA_EXEC_WRAPPER = initalExecWraper;
+  }
+
+  if (verbose) {
+    env.LLD_VERBOSE = 'true';
+  }
+
+  return env;
 }
 
 /**
