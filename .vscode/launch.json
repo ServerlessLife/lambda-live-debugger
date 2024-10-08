@@ -25,6 +25,16 @@
       "cwd": "${workspaceRoot}/test/cdk-basic"
     },
     {
+      "name": "LLDebugger - CDK basic - remove",
+      "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
+      "args": ["../../src/lldebugger.ts", "-c environment=test", "-r"],
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal",
+      "type": "node",
+      "cwd": "${workspaceRoot}/test/cdk-basic"
+    },
+    {
       "name": "LLDebugger - CDK basic - monorepo",
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": [

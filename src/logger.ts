@@ -63,6 +63,14 @@ function setVerbose(enabled: boolean) {
   verboseEnabled = enabled;
 }
 
+/**
+ * Check if verbose logging is enabled
+ * @returns Whether verbose logging is enabled
+ */
+function isVerbose() {
+  return verboseEnabled;
+}
+
 export const Logger = {
   log,
   error,
@@ -70,4 +78,5 @@ export const Logger = {
   important,
   verbose,
   setVerbose,
+  isVerbose,
 };
