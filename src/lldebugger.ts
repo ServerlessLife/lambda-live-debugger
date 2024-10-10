@@ -105,6 +105,9 @@ async function run() {
 
   await LambdaConnection.connect();
   Logger.log('Debugger started!');
+  Logger.info(
+    `When you want to stop debugging and return to normal execution, type command 'lld -r' to remove LLD Layer from the functions.`,
+  );
 }
 
 run().catch(Logger.error);
