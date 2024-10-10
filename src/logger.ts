@@ -45,6 +45,17 @@ function warn(...args: any[]) {
 }
 
 /**
+ * Log an info message in green
+ * @param args The arguments to log
+ */
+function info(...args: any[]) {
+  args = args.map((arg) =>
+    typeof arg === 'string' ? chalk.greenBright(arg) : arg,
+  );
+  console.info(...args);
+}
+
+/**
  * Log a verbose message if verbose is enabled. Log the message in grey.
  * @param args The arguments to log
  */
@@ -76,6 +87,7 @@ export const Logger = {
   error,
   warn,
   important,
+  info,
   verbose,
   setVerbose,
   isVerbose,
