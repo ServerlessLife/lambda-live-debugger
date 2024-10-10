@@ -167,9 +167,11 @@ export class SamFramework implements IFramework {
 
       if (!codePath) {
         const fileWithExtension = handlerParts[0];
+        const possibleCodePathsTs = `${fileWithExtension}.ts`;
+        const possibleCodePathsJs = `${fileWithExtension}.js`;
         const possibleCodePaths = [
-          `${fileWithExtension}.ts`,
-          `${fileWithExtension}.js`,
+          possibleCodePathsTs,
+          possibleCodePathsJs,
           `${fileWithExtension}.cjs`,
           `${fileWithExtension}.mjs`,
         ];
@@ -183,10 +185,14 @@ export class SamFramework implements IFramework {
             // ignore, file not found
           }
         }
-      }
 
-      if (!codePath) {
-        throw new Error(`Code path not found for function: ${func.Name}`);
+        if (!codePath) {
+          codePath = possibleCodePathsJs;
+
+          Logger.warn(
+            `[Function ${functionName}] Can not find code path for handler: ${handlerFull}. Using fallback: ${codePath}`,
+          );
+        }
       }
 
       const packageJsonPath = await findPackageJson(codePath);
