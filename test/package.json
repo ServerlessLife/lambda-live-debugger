@@ -9,15 +9,15 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@aws-sdk/client-lambda": "^3.577.0",
-    "vitest": "^2.0.4",
-    "serverless": "^3.38.0",
-    "serverless-esbuild": "^1.52.1",
-    "typescript": "~5.4.3"
+    "@aws-sdk/client-lambda": "^3.670.0",
+    "vitest": "^2.1.2",
+    "serverless": "^4.4.5",
+    "serverless-esbuild": "^1.54.4",
+    "typescript": "~5.6.3"
   },
   "dependencies": {
-    "esbuild": "^0.20.1",
-    "@aws-sdk/client-iam": "^3.577.0",
+    "esbuild": "^0.24.0",
+    "@aws-sdk/client-iam": "^3.670.0",
     "@tsconfig/node20": "^20.1.4"
   }
 }
