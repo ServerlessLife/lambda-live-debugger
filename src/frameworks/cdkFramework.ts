@@ -280,7 +280,10 @@ export class CdkFramework implements IFramework {
             contents = fileContent;
           }
 
-          const loader = args.path.split('.').pop() as esbuild.Loader;
+          // for .mjs files, use js loader
+          const fileExtension = args.path.split('.').pop();
+          const loader: esbuild.Loader =
+            fileExtension === 'mjs' ? 'js' : (fileExtension as esbuild.Loader);
 
           // Inject code to get the file path of the Lambda function and CDK hierarchy
           if (args.path.includes('aws-cdk-lib/aws-lambda/lib/function.')) {
@@ -309,12 +312,12 @@ export class CdkFramework implements IFramework {
               };
 
               // console.log("CDK INFRA: ", {
-              //   stackName: lambdaInfo.stackName,
-              //   codePath: lambdaInfo.codePath,
-              //   code: lambdaInfo.code,
-              //   handler: lambdaInfo.handler,
-              //   bundling: lambdaInfo.bundling
-              // });
+                //   stackName: lambdaInfo.stackName,
+                //   codePath: lambdaInfo.codePath,
+                //   code: lambdaInfo.code,
+                //   handler: lambdaInfo.handler,
+                //   bundling: lambdaInfo.bundling
+                // });
               global.lambdas.push(lambdaInfo);` + codeToFind,
             );
           }
