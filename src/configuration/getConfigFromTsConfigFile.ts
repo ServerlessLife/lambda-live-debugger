@@ -34,6 +34,7 @@ export async function getConfigTsFromConfigFile(
       format: 'esm',
       outfile: compileOutput,
       sourcemap: true,
+      treeShaking: true,
       banner: {
         js: [
           `import { createRequire as topLevelCreateRequire } from 'module';`,
