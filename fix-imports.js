@@ -20,7 +20,10 @@ async function processFiles(directory) {
       const updatedData = data
         .split('\n')
         .map((line) => {
-          if (line.trim().startsWith('import')) {
+          if (
+            line.trim().startsWith('import') ||
+            line.trim().startsWith('export')
+          ) {
             return line.replace(/\.js"/g, '.mjs"').replace(/\.js'/g, ".mjs'");
           }
           return line;

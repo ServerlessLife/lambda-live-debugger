@@ -13,6 +13,9 @@
     "email": "marko@serverlesslife.com",
     "organization": false
   },
+  "exports": {
+    ".": "./dist/index.mjs"
+  },
   "keywords": [
     "aws",
     "lambda",
