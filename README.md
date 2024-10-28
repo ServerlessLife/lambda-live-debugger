@@ -246,6 +246,7 @@ getLambdas: async (foundLambdas, config) => {
         .replace('.js', '.ts');
     }
   }
+  return foundLambdas;
 };
 ```
 
@@ -264,6 +265,7 @@ export default {
         };
       }
     }
+    return foundLambdas;
   }
 } satisfies LldConfigTs;
 ```
