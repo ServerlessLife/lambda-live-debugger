@@ -32,7 +32,7 @@ export type LldConfigBase = {
   interval: number;
 
   /**
-   * Framework
+   * Framework (cdk, sls, sam, terraform, none)
    */
   framework?: string;
 

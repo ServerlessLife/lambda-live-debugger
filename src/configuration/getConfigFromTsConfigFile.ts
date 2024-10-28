@@ -35,6 +35,24 @@ export async function getConfigTsFromConfigFile(
       outfile: compileOutput,
       sourcemap: true,
       treeShaking: true,
+      tsconfigRaw: {
+        compilerOptions: {
+          esModuleInterop: true,
+          skipLibCheck: true,
+          target: 'esnext',
+          allowJs: true,
+          resolveJsonModule: true,
+          moduleDetection: 'force',
+          isolatedModules: true,
+          verbatimModuleSyntax: true,
+          strict: true,
+          noUncheckedIndexedAccess: true,
+          noImplicitOverride: true,
+          module: 'NodeNext',
+          sourceMap: true,
+          lib: ['esnext'],
+        },
+      },
       banner: {
         js: [
           `import { createRequire as topLevelCreateRequire } from 'module';`,
