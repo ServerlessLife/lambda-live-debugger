@@ -51,7 +51,7 @@ export async function getConfigFromWizard({
     },
   ]);
 
-  if (answers.framework === 'other') {
+  if (answers.framework === 'other' || answers.framework === 'none') {
     answers.framework = undefined;
   }
 
