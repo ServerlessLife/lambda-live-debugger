@@ -44,7 +44,7 @@ export async function getConfigTsFromConfigFile(
           resolveJsonModule: true,
           moduleDetection: 'force',
           isolatedModules: true,
-          verbatimModuleSyntax: true,
+          verbatimModuleSyntax: false,
           strict: true,
           noUncheckedIndexedAccess: true,
           noImplicitOverride: true,
