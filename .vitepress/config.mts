@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitepress';
+import markdownItYouTubeEmbed from './markdown-it-youtube-embed.js';
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -105,5 +106,10 @@ export default defineConfig({
         link: 'https://github.com/ServerlessLife/lambda-live-debugger',
       },
     ],
+  },
+  markdown: {
+    config: (md) => {
+      md.use(markdownItYouTubeEmbed);
+    },
   },
 });

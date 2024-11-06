@@ -13,6 +13,8 @@ It supports the following frameworks:
 - Any other framework or setup by implementing a simple function in TypeScript
 - ... (Need support for another framework? Let me know!)
 
+[![Video presentation of Lambda Live Debugger](https://img.youtube.com/vi/BrhybwyDM0I/0.jpg)](https://www.youtube.com/watch?v=BrhybwyDM0I)
+
 ## Why?
 
 Serverless is amazing and solves many issues with traditional systems. However, writing code for Lambda functions can be challenging. The cycle of writing, deploying, running, fixing, and redeploying is time-consuming and tedious. You could use tools to run Lambda locally or use unit/integration tests; those approaches often don't replicate the actual environment closely enough.
