@@ -26,4 +26,4 @@ if (!testCase) {
   process.exit(1);
 }
 
-modifyPackageJson(filePath, testCase);
+modifyPackageJson(testCase);
