@@ -148,9 +148,10 @@
     "test/cdk-config",
     "test/sls-basic",
     "test/sls-esbuild",
+    "test/sls-esbuild-cjs",
     "test/osls-basic",
     "test/osls-esbuild",
-    "test/sls-esbuild-cjs",
+    "test/osls-esbuild-cjs",
     "test/sam-basic",
     "test/sam-alt",
     "test/terraform-basic"

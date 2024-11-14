@@ -16,7 +16,10 @@ async function modifyPackageJson(testCase) {
 
   // Write the modified package.json back to the file
   await writeFile(filePath, JSON.stringify(packageJson, null, 2), 'utf-8');
-  console.log(`Modified ${filePath} successfully!`);
+  console.log(
+    `Modified ${filePath} successfully!`,
+    JSON.stringify(packageJson, null, 2),
+  );
 }
 
 // Run the function with the provided file path and argument
