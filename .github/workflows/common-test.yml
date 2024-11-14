@@ -263,6 +263,54 @@ jobs:
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 1 test/sls-esbuild-esm.test.ts
 
+  test-osls-basic:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: test-osls-basic
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.node_version }}
+          registry-url: 'https://registry.npmjs.org'
+      - name: Install dependencies
+        run: npm ci
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        if: ${{ inputs.mode == 'build' }}
+        with:
+          name: dist
+          path: dist
+      - name: Install lambda-live-debugger globally
+        if: ${{ inputs.mode == 'global' }}
+        run: |
+          npm i lambda-live-debugger -g
+          npm i osls@3.41.0 -g
+        working-directory: test
+      - name: Install lambda-live-debugger locally
+        if: ${{ inputs.mode == 'local' }}
+        run: |
+          npm i lambda-live-debugger
+        working-directory: test
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-west-1
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: GitHubActions
+      - name: Destroy
+        run: npm run destroy
+        working-directory: test/osls-basic
+        continue-on-error: true
+      - name: Deploy
+        run: npm run deploy
+        working-directory: test/osls-basic
+      - name: Test
+        run: npx vitest --retry 1 test/sls-basic.test.ts
+      - name: Test - observability mode
+        run: OBSERVABLE_MODE=true npx vitest --retry 1 test/osls-basic.test.ts
+
   test-sam-basic:
     runs-on: ubuntu-latest
     concurrency:
