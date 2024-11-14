@@ -21,16 +21,13 @@ async function modifyPackageJson(testCase) {
   packageJson.workspaces = ['test', `test/${testCase}`];
 
   await writeFile(filePath, JSON.stringify(packageJson, null, 2), 'utf-8');
-  console.log(
-    `Modified ${filePath} successfully!`,
-    JSON.stringify(packageJson, null, 2),
-  );
+  console.log(`Modified ${filePath} successfully!`);
 }
 
-const [testCase] = argv.slice(1);
+const [testCase] = argv.slice(2);
 if (!testCase) {
-  console.error('Usage: node prepareForTest.js <workspace-arg>');
+  console.error('Usage: node prepareForTest.js <testCase>');
   process.exit(1);
 }
 
-modifyPackageJson(testCase);
+void modifyPackageJson(testCase).catch(console.error);
