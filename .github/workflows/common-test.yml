@@ -307,7 +307,7 @@ jobs:
         run: npm run deploy
         working-directory: test/osls-basic
       - name: Test
-        run: npx vitest --retry 1 test/sls-basic.test.ts
+        run: npx vitest --retry 1 test/osls-basic.test.ts
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 1 test/osls-basic.test.ts
 
