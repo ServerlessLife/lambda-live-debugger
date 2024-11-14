@@ -7,7 +7,7 @@ This tool offers similar functionality to [SST](https://sst.dev/) and [Serverles
 It supports the following frameworks:
 
 - AWS CDK v2
-- Serverless Framework v3 (SLS)
+- Serverless Framework v3 (SLS) and [`osls` fork](https://github.com/oss-serverless/serverless)
 - AWS Serverless Application Model (SAM)
 - Terraform
 - Any other framework or setup by implementing a simple function in TypeScript
