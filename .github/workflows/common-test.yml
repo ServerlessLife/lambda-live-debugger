@@ -276,6 +276,8 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - name: Install dependencies
         run: npm ci
+      - name: Uninstall serverless
+        run: npm uninstall serverless
       - name: Download build artifact
         uses: actions/download-artifact@v4
         if: ${{ inputs.mode == 'build' }}
