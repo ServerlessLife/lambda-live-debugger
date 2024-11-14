@@ -14,6 +14,7 @@ export default [
       '**/.aws-sam/**',
       'src/extension/aws/*.js',
       '.vitepress/cache/**',
+      'prepareForTest.js',
     ],
   },
   {
