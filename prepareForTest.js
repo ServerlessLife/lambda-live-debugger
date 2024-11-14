@@ -1,6 +1,11 @@
 import { readFile, writeFile } from 'fs/promises';
 import { argv } from 'process';
 
+/**
+ * Prepare the package.json file for testing.
+ * Remove everything that is not needed for testing.
+ * @param {*} testCase
+ */
 async function modifyPackageJson(testCase) {
   const filePath = 'package.json';
 
@@ -11,10 +16,10 @@ async function modifyPackageJson(testCase) {
   delete packageJson.scripts;
   delete packageJson.devDependencies;
 
-  // Replace workspaces node with specified values
+  // Replace workspaces node with the test and the test case workspaces
+  // With this all the necessary npm packages will be installed
   packageJson.workspaces = ['test', `test/${testCase}`];
 
-  // Write the modified package.json back to the file
   await writeFile(filePath, JSON.stringify(packageJson, null, 2), 'utf-8');
   console.log(
     `Modified ${filePath} successfully!`,
@@ -22,7 +27,6 @@ async function modifyPackageJson(testCase) {
   );
 }
 
-// Run the function with the provided file path and argument
 const [testCase] = argv.slice(1);
 if (!testCase) {
   console.error('Usage: node prepareForTest.js <workspace-arg>');
