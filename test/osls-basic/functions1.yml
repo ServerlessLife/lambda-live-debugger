@@ -1,0 +1,2 @@
+testJsEsModule:
+  handler: services/testJsEsModule/lambda.lambdaHandler

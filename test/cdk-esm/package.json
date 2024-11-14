@@ -8,7 +8,7 @@
   "scripts": {
     "deploy": "cdk deploy --all -c environment=test --require-approval never --outputs-file cdk-outputs.json",
     "build": "cdk synth -c environment=test",
-    "destroy": "cdk destroy  -c environment=test --force"
+    "destroy": "cdk destroy  --all -c environment=test --force"
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",

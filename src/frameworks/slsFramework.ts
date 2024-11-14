@@ -62,72 +62,38 @@ export class SlsFramework implements IFramework {
     let resolveVariablesMeta: any;
     let sources: any;
     let Serverless: any;
+    let error1: any | undefined;
 
     try {
-      // lazy load modules
-      resolveConfigurationPath = (
-        await import(
-          //@ts-ignore
-          'serverless/lib/cli/resolve-configuration-path.js'
-        )
-      ).default;
-      readConfiguration = (
-        await import(
-          //@ts-ignore
-          'serverless/lib/configuration/read.js'
-        )
-      ).default;
-      resolveVariables = (
-        await import(
-          //@ts-ignore
-          'serverless/lib/configuration/variables/resolve.js'
-        )
-      ).default;
-      resolveVariablesMeta = (
-        await import(
-          //@ts-ignore
-          'serverless/lib/configuration/variables/resolve-meta.js'
-        )
-      ).default;
-      const env = await import(
-        //@ts-ignore
-        'serverless/lib/configuration/variables/sources/env.js'
-      );
-      const file = await import(
-        //@ts-ignore
-        'serverless/lib/configuration/variables/sources/file.js'
-      );
-      const opt = await import(
-        //@ts-ignore
-        'serverless/lib/configuration/variables/sources/opt.js'
-      );
-      const self = await import(
-        //@ts-ignore
-        'serverless/lib/configuration/variables/sources/self.js'
-      );
-      const strToBool = await import(
-        //@ts-ignore
-        'serverless/lib/configuration/variables/sources/str-to-bool.js'
-      );
-      const sls = await import(
-        //@ts-ignores
-        'serverless/lib/configuration/variables/sources/instance-dependent/get-sls.js'
-      );
+      try {
+        const frameworkFunctions = await loadFramework('serverless');
+        resolveConfigurationPath = frameworkFunctions.resolveConfigurationPath;
+        readConfiguration = frameworkFunctions.readConfiguration;
+        resolveVariables = frameworkFunctions.resolveVariables;
+        resolveVariablesMeta = frameworkFunctions.resolveVariablesMeta;
+        sources = frameworkFunctions.sources;
+        Serverless = frameworkFunctions.Serverless;
 
-      sources = {
-        env: env.default,
-        file: file.default,
-        opt: opt.default,
-        self: self.default,
-        strToBool: strToBool.default,
-        sls: sls.default(),
-      };
+        Logger.verbose(`[SLS] Npm module 'serverless' loaded`);
+      } catch (error: any) {
+        Logger.verbose(`[SLS] Failed to load npm module 'serverless'`, error);
 
-      Serverless = (await import('serverless')).default;
-    } catch (error: any) {
-      Logger.error('Error loading serverless modules', error);
+        error1 = error;
+        const frameworkFunctions = await loadFramework('osls');
+        resolveConfigurationPath = frameworkFunctions.resolveConfigurationPath;
+        readConfiguration = frameworkFunctions.readConfiguration;
+        resolveVariables = frameworkFunctions.resolveVariables;
+        resolveVariablesMeta = frameworkFunctions.resolveVariablesMeta;
+        sources = frameworkFunctions.sources;
+        Serverless = frameworkFunctions.Serverless;
+
+        Logger.verbose(`[SLS] Npm module 'osls' loaded`);
+      }
+    } catch (error2: any) {
+      const error = error1 ?? error2;
+      Logger.error('Error loading serverless (or osls) module', error);
       Logger.log(
-        'If you are running Lambda Live Debugger from a global installation, install Serverless Framework globally as well. If you are using monorepo, install Serverless Framework also in the project root folder.',
+        'If you are running Lambda Live Debugger from a global installation, install Serverless Framework globally as well. If you are using monorepo, install Serverless Framework also in the project root folder. The fork of Serverless Framework https://github.com/oss-serverless/serverless is also supported.',
       );
       throw new Error(`Error loading serverless modules. ${error.message}`, {
         cause: error,
@@ -315,3 +281,73 @@ export class SlsFramework implements IFramework {
 }
 
 export const slsFramework = new SlsFramework();
+async function loadFramework(npmName: string) {
+  // lazy load modules
+  const resolveConfigurationPath = (
+    await import(
+      //@ts-ignore
+      `${npmName}/lib/cli/resolve-configuration-path.js`
+    )
+  ).default;
+  const readConfiguration = (
+    await import(
+      //@ts-ignore
+      `${npmName}/lib/configuration/read.js`
+    )
+  ).default;
+  const resolveVariables = (
+    await import(
+      //@ts-ignore
+      `${npmName}/lib/configuration/variables/resolve.js`
+    )
+  ).default;
+  const resolveVariablesMeta = (
+    await import(
+      //@ts-ignore
+      `${npmName}/lib/configuration/variables/resolve-meta.js`
+    )
+  ).default;
+  const env = await import(
+    //@ts-ignore
+    `${npmName}/lib/configuration/variables/sources/env.js`
+  );
+  const file = await import(
+    //@ts-ignore
+    `${npmName}/lib/configuration/variables/sources/file.js`
+  );
+  const opt = await import(
+    //@ts-ignore
+    `${npmName}/lib/configuration/variables/sources/opt.js`
+  );
+  const self = await import(
+    //@ts-ignore
+    `${npmName}/lib/configuration/variables/sources/self.js`
+  );
+  const strToBool = await import(
+    //@ts-ignore
+    `${npmName}/lib/configuration/variables/sources/str-to-bool.js`
+  );
+  const sls = await import(
+    //@ts-ignores
+    `${npmName}/lib/configuration/variables/sources/instance-dependent/get-sls.js`
+  );
+
+  const sources = {
+    env: env.default,
+    file: file.default,
+    opt: opt.default,
+    self: self.default,
+    strToBool: strToBool.default,
+    sls: sls.default(),
+  };
+
+  const Serverless = (await import(npmName)).default;
+  return {
+    resolveConfigurationPath,
+    readConfiguration,
+    resolveVariablesMeta,
+    resolveVariables,
+    sources,
+    Serverless,
+  };
+}

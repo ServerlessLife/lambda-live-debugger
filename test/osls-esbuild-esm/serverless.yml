@@ -1,0 +1,24 @@
+service: lls-osls-esbuild-esm
+frameworkVersion: '3'
+
+plugins:
+  - serverless-esbuild
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: eu-west-1
+  stage: test
+
+custom:
+  esbuild:
+    bundle: true
+    minify: true
+    format: esm
+    outputFileExtension: .mjs
+    banner:
+      js: "import { createRequire } from 'module';const require = createRequire(import.meta.url);"
+
+functions:
+  testTsEsModule:
+    handler: services/testTsEsModule/lambda.lambdaHandler

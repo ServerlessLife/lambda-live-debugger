@@ -1,0 +1,11 @@
+service: lls-osls-basic
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: eu-west-1
+
+functions:
+  - ${file(./functions1.yml)}
+  - ${file(./functions2.yml)}
