@@ -151,6 +151,46 @@
       "cwd": "${workspaceRoot}/test/osls-basic"
     },
     {
+      "name": "LLDebugger - OSLS EsBuild CJS",
+      "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
+      "args": ["../../src/lldebugger.ts"],
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal",
+      "type": "node",
+      "cwd": "${workspaceRoot}/test/osls-esbuild-cjs"
+    },
+    {
+      "name": "LLDebugger - OSLS EsBuild CJS - observability",
+      "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
+      "args": ["../../src/lldebugger.ts", "-o"],
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal",
+      "type": "node",
+      "cwd": "${workspaceRoot}/test/osls-esbuild-cjs"
+    },
+    {
+      "name": "LLDebugger - OSLS EsBuild ESM",
+      "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
+      "args": ["../../src/lldebugger.ts"],
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal",
+      "type": "node",
+      "cwd": "${workspaceRoot}/test/osls-esbuild-esm"
+    },
+    {
+      "name": "LLDebugger - OSLS EsBuild ESM - observability",
+      "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
+      "args": ["../../src/lldebugger.ts", "-o"],
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal",
+      "type": "node",
+      "cwd": "${workspaceRoot}/test/osls-esbuild-esm"
+    },
+    {
       "name": "LLDebugger - SAM basic",
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": ["../../src/lldebugger.ts", "--config-env=test"],

@@ -1,0 +1,20 @@
+service: lls-osls-esbuild-cjs
+frameworkVersion: '3'
+
+plugins:
+  - serverless-esbuild
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: eu-west-1
+  stage: test
+
+custom:
+  esbuild:
+    bundle: true
+    minify: false
+
+functions:
+  testTsCommonJs:
+    handler: services/testTsCommonJs/lambda.lambdaHandler

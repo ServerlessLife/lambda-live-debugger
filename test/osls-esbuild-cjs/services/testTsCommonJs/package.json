@@ -1,0 +1,8 @@
+{
+  "name": "sls-esbuild-test-ts-commonjs",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "dependencies": {
+    "@aws-sdk/client-sts": "^3.577.0"
+  }
+}
