@@ -50,7 +50,8 @@ async function regularMode(context: any, event: any) {
 
   const ioTService = await IoTService.connect({
     onMessage: async (message: IoTMessage) => {
-      Logger.log('IoT message', message);
+      Logger.log('IoT message', message.type);
+      Logger.verbose('IoT full message', message);
 
       if (message.type === 'PING') {
         if (message.data.workerId === workerId) {
@@ -93,11 +94,13 @@ async function regularMode(context: any, event: any) {
       env: process.env,
     },
   };
+  
   Logger.log(
     'Publishing to IoT',
     `${process.env.LLD_DEBUGGER_ID}/events`,
-    payload,
   );
+  Logger.verbose('Published payload', payload);
+
   await ioTService.publish(payload, `${process.env.LLD_DEBUGGER_ID}/events`);
 
   return promise;
@@ -194,11 +197,13 @@ async function observableMode(context: any, event: any) {
         env: process.env,
       },
     };
+
     Logger.log(
       'Publishing to IoT',
       `${process.env.LLD_DEBUGGER_ID}/events`,
-      payload,
     );
+    Logger.verbose('Published payload', payload);
+
     await ioTService.publish(payload, `${process.env.LLD_DEBUGGER_ID}/events`);
   };
 
