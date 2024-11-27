@@ -330,6 +330,7 @@ If you have a new feature idea, please create and issue.
 
 - [Kristian Dreher](https://www.linkedin.com/in/kristiandreher)
 - [Roger Chi](https://rogerchi.com/)
+- [Sebastian / avocadomaster](https://github.com/avocadomaster)
 - [Sebastian Bille](https://blog.sebastianbille.com)
 - ⭐ Your name here for notable code or documentation contributions or sample projects submitted with a bug report that resulted in tool improvement.
 
