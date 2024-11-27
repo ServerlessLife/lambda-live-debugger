@@ -50,7 +50,11 @@ async function regularMode(context: any, event: any) {
 
   const ioTService = await IoTService.connect({
     onMessage: async (message: IoTMessage) => {
-      Logger.log('IoT message', message);
+      if (Logger.isVerbose()) {
+        Logger.verbose('IoT message', message);
+      } else {
+        Logger.log('IoT message', message.type);
+      }
 
       if (message.type === 'PING') {
         if (message.data.workerId === workerId) {
@@ -93,11 +97,16 @@ async function regularMode(context: any, event: any) {
       env: process.env,
     },
   };
-  Logger.log(
-    'Publishing to IoT',
-    `${process.env.LLD_DEBUGGER_ID}/events`,
-    payload,
-  );
+
+  if (Logger.isVerbose()) {
+    Logger.verbose(
+      `Publishing to IoT ${process.env.LLD_DEBUGGER_ID}/events`,
+      payload,
+    );
+  } else {
+    Logger.log(`Publishing to IoT ${process.env.LLD_DEBUGGER_ID}/events`);
+  }
+
   await ioTService.publish(payload, `${process.env.LLD_DEBUGGER_ID}/events`);
 
   return promise;
@@ -194,11 +203,16 @@ async function observableMode(context: any, event: any) {
         env: process.env,
       },
     };
-    Logger.log(
-      'Publishing to IoT',
-      `${process.env.LLD_DEBUGGER_ID}/events`,
-      payload,
-    );
+
+    if (Logger.isVerbose()) {
+      Logger.verbose(
+        `Publishing to IoT ${process.env.LLD_DEBUGGER_ID}/events`,
+        payload,
+      );
+    } else {
+      Logger.log(`Publishing to IoT ${process.env.LLD_DEBUGGER_ID}/events`);
+    }
+
     await ioTService.publish(payload, `${process.env.LLD_DEBUGGER_ID}/events`);
   };
 
