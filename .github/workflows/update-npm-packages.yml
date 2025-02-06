@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  node_version: 20
+  node_version: 22
 
 jobs:
   update-packages:

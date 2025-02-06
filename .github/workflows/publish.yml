@@ -8,7 +8,7 @@ permissions:
   contents: write
 
 env:
-  node_version: 20
+  node_version: 22
 
 jobs:
   build:

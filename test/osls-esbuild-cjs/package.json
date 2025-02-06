@@ -13,8 +13,8 @@
   "license": "ISC",
   "devDependencies": {
     "esbuild": "^0.20.2",
-    "osls": "^3.41.0",
-    "serverless-esbuild": "^1.52.1",
+    "osls": "^3.46.0",
+    "serverless-esbuild": "^1.54.6",
     "@tsconfig/node20": "^20.1.4"
   },
   "dependencies": {

@@ -25,7 +25,7 @@ export class CdkbasicStack2 extends cdk.Stack {
       {
         entry: path.join(__dirname, '../../services/testJsEsModule/lambda.js'),
         handler: 'lambdaHandler',
-        runtime: lambda.Runtime.NODEJS_20_X,
+        runtime: lambda.Runtime.NODEJS_22_X,
         bundling: {
           format: lambda_nodejs.OutputFormat.ESM,
         },
@@ -37,7 +37,7 @@ export class CdkbasicStack2 extends cdk.Stack {
       this,
       'TestJsCommonJsBase',
       {
-        runtime: lambda.Runtime.NODEJS_20_X,
+        runtime: lambda.Runtime.NODEJS_22_X,
         handler: 'lambda.lambdaHandler',
         code: lambda.Code.fromAsset('services/testJsCommonJs'),
         logRetention: log.RetentionDays.ONE_DAY,
@@ -48,7 +48,7 @@ export class CdkbasicStack2 extends cdk.Stack {
       this,
       'TestJsEsModuleBase',
       {
-        runtime: lambda.Runtime.NODEJS_20_X,
+        runtime: lambda.Runtime.NODEJS_22_X,
         handler: 'lambda.lambdaHandler',
         code: lambda.Code.fromAsset('services/testJsEsModule'),
         logRetention: log.RetentionDays.ONE_DAY,

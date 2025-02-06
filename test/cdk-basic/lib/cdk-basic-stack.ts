@@ -16,7 +16,7 @@ export class CdkbasicStack extends cdk.Stack {
         // a different way to get the path
         entry: path.join(__dirname, '../services/testTsCommonJs/lambda.ts'),
         handler: 'lambdaHandler',
-        runtime: lambda.Runtime.NODEJS_20_X,
+        runtime: lambda.Runtime.NODEJS_22_X,
         logRetention: log.RetentionDays.ONE_DAY,
       },
     );
@@ -27,7 +27,7 @@ export class CdkbasicStack extends cdk.Stack {
       {
         entry: 'services/testTsEsModule/lambda.ts',
         handler: 'lambdaHandler',
-        runtime: lambda.Runtime.NODEJS_20_X,
+        runtime: lambda.Runtime.NODEJS_22_X,
         bundling: {
           format: lambda_nodejs.OutputFormat.ESM,
         },
@@ -41,7 +41,7 @@ export class CdkbasicStack extends cdk.Stack {
       {
         entry: 'services/testJsCommonJs/lambda.js',
         handler: 'lambdaHandler',
-        runtime: lambda.Runtime.NODEJS_20_X,
+        runtime: lambda.Runtime.NODEJS_22_X,
         logRetention: log.RetentionDays.ONE_DAY,
       },
     );
