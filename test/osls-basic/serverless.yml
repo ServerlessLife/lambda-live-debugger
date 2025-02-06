@@ -3,7 +3,7 @@ frameworkVersion: '3'
 
 provider:
   name: aws
-  runtime: nodejs20.x
+  runtime: nodejs22.x
   region: eu-west-1
 
 functions:

@@ -19,7 +19,7 @@ export class CdkEsmStack extends cdk.Stack {
         // a different way to get the path
         entry: path.join(__dirname, '../services/testTsCommonJs/lambda.ts'),
         handler: 'lambdaHandler',
-        runtime: lambda.Runtime.NODEJS_20_X,
+        runtime: lambda.Runtime.NODEJS_22_X,
         logRetention: log.RetentionDays.ONE_DAY,
       },
     );
@@ -30,7 +30,7 @@ export class CdkEsmStack extends cdk.Stack {
       {
         entry: path.resolve(__dirname, '../services/testTsEsModule/lambda.ts'),
         handler: 'lambdaHandler',
-        runtime: lambda.Runtime.NODEJS_20_X,
+        runtime: lambda.Runtime.NODEJS_22_X,
         environment: {
           NODE_OPTIONS: '--enable-source-maps',
           LOG_LEVEL: 'DEBUG',
@@ -56,7 +56,7 @@ export class CdkEsmStack extends cdk.Stack {
       {
         entry: 'services/testJsCommonJs/lambda.js',
         handler: 'lambdaHandler',
-        runtime: lambda.Runtime.NODEJS_20_X,
+        runtime: lambda.Runtime.NODEJS_22_X,
         logRetention: log.RetentionDays.ONE_DAY,
       },
     );

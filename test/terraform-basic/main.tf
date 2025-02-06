@@ -52,7 +52,7 @@ resource "aws_s3_object" "test-js-commonjs_1_zip" {
 resource "aws_lambda_function" "test-js-commonjs_1" {
   function_name = "lld-terraform-basic-test-js-commonjs_1"
   handler       = "lambda.lambdaHandler"
-  runtime       = "nodejs20.x"
+  runtime       = "nodejs22.x"
 
   s3_bucket = aws_s3_object.test-js-commonjs_1_zip.bucket
   s3_key    = aws_s3_object.test-js-commonjs_1_zip.key
@@ -78,7 +78,7 @@ resource "aws_s3_object" "test-js-commonjs_2_zip" {
 resource "aws_lambda_function" "test-js-commonjs_2" {
   function_name = "lld-terraform-basic-test-js-commonjs_2"
   handler       = "lambda.lambdaHandler"
-  runtime       = "nodejs20.x"
+  runtime       = "nodejs22.x"
 
   s3_bucket = aws_s3_object.test-js-commonjs_2_zip.bucket
   s3_key    = aws_s3_object.test-js-commonjs_2_zip.key
@@ -104,7 +104,7 @@ resource "aws_s3_object" "test-js-esmodule_zip" {
 resource "aws_lambda_function" "test-js-esmodule" {
   function_name = "lld-terraform-basic-test-js-esmodule"
   handler       = "lambda.lambdaHandler"
-  runtime       = "nodejs20.x"
+  runtime       = "nodejs22.x"
 
   s3_bucket = aws_s3_object.test-js-esmodule_zip.bucket
   s3_key    = aws_s3_object.test-js-esmodule_zip.key
@@ -130,7 +130,7 @@ resource "aws_s3_object" "test-ts-esmodule_zip" {
 resource "aws_lambda_function" "test-ts-esmodule" {
   function_name = "lld-terraform-basic-test-ts-esmodule"
   handler       = "lambda.lambdaHandler"
-  runtime       = "nodejs20.x"
+  runtime       = "nodejs22.x"
 
   s3_bucket = aws_s3_object.test-ts-esmodule_zip.bucket
   s3_key    = aws_s3_object.test-ts-esmodule_zip.key
@@ -156,7 +156,7 @@ resource "aws_s3_object" "test-ts-commonjs_zip" {
 resource "aws_lambda_function" "test-ts-commonjs" {
   function_name = "lld-terraform-basic-test-ts-commonjs"
   handler       = "lambda.lambdaHandler"
-  runtime       = "nodejs20.x"
+  runtime       = "nodejs22.x"
 
   s3_bucket = aws_s3_object.test-ts-commonjs_zip.bucket
   s3_key    = aws_s3_object.test-ts-commonjs_zip.key
