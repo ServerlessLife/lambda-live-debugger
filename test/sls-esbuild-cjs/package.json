@@ -14,7 +14,7 @@
   "devDependencies": {
     "esbuild": "^0.20.2",
     "serverless": "^3.38.0",
-    "serverless-esbuild": "^1.52.1",
+    "serverless-esbuild": "^1.54.6",
     "@tsconfig/node20": "^20.1.4"
   },
   "dependencies": {

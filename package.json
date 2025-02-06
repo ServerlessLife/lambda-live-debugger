@@ -96,7 +96,7 @@
     "semantic-release": "^23.0.8",
     "serverless": "^3.38.0",
     "osls": "^3.46.0",
-    "serverless-esbuild": "^1.52.1",
+    "serverless-esbuild": "^1.54.6",
     "tsx": "^4.7.1",
     "typescript-eslint": "^8.0.0",
     "vitepress": "^1.3.3"
