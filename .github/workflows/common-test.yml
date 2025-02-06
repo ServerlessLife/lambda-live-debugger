@@ -22,7 +22,7 @@ env:
   DISABLE_PARALLEL_DEPLOY: false
   REAL_NPM: ${{ inputs.mode == 'global' || inputs.mode == 'local' }}
   TEST_MONOREPO: ${{ inputs.testMonorepo }}
-  node_version: 20
+  node_version: 22
 
 jobs:
   test-cdk-basic:
