@@ -283,7 +283,7 @@ export class CdkFramework implements IFramework {
           // for .mjs files, use js loader
           const fileExtension = args.path.split('.').pop();
           const loader: esbuild.Loader =
-            (fileExtension === 'mjs' || fileExtension === 'cjs')
+            fileExtension === 'mjs' || fileExtension === 'cjs'
               ? 'js'
               : (fileExtension as esbuild.Loader);
           // Inject code to get the file path of the Lambda function and CDK hierarchy
