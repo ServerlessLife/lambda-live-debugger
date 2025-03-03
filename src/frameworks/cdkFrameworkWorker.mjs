@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { workerData, parentPort } from 'node:worker_threads';
+import { pathToFileURL } from 'url';
 import { Logger } from '../logger.mjs';
 
 Logger.setVerbose(workerData.verbose);
@@ -14,7 +15,7 @@ parentPort.on('message', async (data) => {
     Logger.verbose(`[Worker] Received message`, data);
 
     // execute code to get the data into global.lambdas
-    await import(data.compileOutput);
+    await import(pathToFileURL(data.compileOutput).href);
 
     if (!global.lambdas || global.lambdas?.length === 0) {
       throw new Error('No Lambda functions found in the CDK code');

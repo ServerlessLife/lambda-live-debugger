@@ -1,6 +1,7 @@
 import * as esbuild from 'esbuild';
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import { pathToFileURL } from 'url';
 import { BundlingType, LambdaResource } from '../types/resourcesDiscovery.js';
 import { outputFolder } from '../constants.js';
 import { findPackageJson } from '../utils/findPackageJson.js';
@@ -287,7 +288,11 @@ export class CdkFramework implements IFramework {
               ? 'js'
               : (fileExtension as esbuild.Loader);
           // Inject code to get the file path of the Lambda function and CDK hierarchy
-          if (args.path.includes('aws-cdk-lib/aws-lambda/lib/function.')) {
+          if (
+            args.path.includes(
+              path.join('aws-cdk-lib', 'aws-lambda', 'lib', 'function.'),
+            )
+          ) {
             const codeToFind =
               'try{jsiiDeprecationWarnings().aws_cdk_lib_aws_lambda_FunctionProps(props)}';
 
@@ -487,20 +492,21 @@ export class CdkFramework implements IFramework {
     compileCodeFile: string;
   }) {
     const lambdas: any[] = await new Promise((resolve, reject) => {
-      const worker = new Worker(
+      const workerPath = pathToFileURL(
         path.resolve(
           path.join(getModuleDirname(), 'frameworks/cdkFrameworkWorker.mjs'),
         ),
-        {
-          workerData: {
-            verbose: config.verbose,
-            awsCdkLibPath,
-            projectDirname: getProjectDirname(),
-            moduleDirname: getModuleDirname(),
-            subfolder: config.subfolder,
-          },
+      ).href;
+
+      const worker = new Worker(new URL(workerPath), {
+        workerData: {
+          verbose: config.verbose,
+          awsCdkLibPath,
+          projectDirname: getProjectDirname(),
+          moduleDirname: getModuleDirname(),
+          subfolder: config.subfolder,
         },
-      );
+      });
 
       worker.on('message', async (message) => {
         resolve(message);
