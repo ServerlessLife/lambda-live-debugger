@@ -130,7 +130,7 @@ function startWorker(input: WorkerRequest) {
     path.resolve(path.join(getModuleDirname(), `./nodeWorkerRunner.mjs`)),
   ).href;
 
-  const worker: MyWorker = new Worker(workerPath, {
+  const worker: MyWorker = new Worker(new URL(workerPath), {
     env: {
       ...input.environment,
       IS_LOCAL: 'true',
