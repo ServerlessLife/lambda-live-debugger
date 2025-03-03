@@ -7,6 +7,7 @@ import type Serverless from 'serverless';
 import { IFramework } from './iFrameworks.js';
 import { LldConfigBase } from '../types/lldConfig.js';
 import { Logger } from '../logger.js';
+import { pathToFileURL } from 'url';
 
 /**
  * Support for Serverless Framework
@@ -285,51 +286,44 @@ async function loadFramework(npmName: string) {
   // lazy load modules
   const resolveConfigurationPath = (
     await import(
-      //@ts-ignore
-      `${npmName}/lib/cli/resolve-configuration-path.js`
+      pathToFileURL(`${npmName}/lib/cli/resolve-configuration-path.js`).href
     )
   ).default;
   const readConfiguration = (
-    await import(
-      //@ts-ignore
-      `${npmName}/lib/configuration/read.js`
-    )
+    await import(pathToFileURL(`${npmName}/lib/configuration/read.js`).href)
   ).default;
   const resolveVariables = (
     await import(
-      //@ts-ignore
-      `${npmName}/lib/configuration/variables/resolve.js`
+      pathToFileURL(`${npmName}/lib/configuration/variables/resolve.js`).href
     )
   ).default;
   const resolveVariablesMeta = (
     await import(
-      //@ts-ignore
-      `${npmName}/lib/configuration/variables/resolve-meta.js`
+      pathToFileURL(`${npmName}/lib/configuration/variables/resolve-meta.js`)
+        .href
     )
   ).default;
   const env = await import(
-    //@ts-ignore
-    `${npmName}/lib/configuration/variables/sources/env.js`
+    pathToFileURL(`${npmName}/lib/configuration/variables/sources/env.js`).href
   );
   const file = await import(
-    //@ts-ignore
-    `${npmName}/lib/configuration/variables/sources/file.js`
+    pathToFileURL(`${npmName}/lib/configuration/variables/sources/file.js`).href
   );
   const opt = await import(
-    //@ts-ignore
-    `${npmName}/lib/configuration/variables/sources/opt.js`
+    pathToFileURL(`${npmName}/lib/configuration/variables/sources/opt.js`).href
   );
   const self = await import(
-    //@ts-ignore
-    `${npmName}/lib/configuration/variables/sources/self.js`
+    pathToFileURL(`${npmName}/lib/configuration/variables/sources/self.js`).href
   );
   const strToBool = await import(
-    //@ts-ignore
-    `${npmName}/lib/configuration/variables/sources/str-to-bool.js`
+    pathToFileURL(
+      `${npmName}/lib/configuration/variables/sources/str-to-bool.js`,
+    ).href
   );
   const sls = await import(
-    //@ts-ignores
-    `${npmName}/lib/configuration/variables/sources/instance-dependent/get-sls.js`
+    pathToFileURL(
+      `${npmName}/lib/configuration/variables/sources/instance-dependent/get-sls.js`,
+    ).href
   );
 
   const sources = {
@@ -341,7 +335,7 @@ async function loadFramework(npmName: string) {
     sls: sls.default(),
   };
 
-  const Serverless = (await import(npmName)).default;
+  const Serverless = (await import(pathToFileURL(npmName).href)).default;
   return {
     resolveConfigurationPath,
     readConfiguration,
