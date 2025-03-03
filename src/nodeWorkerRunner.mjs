@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { createRequire as topLevelCreateRequire } from 'module';
+import { pathToFileURL } from 'url';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const require = topLevelCreateRequire(import.meta.url);
 
@@ -14,7 +15,8 @@ Logger.verbose(
 parentPort.on('message', async (data) => {
   Logger.verbose(`[Worker ${workerData.workerId}] Received message`, data);
   try {
-    const mod = await import(workerData.artifactFile);
+    const artifactFile = pathToFileURL(workerData.artifactFile).href;
+    const mod = await import(artifactFile);
     const fn = mod[workerData.handler];
 
     if (!fn) {

@@ -1,6 +1,7 @@
 import { Worker } from 'node:worker_threads';
 import { FuctionRequest } from './ioTService.js';
 import * as path from 'path';
+import { pathToFileURL } from 'url';
 import { Configuration } from './configuration.js';
 import { getModuleDirname, getProjectDirname } from './getDirname.js';
 import { Logger } from './logger.js';
@@ -125,22 +126,23 @@ function startWorker(input: WorkerRequest) {
 
   const localProjectDir = getProjectDirname();
 
-  const worker: MyWorker = new Worker(
+  const workerPath = pathToFileURL(
     path.resolve(path.join(getModuleDirname(), `./nodeWorkerRunner.mjs`)),
-    {
-      env: {
-        ...input.environment,
-        IS_LOCAL: 'true',
-        LOCAL_PROJECT_DIR: localProjectDir,
-      },
-      execArgv: ['--enable-source-maps'],
-      workerData: input,
-      stderr: true,
-      stdin: true,
-      stdout: true,
-      //type: "module",
+  ).href;
+
+  const worker: MyWorker = new Worker(workerPath, {
+    env: {
+      ...input.environment,
+      IS_LOCAL: 'true',
+      LOCAL_PROJECT_DIR: localProjectDir,
     },
-  );
+    execArgv: ['--enable-source-maps'],
+    workerData: input,
+    stderr: true,
+    stdin: true,
+    stdout: true,
+    //type: "module",
+  });
 
   worker.stdout.on('data', (data: Buffer) => {
     Logger.log(`[Function ${input.functionId}]`, data.toString());
