@@ -402,7 +402,7 @@ export default {
   // Observable mode interval
   interval: ${config.interval === defaultObservableInterval ? undefined : config.interval},
   // Approval required for AWS infrastructure changes
-  approvalRequired: ${config.approval},
+  approval: ${config.approval},
   // Verbose logging
   verbose: ${config.verbose},
   // Modify Lambda function list or support custom framework
@@ -449,7 +449,7 @@ function getConfigFromAnswers(answers: any): LldConfigCliArgs {
       answers.interval !== undefined
         ? answers.interval
         : defaultObservableInterval,
-    approvalRequired: answers.approvalRequired,
+    approval: answers.approval,
     verbose: answers.verbose,
     interactive: answers.interactive,
     gitignore: answers.gitignore,
