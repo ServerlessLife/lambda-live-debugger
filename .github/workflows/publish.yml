@@ -1,7 +1,18 @@
 name: Publish to npm
+run-name: Publishing ${{ inputs.release_type || 'stable' }} release
 
 on:
   workflow_dispatch:
+    inputs:
+      release-type:
+        description: 'Release type'
+        required: true
+        default: 'stable'
+        type: choice
+        options:
+          - stable
+          - alpha
+          - beta
 
 permissions:
   id-token: write
@@ -46,7 +57,11 @@ jobs:
       - name: Semantic Release
         run: |
           npm whoami
-          npx semantic-release
+          if [ "${{ github.event.inputs.release-type }}" != "stable" ]; then
+            npx semantic-release --tag ${{ github.event.inputs.release-type }}
+          else
+            npx semantic-release
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.PRIVATE_GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
