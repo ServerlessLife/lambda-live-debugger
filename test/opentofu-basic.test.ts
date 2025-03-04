@@ -16,13 +16,19 @@ export const execAsync = promisify(exec);
 
 const observableMode = process.env.OBSERVABLE_MODE === 'true';
 
-describe('terraform-basic', async () => {
-  const folder = await getTestProjectFolder('terraform-basic');
+describe('opentofu-basic', async () => {
+  const folder = await getTestProjectFolder('opentofu-basic');
   let lldProcess: ChildProcess | undefined;
+  const args: string[] = [];
 
   beforeAll(async () => {
+    if (process.env.RUN_TEST_FROM_CLI === 'true') {
+      // localy I need to specify it is OpenTofu, because I have also Terraform installed
+      args.push('--framework=opentofu');
+    }
+
     if (process.env.CI === 'true' || process.env.RUN_TEST_FROM_CLI === 'true') {
-      lldProcess = await startDebugger(folder);
+      lldProcess = await startDebugger(folder, args);
     }
   });
 
@@ -137,7 +143,7 @@ describe('terraform-basic', async () => {
 
   test('remove infra', async () => {
     if (process.env.CI === 'true' || process.env.RUN_TEST_FROM_CLI === 'true') {
-      await removeInfra(lldProcess, folder);
+      await removeInfra(lldProcess, folder, args);
       const lambdaName = await getFunctionName(
         folder,
         'lambda-test-js-commonjs_1_name',
@@ -149,13 +155,13 @@ describe('terraform-basic', async () => {
 
 export async function getFunctionName(folder: string, functionName: string) {
   let jsonString: string | undefined = await fs.readFile(
-    `${folder}/terraform-outputs.json`,
+    `${folder}/opentofu-outputs.json`,
     'utf-8',
   );
 
   // on CICD we get strange output
   const start = jsonString.indexOf('{');
-  const end = jsonString.lastIndexOf('::debug::Terraform exited with code 0.');
+  const end = jsonString.lastIndexOf('::debug::Opentofu exited with code 0.');
   if (start > -1 && end > -1) {
     jsonString = jsonString.substring(start, end);
   }
