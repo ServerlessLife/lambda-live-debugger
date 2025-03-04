@@ -9,5 +9,6 @@ export { CdkFramework } from './frameworks/cdkFramework.js';
 export { SlsFramework } from './frameworks/slsFramework.js';
 export { SamFramework } from './frameworks/samFramework.js';
 export { TerraformFramework } from './frameworks/terraformFramework.js';
+export { OpenTofuFramework } from './frameworks/openTofuFramework.js';
 export { type IFramework } from './frameworks/iFrameworks.js';
 export { type AwsConfiguration } from './types/awsConfiguration.js';

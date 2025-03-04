@@ -3,6 +3,7 @@ import { cdkFramework } from './frameworks/cdkFramework.js';
 import { slsFramework } from './frameworks/slsFramework.js';
 import { samFramework } from './frameworks/samFramework.js';
 import { terraformFramework } from './frameworks/terraformFramework.js';
+import { openTofuFramework } from './frameworks/openTofuFramework.js';
 import { LldConfig } from './types/lldConfig.js';
 import { LambdaResource } from './types/resourcesDiscovery.js';
 import { Logger } from './logger.js';
@@ -16,6 +17,7 @@ const frameworksSupported: IFramework[] = [
   slsFramework,
   samFramework,
   terraformFramework,
+  openTofuFramework,
 ];
 
 /**

@@ -11,7 +11,7 @@ terraform {
 }
 
 resource "aws_iam_role" "lambda_role" {
-  name = "lld-terraform-basic-lambda_execution_role"
+  name = "lld-openotofu-basic-lambda_execution_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -32,7 +32,7 @@ resource "random_string" "random" {
 }
 
 resource "aws_s3_bucket" "deploy_bucket" {
-  bucket = "lld-terraform-basic-deploy-${random_string.random.result}"
+  bucket = "lld-openotofu-basic-deploy-${random_string.random.result}"
 }
 
 // services/testJsCommonJs/lambda.js #1
@@ -50,7 +50,7 @@ resource "aws_s3_object" "test-js-commonjs_1_zip" {
 }
 
 resource "aws_lambda_function" "test-js-commonjs_1" {
-  function_name = "lld-terraform-basic-test-js-commonjs_1"
+  function_name = "lld-openotofu-basic-test-js-commonjs_1"
   handler       = "lambda.lambdaHandler"
   runtime       = "nodejs22.x"
 
@@ -76,7 +76,7 @@ resource "aws_s3_object" "test-js-commonjs_2_zip" {
 }
 
 resource "aws_lambda_function" "test-js-commonjs_2" {
-  function_name = "lld-terraform-basic-test-js-commonjs_2"
+  function_name = "lld-openotofu-basic-test-js-commonjs_2"
   handler       = "lambda.lambdaHandler"
   runtime       = "nodejs22.x"
 
@@ -90,7 +90,7 @@ resource "aws_lambda_function" "test-js-commonjs_2" {
 module "test-js-commonjs_3" {
   source = "terraform-aws-modules/lambda/aws"
 
-  function_name = "lld-terraform-basic-test-js-commonjs_3"
+  function_name = "lld-openotofu-basic-test-js-commonjs_3"
   handler       = "lambda.lambdaHandler"
   runtime       = "nodejs22.x"
 
@@ -112,7 +112,7 @@ resource "aws_s3_object" "test-js-esmodule_zip" {
 }
 
 resource "aws_lambda_function" "test-js-esmodule" {
-  function_name = "lld-terraform-basic-test-js-esmodule"
+  function_name = "lld-openotofu-basic-test-js-esmodule"
   handler       = "lambda.lambdaHandler"
   runtime       = "nodejs22.x"
 
@@ -138,7 +138,7 @@ resource "aws_s3_object" "test-ts-esmodule_zip" {
 }
 
 resource "aws_lambda_function" "test-ts-esmodule" {
-  function_name = "lld-terraform-basic-test-ts-esmodule"
+  function_name = "lld-openotofu-basic-test-ts-esmodule"
   handler       = "lambda.lambdaHandler"
   runtime       = "nodejs22.x"
 
@@ -164,7 +164,7 @@ resource "aws_s3_object" "test-ts-commonjs_zip" {
 }
 
 resource "aws_lambda_function" "test-ts-commonjs" {
-  function_name = "lld-terraform-basic-test-ts-commonjs"
+  function_name = "lld-openotofu-basic-test-ts-commonjs"
   handler       = "lambda.lambdaHandler"
   runtime       = "nodejs22.x"
 
