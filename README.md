@@ -101,7 +101,7 @@ The configuration is saved to `lldebugger.config.ts`.
 
 ```
  -V, --version                   output the version number
- -r, --remove [option]           Remove Lambda Live Debugger infrastructure. Options: 'keep-layer' (default), 'remove-all'. The latest also removes the Lambda Layer
+ -r, --remove [option]           Remove Lambda Live Debugger infrastructure. Options: 'keep-layer' (default), 'all'. The latest also removes the Lambda Layer
  -w, --wizard                    Program interactively asks for each parameter and saves it to lldebugger.config.ts
  -v, --verbose                   Verbose logging
  -c, --context <context>         AWS CDK context (default: [])
