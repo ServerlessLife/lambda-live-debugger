@@ -38,7 +38,7 @@ export async function getConfigFromWizard({
 }): Promise<LldConfigBase> {
   let lambdasList: LambdaResource[] | undefined;
 
-  let answers = await inquirer.prompt([
+  let answers: any = await inquirer.prompt([
     {
       type: 'list',
       name: 'framework',
@@ -175,17 +175,18 @@ export async function getConfigFromWizard({
   answers = { ...answers, ...answersObservable };
 
   if (answers.observable) {
+    const defaultInt =
+      configFromCliArgs.interval !== undefined
+        ? configFromCliArgs.interval
+        : currentConfig?.interval !== undefined
+          ? currentConfig?.interval
+          : defaultObservableInterval;
     const observableAnswers = await inquirer.prompt([
       {
         type: 'number',
         name: 'interval',
         message: `Would you like to enter Observability mode interval at which events are sent to the debugger? Default is ${defaultObservableInterval}`,
-        default:
-          configFromCliArgs.observable !== undefined
-            ? configFromCliArgs.observable
-            : currentConfig?.interval !== undefined
-              ? currentConfig?.interval
-              : defaultObservableInterval,
+        default: defaultInt,
       },
     ]);
 
