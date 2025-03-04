@@ -112,7 +112,7 @@
     "@aws-sdk/credential-providers": "^3.758.0",
     "aws-iot-device-sdk": "^2.2.15",
     "chalk": "^5.4.1",
-    "chokidar": "^4.0.3",
+    "chokidar": "^3.6.0",
     "commander": "^13.1.0",
     "esbuild": "^0.25.0",
     "inquirer": "^12.4.2",
