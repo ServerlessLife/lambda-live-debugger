@@ -68,6 +68,11 @@ export type LldConfigBase = {
    * Monorepo subfolder
    */
   subfolder?: string;
+
+  /**
+   * Approval required for AWS infrastructure changes
+   */
+  approval?: boolean;
 } & AwsConfiguration;
 
 export type LldConfigCliArgs = {

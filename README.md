@@ -110,6 +110,7 @@ The configuration is saved to `lldebugger.config.ts`.
  -m, --subfolder <subfolder>     Monorepo subfolder
  -o, --observable                Observability mode
  -i --interval <interval>        Observability mode interval (default: "3000")
+ -a --approval                   User approval required for AWS infrastructure changes, like adding a Lambda layer
  --config-env <evironment>       SAM environment
  --sam-config-file <file>        SAM configuration file
  --sam-template-file <file>      SAM template file
