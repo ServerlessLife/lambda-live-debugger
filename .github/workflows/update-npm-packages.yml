@@ -30,7 +30,7 @@ jobs:
           for file in $package_files; do
             dir=$(dirname "$file")
             echo "Updating packages in $dir"
-            (cd "$dir" && ncu -u)
+            (cd "$dir" && ncu -u --reject serverless)
           done
 
       - name: Install updated packages in root
