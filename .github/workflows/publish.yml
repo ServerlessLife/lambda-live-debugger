@@ -1,5 +1,5 @@
 name: Publish to npm
-run-name: Publishing ${{ inputs.release_type || 'stable' }} release
+run-name: Publishing ${{ github.event.inputs.release-type }} release
 
 on:
   workflow_dispatch:
