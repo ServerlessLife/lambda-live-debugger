@@ -47,6 +47,10 @@ export async function getConfigFromCliArgs(
     'Observability mode interval',
     defaultObservableInterval.toString(),
   );
+  program.option(
+    '-a, --approval',
+    'User approval required for AWS infrastructure changes, like adding a Lambda layer',
+  );
   program.option('--config-env <evironment>', 'SAM environment');
   program.option('--sam-config-file <file>', 'SAM configuration file');
   program.option('--sam-template-file <file>', 'SAM template file');
