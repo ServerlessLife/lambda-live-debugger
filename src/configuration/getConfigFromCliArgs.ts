@@ -20,7 +20,7 @@ export async function getConfigFromCliArgs(
   program.name('lld').description('Lambda Live Debugger').version(version);
   program.option(
     '-r, --remove [option]',
-    "Remove Lambda Live Debugger infrastructure. Options: 'keep-layer' (default), 'remove-all'. The latest also removes the Lambda Layer",
+    "Remove Lambda Live Debugger infrastructure. Options: 'keep-layer' (default), 'all'. The latest also removes the Lambda Layer",
     //validateRemoveOption,
     //"keep-layer"
   );
