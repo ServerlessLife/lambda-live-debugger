@@ -18,7 +18,6 @@ function watchForFileChanges(folder: string) {
     persistent: true,
     ignoreInitial: true,
     followSymlinks: false,
-    disableGlobbing: false,
     ignored: [
       '**/node_modules/**',
       '**/.lldebugger/**',
