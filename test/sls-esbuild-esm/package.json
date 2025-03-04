@@ -13,7 +13,7 @@
   "license": "ISC",
   "devDependencies": {
     "esbuild": "^0.25.0",
-    "serverless": "^4.7.0",
+    "serverless": "^3.38.0",
     "serverless-esbuild": "^1.55.0",
     "@types/aws-lambda": "^8.10.147"
   },
