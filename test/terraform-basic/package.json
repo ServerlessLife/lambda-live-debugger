@@ -9,7 +9,7 @@
     "build_test-ts-commonjs": "cd services/testTsCommonJs && npx tsc && cp package.json ./dist && cd ../..",
     "build": "npm run build_test-ts-esmodule && npm run build_test-ts-commonjs",
     "deploy": "npm run build && terraform apply -auto-approve && terraform output -json > terraform-outputs.json",
-    "destroy": "terraform destroy -auto-approve"
+    "destroy": "npm run build && terraform destroy -auto-approve"
   },
   "keywords": [],
   "author": "",
