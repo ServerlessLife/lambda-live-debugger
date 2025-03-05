@@ -8,10 +8,10 @@ export async function removeInfra(
 ) {
   lldProcess?.kill();
 
-  let command = `node ../../dist/lldebugger.mjs --remove ${args?.join(' ')}`;
+  let command = `node ../../dist/lldebugger.mjs --remove -v ${args?.join(' ')}`;
 
   if (process.env.REAL_NPM === 'true') {
-    command = `lld --remove ${args?.join(' ')}`;
+    command = `lld --remove -v ${args?.join(' ')}`;
   }
 
   await execSync(command, {
