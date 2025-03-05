@@ -75,29 +75,29 @@ export async function getConfigFromWizard({
 
       if (cdkAnswers.context && cdkAnswers.context.trim() !== '') {
         answers.context = [cdkAnswers.context.trim()];
-      }
 
-      // more context
-      while (true) {
-        const moreContextAnswers = await inquirer.prompt([
-          {
-            type: 'input',
-            name: 'context',
-            message: 'Would you like to enter more CDK context?',
-            default: oldContext.length > 0 ? oldContext.shift() : undefined,
-          },
-        ]);
+        // more context
+        while (true) {
+          const moreContextAnswers = await inquirer.prompt([
+            {
+              type: 'input',
+              name: 'context',
+              message: 'Would you like to enter more CDK context?',
+              default: oldContext.length > 0 ? oldContext.shift() : undefined,
+            },
+          ]);
 
-        if (
-          moreContextAnswers.context &&
-          moreContextAnswers.context.trim() !== ''
-        ) {
-          answers.context = [
-            ...(answers.context ?? []),
-            moreContextAnswers.context.trim(),
-          ];
-        } else {
-          break;
+          if (
+            moreContextAnswers.context &&
+            moreContextAnswers.context.trim() !== ''
+          ) {
+            answers.context = [
+              ...(answers.context ?? []),
+              moreContextAnswers.context.trim(),
+            ];
+          } else {
+            break;
+          }
         }
       }
     }
