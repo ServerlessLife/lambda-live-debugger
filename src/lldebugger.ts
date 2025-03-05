@@ -131,9 +131,14 @@ async function run() {
           Logger.log('Exiting...');
           return;
         }
-      } catch {
-        // user canceled
-        return;
+      } catch (error: any) {
+        if (error.name === 'ExitPromptError') {
+          // user canceled the prompt
+          Logger.log('Exiting...');
+          return;
+        } else {
+          throw error;
+        }
       }
     }
   }
