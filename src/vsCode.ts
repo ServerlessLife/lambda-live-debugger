@@ -23,7 +23,7 @@ async function getVsCodeLaunchConfig() {
         name: 'Lambda Live Debugger',
         type: 'node',
         request: 'launch',
-        runtimeExecutable: runtimeExecutable,
+        runtimeExecutable: runtimeExecutable!,
         runtimeArgs: [],
         console: 'integratedTerminal',
         skipFiles: ['<node_internals>/**'],

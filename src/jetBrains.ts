@@ -11,8 +11,13 @@ const workspaceXmlPath = path.join(
   'workspace.xml',
 );
 
-async function getWebStormLaunchConfig() {
-  let runtimeExecutable = await getRuntimeExecutableForIde();
+async function getJetBrainsLaunchConfig() {
+  let runtimeExecutable = await getRuntimeExecutableForIde(false);
+
+  if (!runtimeExecutable) {
+    return undefined;
+  }
+
   runtimeExecutable = runtimeExecutable.replace(
     '${workspaceFolder}',
     '$PROJECT_DIR$',
@@ -57,7 +62,7 @@ async function writeWorkspaceXml(filePath: string, json: any) {
     });
     const xmlString = builder.build(json);
     await fs.writeFile(filePath, xmlString, 'utf-8');
-    Logger.verbose(`Updated WebStorm configuration at ${filePath}`);
+    Logger.verbose(`Updated JetBrains IDE configuration at ${filePath}`);
   } catch (err) {
     throw new Error(`Error writing ${filePath}`, { cause: err });
   }
@@ -80,9 +85,16 @@ async function isConfigured() {
 }
 
 async function addConfiguration() {
-  Logger.verbose('Adding WebStorm run/debug configuration');
+  Logger.verbose('Adding JetBrains IDE run/debug configuration');
   const { json } = await readWorkspaceXml(workspaceXmlPath);
-  const config = await getWebStormLaunchConfig();
+  const config = await getJetBrainsLaunchConfig();
+
+  if (!config) {
+    Logger.error(
+      'Cannot find a locally installed Lambda Live Debugger. The JetBrains IDE debugger cannot use a globally installed version.',
+    );
+    return;
+  }
 
   if (!json) {
     // Create new workspace.xml if it does not exist
