@@ -168,7 +168,7 @@ You might want to configure your development tool for debugging. The wizard auto
 
 Now, you have to press F5 or press Run -> Start Debugging, and you can set breakpoints, step through lines of code, inspect variables... For more information on how to [debug in VSCode, please refer to this link](https://code.visualstudio.com/docs/editor/debugging).
 
-For other tools, please send documentation to include here. WebStorm instructions are especially needed.
+The wizard also creates a configuration for JetBrains IDEs, such as WebStorm.
 
 ## Removing
 
