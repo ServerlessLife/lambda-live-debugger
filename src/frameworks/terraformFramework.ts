@@ -73,17 +73,17 @@ export class TerraformFramework implements IFramework {
 
     if (!r) {
       Logger.verbose(
-        `[${this.logName}] This is not a Terraform or OpenTofu project. There are no *.tf files in ${path.resolve('.')} folder.`,
+        `[${this.logName}] This is not a ${this.logName} project. There are no *.tf files in ${path.resolve('.')} folder.`,
       );
       return false;
     } else {
-      // check if terraform is installed
+      // check if Terraform or OpenTofu is installed
       try {
         await execAsync(this.checkInstalledCommand);
         return true;
       } catch {
         Logger.verbose(
-          `[${this.logName}] This is not a ${this.logName} project. Terraform is not installed.`,
+          `[${this.logName}] This is not a ${this.logName} project. ${this.logName} is not installed.`,
         );
         return false;
       }
