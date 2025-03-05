@@ -13,6 +13,10 @@ on:
         description: 'Test monorepo by specifying folder in config'
         type: string
         required: true
+      version:
+        description: 'Specify the version of the package'
+        type: string
+        required: false
 
 permissions:
   id-token: write
@@ -49,12 +53,12 @@ jobs:
       - name: Install lambda-live-debugger globally
         if: ${{ inputs.mode == 'global' }}
         run: |
-          npm i lambda-live-debugger -g
+          npm i lambda-live-debugger@${{ inputs.version || 'latest' }} -g
         working-directory: test
       - name: Install lambda-live-debugger locally
         if: ${{ inputs.mode == 'local' }}
         run: |
-          npm i lambda-live-debugger
+          npm i lambda-live-debugger@${{ inputs.version || 'latest' }}
         working-directory: test
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -98,12 +102,12 @@ jobs:
       - name: Install lambda-live-debugger globally
         if: ${{ inputs.mode == 'global' }}
         run: |
-          npm i lambda-live-debugger -g
+          npm i lambda-live-debugger@${{ inputs.version || 'latest' }} -g
         working-directory: test
       - name: Install lambda-live-debugger locally
         if: ${{ inputs.mode == 'local' }}
         run: |
-          npm i lambda-live-debugger
+          npm i lambda-live-debugger@${{ inputs.version || 'latest' }}
         working-directory: test
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -147,13 +151,13 @@ jobs:
       - name: Install lambda-live-debugger globally
         if: ${{ inputs.mode == 'global' }}
         run: |
-          npm i lambda-live-debugger -g
+          npm i lambda-live-debugger@${{ inputs.version || 'latest' }} -g
           npm i serverless@3.38.0 -g
         working-directory: test
       - name: Install lambda-live-debugger locally
         if: ${{ inputs.mode == 'local' }}
         run: |
-          npm i lambda-live-debugger
+          npm i lambda-live-debugger@${{ inputs.version || 'latest' }}
         working-directory: test
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -197,13 +201,13 @@ jobs:
       - name: Install lambda-live-debugger globally
         if: ${{ inputs.mode == 'global' }}
         run: |
-          npm i lambda-live-debugger -g
+          npm i lambda-live-debugger@${{ inputs.version || 'latest' }} -g
           npm i serverless@3.38.0 -g
         working-directory: test
       - name: Install lambda-live-debugger locally
         if: ${{ inputs.mode == 'local' }}
         run: |
-          npm i lambda-live-debugger
+          npm i lambda-live-debugger@${{ inputs.version || 'latest' }}
         working-directory: test
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -247,13 +251,13 @@ jobs:
       - name: Install lambda-live-debugger globally
         if: ${{ inputs.mode == 'global' }}
         run: |
-          npm i lambda-live-debugger -g
+          npm i lambda-live-debugger@${{ inputs.version || 'latest' }} -g
           npm i serverless@3.38.0 -g
         working-directory: test
       - name: Install lambda-live-debugger locally
         if: ${{ inputs.mode == 'local' }}
         run: |
-          npm i lambda-live-debugger
+          npm i lambda-live-debugger@${{ inputs.version || 'latest' }}
         working-directory: test
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -297,13 +301,13 @@ jobs:
       - name: Install lambda-live-debugger globally
         if: ${{ inputs.mode == 'global' }}
         run: |
-          npm i lambda-live-debugger -g
+          npm i lambda-live-debugger@${{ inputs.version || 'latest' }} -g
           npm i osls@3.46.0 -g
         working-directory: test
       - name: Install lambda-live-debugger locally
         if: ${{ inputs.mode == 'local' }}
         run: |
-          npm i lambda-live-debugger
+          npm i lambda-live-debugger@${{ inputs.version || 'latest' }}
         working-directory: test
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -347,13 +351,13 @@ jobs:
       - name: Install lambda-live-debugger globally
         if: ${{ inputs.mode == 'global' }}
         run: |
-          npm i lambda-live-debugger -g
+          npm i lambda-live-debugger@${{ inputs.version || 'latest' }} -g
           npm i osls@3.46.0 -g
         working-directory: test
       - name: Install lambda-live-debugger locally
         if: ${{ inputs.mode == 'local' }}
         run: |
-          npm i lambda-live-debugger
+          npm i lambda-live-debugger@${{ inputs.version || 'latest' }}
         working-directory: test
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -397,13 +401,13 @@ jobs:
       - name: Install lambda-live-debugger globally
         if: ${{ inputs.mode == 'global' }}
         run: |
-          npm i lambda-live-debugger -g
+          npm i lambda-live-debugger@${{ inputs.version || 'latest' }} -g
           npm i osls@3.46.0 -g
         working-directory: test
       - name: Install lambda-live-debugger locally
         if: ${{ inputs.mode == 'local' }}
         run: |
-          npm i lambda-live-debugger
+          npm i lambda-live-debugger@${{ inputs.version || 'latest' }}
         working-directory: test
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -451,12 +455,12 @@ jobs:
       - name: Install lambda-live-debugger globally
         if: ${{ inputs.mode == 'global' }}
         run: |
-          npm i lambda-live-debugger -g
+          npm i lambda-live-debugger@${{ inputs.version || 'latest' }} -g
         working-directory: test
       - name: Install lambda-live-debugger locally
         if: ${{ inputs.mode == 'local' }}
         run: |
-          npm i lambda-live-debugger
+          npm i lambda-live-debugger@${{ inputs.version || 'latest' }}
         working-directory: test
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -504,12 +508,12 @@ jobs:
       - name: Install lambda-live-debugger globally
         if: ${{ inputs.mode == 'global' }}
         run: |
-          npm i lambda-live-debugger -g
+          npm i lambda-live-debugger@${{ inputs.version || 'latest' }} -g
         working-directory: test
       - name: Install lambda-live-debugger locally
         if: ${{ inputs.mode == 'local' }}
         run: |
-          npm i lambda-live-debugger
+          npm i lambda-live-debugger@${{ inputs.version || 'latest' }}
         working-directory: test
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -553,12 +557,12 @@ jobs:
       - name: Install lambda-live-debugger globally
         if: ${{ inputs.mode == 'global' }}
         run: |
-          npm i lambda-live-debugger -g
+          npm i lambda-live-debugger@${{ inputs.version || 'latest' }} -g
         working-directory: test
       - name: Install lambda-live-debugger locally
         if: ${{ inputs.mode == 'local' }}
         run: |
-          npm i lambda-live-debugger
+          npm i lambda-live-debugger@${{ inputs.version || 'latest' }}
         working-directory: test
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4

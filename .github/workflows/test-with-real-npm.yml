@@ -16,6 +16,10 @@ on:
         description: 'Test monorepo by specifying folder in config'
         type: boolean
         default: false
+      version:
+        description: 'Specify the version of the package'
+        type: string
+        required: true
 
 permissions:
   id-token: write
@@ -27,4 +31,5 @@ jobs:
     with:
       mode: ${{ inputs.mode }}
       testMonorepo: ${{ inputs.testMonorepo }}
+      version: ${{ inputs.version }}
     secrets: inherit
