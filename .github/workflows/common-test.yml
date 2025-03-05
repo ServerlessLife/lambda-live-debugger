@@ -571,7 +571,7 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE }}
           role-session-name: GitHubActions
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
+        uses: hashicorp/setup-terraform@v3
       - name: Terraform Init
         run: |
           ./create_bucket.sh lld-terraform-basic
@@ -588,3 +588,59 @@ jobs:
         run: npx vitest --retry 1 test/terraform-basic.test.ts
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 1 test/terraform-basic.test.ts
+
+  test-opentofu-basic:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: test-opentofu-basic
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.node_version }}
+          registry-url: 'https://registry.npmjs.org'
+      - name: Install dependencies
+        run: |
+          node prepareForTest.js opentofu-basic
+          npm i
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        if: ${{ inputs.mode == 'build' }}
+        with:
+          name: dist
+          path: dist
+      - name: Install lambda-live-debugger globally
+        if: ${{ inputs.mode == 'global' }}
+        run: |
+          npm i lambda-live-debugger -g
+        working-directory: test
+      - name: Install lambda-live-debugger locally
+        if: ${{ inputs.mode == 'local' }}
+        run: |
+          npm i lambda-live-debugger
+        working-directory: test
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-west-1
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: GitHubActions
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v1
+      - name: OpenTofu Init
+        run: |
+          ./create_bucket.sh lld-opentofu-basic
+          tofu init -backend-config="bucket=lld-opentofu-basic"
+        working-directory: test/opentofu-basic
+      - name: Destroy
+        run: npm run destroy
+        working-directory: test/opentofu-basic
+        continue-on-error: true
+      - name: Deploy
+        run: npm run deploy
+        working-directory: test/opentofu-basic
+      - name: Test
+        run: npx vitest --retry 1 test/opentofu-basic.test.ts
+      - name: Test - observability mode
+        run: OBSERVABLE_MODE=true npx vitest --retry 1 test/opentofu-basic.test.ts

@@ -12,19 +12,21 @@ import { LldConfigBase } from '../types/lldConfig.js';
 
 export const execAsync = promisify(exec);
 
-interface TerraformState {
-  resources: Array<{
-    type: string;
-    name: string;
-    values: {
-      function_name?: string;
-      handler?: string;
-      source_dir?: string;
-      source_file?: string;
+interface TerraformResource {
+  type: string;
+  name: string;
+  address: string;
+  values: {
+    function_name?: string;
+    handler?: string;
+    source_dir?: string;
+    source_file?: string;
+    query?: {
+      source_path?: string;
     };
-    //dependencies > depends_on
-    depends_on: Array<string>;
-  }>;
+  };
+  //dependencies > depends_on
+  depends_on: Array<string>;
 }
 
 /**
@@ -39,6 +41,28 @@ export class TerraformFramework implements IFramework {
   }
 
   /**
+   * Name of the framework in logs
+   */
+  protected get logName(): string {
+    return 'Terrform';
+  }
+
+  /**
+   * Get Terraform state CI command
+   */
+  protected get stateCommand(): string {
+    return 'terraform show --json';
+  }
+
+  /**
+   *
+   * @returns Get command to check if Terraform is installed
+   */
+  protected get checkInstalledCommand(): string {
+    return 'terraform --version';
+  }
+
+  /**
    * Can this class handle the current project
    * @returns
    */
@@ -49,11 +73,21 @@ export class TerraformFramework implements IFramework {
 
     if (!r) {
       Logger.verbose(
-        `[Terraform] This is not a Terraform project. There are no *.tf files in ${path.resolve('.')} folder.`,
+        `[${this.logName}] This is not a ${this.logName} project. There are no *.tf files in ${path.resolve('.')} folder.`,
       );
+      return false;
+    } else {
+      // check if Terraform or OpenTofu is installed
+      try {
+        await execAsync(this.checkInstalledCommand);
+        return true;
+      } catch {
+        Logger.verbose(
+          `[${this.logName}] This is not a ${this.logName} project. ${this.logName} is not installed.`,
+        );
+        return false;
+      }
     }
-
-    return r;
   }
 
   /**
@@ -67,7 +101,7 @@ export class TerraformFramework implements IFramework {
     const lambdas = this.extractLambdaInfo(state);
 
     Logger.verbose(
-      '[Terraform] Found Lambdas:',
+      `[${this.logName}] Found Lambdas:`,
       JSON.stringify(lambdas, null, 2),
     );
 
@@ -76,7 +110,7 @@ export class TerraformFramework implements IFramework {
     const tsOutDir = await this.getTsConfigOutDir();
 
     if (tsOutDir) {
-      Logger.verbose('[Terraform] tsOutDir:', tsOutDir);
+      Logger.verbose(`[${this.logName}] tsOutDir:`, tsOutDir);
     }
 
     for (const func of lambdas) {
@@ -141,7 +175,7 @@ export class TerraformFramework implements IFramework {
         packageJsonPath,
         esBuildOptions: undefined,
         metadata: {
-          framework: 'terraform',
+          framework: this.name,
         },
       };
 
@@ -151,7 +185,7 @@ export class TerraformFramework implements IFramework {
     return lambdasDiscovered;
   }
 
-  protected extractLambdaInfo(state: TerraformState) {
+  protected extractLambdaInfo(resources: TerraformResource[]) {
     const lambdas: Array<{
       functionName: string;
       sourceDir?: string;
@@ -159,10 +193,10 @@ export class TerraformFramework implements IFramework {
       handler: string;
     }> = [];
 
-    for (const resource of state.resources) {
+    for (const resource of resources) {
       if (resource.type === 'aws_lambda_function') {
         Logger.verbose(
-          '[Terraform] Found Lambda:',
+          `[${this.logName}] Found Lambda:`,
           JSON.stringify(resource, null, 2),
         );
 
@@ -186,14 +220,34 @@ export class TerraformFramework implements IFramework {
         if (archiveFileResourceName) {
           // get the resource
           const name = archiveFileResourceName.split('.')[2];
-          const archiveFileResource = state.resources.find(
-            (r) => r.name === name,
-          );
+          const archiveFileResource = resources.find((r) => r.name === name);
 
           // get source_dir or source_filename
           if (archiveFileResource) {
             sourceDir = archiveFileResource.values.source_dir;
             sourceFilename = archiveFileResource.values.source_file;
+          }
+        }
+
+        // get dependency "archive_prepare" = serverless.tf support
+        const archivePrepareResourceName = dependencies.find((dep) =>
+          dep.includes('.archive_prepare'),
+        );
+
+        if (archivePrepareResourceName) {
+          // get the resource
+          const name = archivePrepareResourceName;
+          const archivePrepareResource = resources.find((r) =>
+            r.address?.startsWith(name),
+          );
+
+          // get source_dir or source_filename
+          if (archivePrepareResource) {
+            sourceDir =
+              archivePrepareResource.values.query?.source_path?.replaceAll(
+                '"',
+                '',
+              );
           }
         }
 
@@ -213,54 +267,66 @@ export class TerraformFramework implements IFramework {
     return lambdas;
   }
 
-  protected async readTerraformState(): Promise<TerraformState> {
+  protected async readTerraformState(): Promise<TerraformResource[]> {
     // Is there a better way to get the Terraform state???
 
     let output: any;
 
     // get state by running "terraform show --json" command
     try {
-      output = await execAsync('terraform show --json');
+      Logger.verbose(
+        `[${this.logName}] Getting state with '${this.stateCommand}' command`,
+      );
+      output = await execAsync(this.stateCommand);
     } catch (error: any) {
       throw new Error(
-        `Failed to get Terraform state from 'terraform show --json' command: ${error.message}`,
+        `[${this.logName}] Failed to getstate from '${this.stateCommand}' command: ${error.message}`,
         { cause: error },
       );
     }
 
     if (output.stderr) {
       throw new Error(
-        `Failed to get Terraform state from 'terraform show --json' command: ${output.stderr}`,
+        `[${this.logName}] Failed to get state from '${this.stateCommand}' command: ${output.stderr}`,
       );
     }
 
     if (!output.stdout) {
       throw new Error(
-        "Failed to get Terraform state from 'terraform show --json' command",
+        `[${this.logName}] Failed to get state from '${this.stateCommand}' command`,
       );
     }
 
     let jsonString: string | undefined = output.stdout;
 
-    Logger.verbose('Terraform state:', jsonString);
+    Logger.verbose(`[${this.logName}] State:`, jsonString);
 
     jsonString = jsonString?.split('\n').find((line) => line.startsWith('{'));
 
     if (!jsonString) {
       throw new Error(
-        'Failed to get Terraform state. JSON string not found in the output.',
+        `[${this.logName}] Failed to get state. JSON string not found in the output.`,
       );
     }
 
     try {
       const state = JSON.parse(jsonString);
-      return state.values.root_module as TerraformState;
+
+      const rootResources: TerraformResource[] =
+        state.values?.root_module?.resources ?? [];
+
+      const childResources: TerraformResource[] =
+        state.values?.root_module?.child_modules
+          ?.map((m: any) => m.resources)
+          .flat() ?? [];
+
+      return [...rootResources, ...childResources] as TerraformResource[];
     } catch (error: any) {
       //save state to file
-      await fs.writeFile('terraform-state.json', jsonString);
-      Logger.error('Failed to parse Terraform state JSON:', error);
+      await fs.writeFile(`${this.name}-state.json`, jsonString);
+      Logger.error(`[${this.logName}] Failed to parse state JSON:`, error);
       throw new Error(
-        `Failed to parse Terraform state JSON: ${error.message}`,
+        `Failed to parse ${this.logName} state JSON: ${error.message}`,
         { cause: error },
       );
     }
@@ -283,11 +349,11 @@ export class TerraformFramework implements IFramework {
       }
     }
     if (!tsConfigPath) {
-      Logger.verbose('[Terraform] tsconfig.json not found');
+      Logger.verbose(`[${this.logName}] tsconfig.json not found`);
       return undefined;
     }
 
-    Logger.verbose('[Terraform] tsconfig.json found:', tsConfigPath);
+    Logger.verbose(`[${this.logName}] tsconfig.json found:`, tsConfigPath);
     const configFile = ts.readConfigFile(tsConfigPath, ts.sys.readFile);
     const compilerOptions = ts.parseJsonConfigFileContent(
       configFile.config,

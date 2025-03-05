@@ -9,7 +9,7 @@ It supports the following frameworks:
 - AWS CDK v2
 - Serverless Framework v3 (SLS) and [`osls` fork](https://github.com/oss-serverless/serverless)
 - AWS Serverless Application Model (SAM)
-- Terraform
+- Terraform and OpenTofu
 - Any other framework or setup by implementing a simple function in TypeScript
 - ... (Need support for another framework? Let me know!)
 
@@ -211,11 +211,13 @@ Use the `stage` parameter to pass the stage/environment name.
 
 Use the `config-env` parameter to pass the stage/environment name.
 
-### Terraform
+### Terraform and OpenTofu
 
-Only the basic setup is supported. Check the [test case](https://github.com/ServerlessLife/lambda-live-debugger/tree/main/test/terraform-basic).
+Multiple configurations are supported, including [serverless.tf](https://serverless.tf/) framework. You can explore [relevant test cases here](https://github.com/ServerlessLife/lambda-live-debugger/tree/main/test/terraform-basic).
 
-I am not a Terraform developer, so I only know the basics. Please provide a sample project so I can build better support.
+If you use TypeScript, Lambda Live Debugger should automatically locate source files, even when they are transpiled to JavaScript.
+
+If you encounter an unsupported configuration, please open a [GitHub Issue](https://github.com/ServerlessLife/lambda-live-debugger/issues).
 
 ### Custom Setup
 

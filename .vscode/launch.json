@@ -262,6 +262,26 @@
       "cwd": "${workspaceRoot}/test/terraform-basic"
     },
     {
+      "name": "LLDebugger - OpenTofu basic",
+      "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
+      "args": ["../../src/lldebugger.ts", "--config-env=test"],
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal",
+      "type": "node",
+      "cwd": "${workspaceRoot}/test/opentofu-basic"
+    },
+    {
+      "name": "LLDebugger - OpenTofu basic - observability",
+      "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
+      "args": ["../../src/lldebugger.ts", "--config-env=test", "-o"],
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal",
+      "type": "node",
+      "cwd": "${workspaceRoot}/test/opentofu-basic"
+    },
+    {
       "name": "LLDebugger - CDK config",
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": ["../../src/lldebugger.ts", "-w"],
