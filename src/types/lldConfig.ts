@@ -78,6 +78,7 @@ export type LldConfigBase = {
 export type LldConfigCliArgs = {
   remove?: 'keep-layer' | 'all';
   vscode?: boolean;
+  jetbrains?: boolean;
   gitignore?: boolean;
   config?: string;
   wizard?: boolean;
