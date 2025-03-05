@@ -38,4 +38,5 @@ response.json
 dist
 builds
 .terraform.lock.hcl
+.terraform
 opentofu-outputs.json
