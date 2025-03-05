@@ -101,7 +101,7 @@ The configuration is saved to `lldebugger.config.ts`.
 
 ```
  -V, --version                   output the version number
- -r, --remove [option]           Remove Lambda Live Debugger infrastructure. Options: 'keep-layer' (default), 'remove-all'. The latest also removes the Lambda Layer
+ -r, --remove [option]           Remove Lambda Live Debugger infrastructure. Options: 'keep-layer' (default), 'all'. The latest also removes the Lambda Layer
  -w, --wizard                    Program interactively asks for each parameter and saves it to lldebugger.config.ts
  -v, --verbose                   Verbose logging
  -c, --context <context>         AWS CDK context (default: [])
@@ -110,6 +110,7 @@ The configuration is saved to `lldebugger.config.ts`.
  -m, --subfolder <subfolder>     Monorepo subfolder
  -o, --observable                Observability mode
  -i --interval <interval>        Observability mode interval (default: "3000")
+ -a --approval                   User approval required for AWS infrastructure changes, like adding a Lambda layer
  --config-env <evironment>       SAM environment
  --sam-config-file <file>        SAM configuration file
  --sam-template-file <file>      SAM template file

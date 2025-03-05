@@ -20,7 +20,7 @@ export async function getConfigFromCliArgs(
   program.name('lld').description('Lambda Live Debugger').version(version);
   program.option(
     '-r, --remove [option]',
-    "Remove Lambda Live Debugger infrastructure. Options: 'keep-layer' (default), 'remove-all'. The latest also removes the Lambda Layer",
+    "Remove Lambda Live Debugger infrastructure. Options: 'keep-layer' (default), 'all'. The latest also removes the Lambda Layer",
     //validateRemoveOption,
     //"keep-layer"
   );
@@ -46,6 +46,10 @@ export async function getConfigFromCliArgs(
     '-i --interval <interval>',
     'Observability mode interval',
     defaultObservableInterval.toString(),
+  );
+  program.option(
+    '-a, --approval',
+    'User approval required for AWS infrastructure changes, like adding a Lambda layer',
   );
   program.option('--config-env <evironment>', 'SAM environment');
   program.option('--sam-config-file <file>', 'SAM configuration file');

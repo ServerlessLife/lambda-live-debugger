@@ -16,6 +16,7 @@ import fs from 'fs/promises';
 import { Logger } from './logger.js';
 import { getModuleDirname, getProjectDirname } from './getDirname.js';
 import { LambdaConnection } from './lambdaConnection.js';
+import inquirer from 'inquirer';
 
 /**
  * Start the Lambda Live Debugger
@@ -90,6 +91,56 @@ async function run() {
   if (!Configuration.getLambdas().length) {
     Logger.error('No Lambdas found. Exiting...');
     return;
+  }
+
+  if (Configuration.config.approval === true) {
+    const changes = await InfraDeploy.getPlanedInfrastructureChanges();
+
+    if (
+      !changes.deployLayer &&
+      !changes.lambdasToUpdate.length &&
+      !changes.rolesToUpdate.length
+    ) {
+      Logger.verbose('No infrastructure changes required.');
+    } else {
+      // list all changes and ask for approval
+      try {
+        const confirn = await inquirer.prompt([
+          {
+            type: 'confirm',
+            name: 'approval',
+            message: `\nThe following changes will be applied to your AWS account:${
+              (changes.deployLayer
+                ? `\n - Deploy Lambda Live Debugger layer version ${version}`
+                : '') +
+              (changes.lambdasToUpdate.length
+                ? `\n - Attach the layer and add environment variables to the Lambdas:\n${changes.lambdasToUpdate
+                    .map((l) => `   - ${l}`)
+                    .join('\n')}`
+                : '') +
+              (changes.rolesToUpdate.length
+                ? `\n - Add IoT permissions to IAM Roles:\n${changes.rolesToUpdate
+                    .map((r) => `   - ${r}`)
+                    .join('\n')}`
+                : '')
+            }\n\nDo you want to continue?`,
+          },
+        ]);
+
+        if (!confirn.approval) {
+          Logger.log('Exiting...');
+          return;
+        }
+      } catch (error: any) {
+        if (error.name === 'ExitPromptError') {
+          // user canceled the prompt
+          Logger.log('Exiting...');
+          return;
+        } else {
+          throw error;
+        }
+      }
+    }
   }
 
   await InfraDeploy.deployInfrastructure();

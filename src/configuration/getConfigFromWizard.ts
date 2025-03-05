@@ -199,6 +199,19 @@ export async function getConfigFromWizard({
     };
   }
 
+  // do you want to manually approve AWS infrastructure changes?
+  const answersApproval = await inquirer.prompt([
+    {
+      type: 'confirm',
+      name: 'approval',
+      message:
+        'Before debugging, do you want to review and manually approve AWS infrastructure changes, like adding a Lambda layer?',
+      default: currentConfig?.approval === true,
+    },
+  ]);
+
+  answers = { ...answers, ...answersApproval };
+
   const answersAws = await inquirer.prompt([
     {
       type: 'input',
@@ -388,6 +401,8 @@ export default {
   observable: ${config.observable},
   // Observable mode interval
   interval: ${config.interval === defaultObservableInterval ? undefined : config.interval},
+  // Approval required for AWS infrastructure changes
+  approval: ${config.approval},
   // Verbose logging
   verbose: ${config.verbose},
   // Modify Lambda function list or support custom framework
@@ -434,6 +449,7 @@ function getConfigFromAnswers(answers: any): LldConfigCliArgs {
       answers.interval !== undefined
         ? answers.interval
         : defaultObservableInterval,
+    approval: answers.approval,
     verbose: answers.verbose,
     interactive: answers.interactive,
     gitignore: answers.gitignore,
