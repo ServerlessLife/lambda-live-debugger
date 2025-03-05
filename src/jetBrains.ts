@@ -91,7 +91,7 @@ async function addConfiguration() {
 
   if (!config) {
     Logger.error(
-      'Cannot find a locally installed Lambda Live Debugger. The JetBrains IDE debugger cannot use a globally installed version.',
+      'Failed to configure JetBrains IDE. Cannot find a locally installed Lambda Live Debugger. The JetBrains IDE debugger cannot use a globally installed version.',
     );
     return;
   }
