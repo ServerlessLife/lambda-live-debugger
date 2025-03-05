@@ -81,10 +81,9 @@ export class TerraformFramework implements IFramework {
       try {
         await execAsync(this.checkInstalledCommand);
         return true;
-      } catch (error: any) {
+      } catch {
         Logger.verbose(
           `[${this.logName}] This is not a ${this.logName} project. Terraform is not installed.`,
-          { cause: error },
         );
         return false;
       }
