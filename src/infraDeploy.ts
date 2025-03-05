@@ -20,6 +20,7 @@ import { Configuration } from './configuration.js';
 import { AwsCredentials } from './awsCredentials.js';
 import { getModuleDirname } from './getDirname.js';
 import { Logger } from './logger.js';
+import * as crypto from 'crypto';
 
 let lambdaClient: LambdaClient | undefined;
 let iamClient: IAMClient | undefined;
@@ -27,6 +28,7 @@ let iamClient: IAMClient | undefined;
 const inlinePolicyName = 'LambdaLiveDebuggerPolicy';
 const layerName = 'LambdaLiveDebugger';
 const lldWrapperPath = '/opt/lld-wrapper';
+let layerDescription: string | undefined;
 
 /**
  * Policy document to attach to the Lambda role
@@ -118,7 +120,16 @@ async function findExistingLayerVersion() {
  * @returns
  */
 async function getLayerDescription() {
-  return `Lambda Live Debugger Layer version ${await getVersion()}`;
+  if (!layerDescription) {
+    layerDescription = `Lambda Live Debugger Layer version ${await getVersion()}`;
+  }
+
+  if ((await getVersion()) === '0.0.1') {
+    // add a random string to the description to make it unique
+    layerDescription = `Lambda Live Debugger Layer - development ${crypto.randomUUID()}`;
+  }
+
+  return layerDescription;
 }
 
 /**
@@ -131,20 +142,8 @@ async function deployLayer() {
   // Check if the layer already exists
   const existingLayer = await findExistingLayerVersion();
   if (existingLayer && existingLayer.LayerVersionArn) {
-    // delete existing layer when developing
-    if ((await getVersion()) === '0.0.1') {
-      Logger.verbose(
-        'Deleting existing layer version, because it is a development mode.',
-      );
-      const deleteLayerVersionCommand = new DeleteLayerVersionCommand({
-        LayerName: layerName,
-        VersionNumber: existingLayer.Version,
-      });
-      await getLambdaClient().send(deleteLayerVersionCommand);
-    } else {
-      Logger.verbose(`${layerDescription} already deployed.`);
-      return existingLayer.LayerVersionArn;
-    }
+    Logger.verbose(`${layerDescription} already deployed.`);
+    return existingLayer.LayerVersionArn;
   }
 
   // check the ZIP
