@@ -104,31 +104,41 @@ async function run() {
       Logger.verbose('No infrastructure changes required.');
     } else {
       // list all changes and ask for approval
-      const confirn = await inquirer.prompt([
-        {
-          type: 'confirm',
-          name: 'approval',
-          message: `\nThe following changes will be applied to your AWS account:${
-            (changes.deployLayer
-              ? '\n - Deploy Lambda Live Debugger layer'
-              : '') +
-            (changes.lambdasToUpdate.length
-              ? `\n - Attach the layer and add environment variables to the Lambdas:\n${changes.lambdasToUpdate
-                  .map((l) => `   - ${l}`)
-                  .join('\n')}`
-              : '') +
-            (changes.rolesToUpdate.length
-              ? `\n - Add IoT permissions to IAM Roles:\n${changes.rolesToUpdate
-                  .map((r) => `   - ${r}`)
-                  .join('\n')}`
-              : '')
-          }\n\nDo you want to continue?`,
-        },
-      ]);
+      try {
+        const confirn = await inquirer.prompt([
+          {
+            type: 'confirm',
+            name: 'approval',
+            message: `\nThe following changes will be applied to your AWS account:${
+              (changes.deployLayer
+                ? `\n - Deploy Lambda Live Debugger layer version ${version}`
+                : '') +
+              (changes.lambdasToUpdate.length
+                ? `\n - Attach the layer and add environment variables to the Lambdas:\n${changes.lambdasToUpdate
+                    .map((l) => `   - ${l}`)
+                    .join('\n')}`
+                : '') +
+              (changes.rolesToUpdate.length
+                ? `\n - Add IoT permissions to IAM Roles:\n${changes.rolesToUpdate
+                    .map((r) => `   - ${r}`)
+                    .join('\n')}`
+                : '')
+            }\n\nDo you want to continue?`,
+          },
+        ]);
 
-      if (!confirn.approval) {
-        Logger.log('Exiting...');
-        return;
+        if (!confirn.approval) {
+          Logger.log('Exiting...');
+          return;
+        }
+      } catch (error: any) {
+        if (error.name === 'ExitPromptError') {
+          // user canceled the prompt
+          Logger.log('Exiting...');
+          return;
+        } else {
+          throw error;
+        }
       }
     }
   }
