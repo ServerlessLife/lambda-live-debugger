@@ -17,6 +17,7 @@ import { Logger } from './logger.js';
 import { getModuleDirname, getProjectDirname } from './getDirname.js';
 import { LambdaConnection } from './lambdaConnection.js';
 import inquirer from 'inquirer';
+import { JetBrains } from './jetBrains.js';
 
 /**
  * Start the Lambda Live Debugger
@@ -44,6 +45,10 @@ async function run() {
 
   if (Configuration.config.vscode) {
     await VsCode.addConfiguration();
+  }
+
+  if (Configuration.config.jetbrains) {
+    await JetBrains.addConfiguration();
   }
 
   if (!Configuration.config.start && !Configuration.config.remove) {

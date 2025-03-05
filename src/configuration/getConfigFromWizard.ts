@@ -17,6 +17,7 @@ import { GitIgnore } from '../gitignore.js';
 import { VsCode } from '../vsCode.js';
 import { Logger } from '../logger.js';
 import { Configuration } from '../configuration.js';
+import { JetBrains } from '../jetBrains.js';
 
 const configFileName = path.resolve(configFileDefaultName);
 
@@ -335,6 +336,19 @@ export async function getConfigFromWizard({
         answers.vscode = answersVsCode.vscode;
       }
 
+      if (!(await JetBrains.isConfigured())) {
+        const answersJetBrains = await inquirer.prompt([
+          {
+            type: 'confirm',
+            name: 'jetbrains',
+            message: `Would you like to add configuration for JetBrains IDE, like WebStorm?`,
+            default: false,
+          },
+        ]);
+
+        answers.jetbrains = answersJetBrains.jetbrains;
+      }
+
       const answersVerbose = await inquirer.prompt([
         {
           type: 'confirm',
@@ -464,6 +478,7 @@ function getConfigFromAnswers(answers: any): LldConfigCliArgs {
     interactive: answers.interactive,
     gitignore: answers.gitignore,
     vscode: answers.vscode,
+    jetbrains: answers.jetbrains,
   };
 
   //remove undefined and empty strings
