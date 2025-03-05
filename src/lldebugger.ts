@@ -110,7 +110,7 @@ async function run() {
           name: 'approval',
           message: `\nThe following changes will be applied to your AWS account:${
             (changes.deployLayer
-              ? '\n - Deploy Lambda Live Debugger layer'
+              ? `\n - Deploy Lambda Live Debugger layer version ${version}`
               : '') +
             (changes.lambdasToUpdate.length
               ? `\n - Attach the layer and add environment variables to the Lambdas:\n${changes.lambdasToUpdate
