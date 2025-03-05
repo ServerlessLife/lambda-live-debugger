@@ -15,7 +15,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.137"
+    "@types/aws-lambda": "^8.10.147"
   },
   "dependencies": {
     "@aws-sdk/client-sts": "^3.758.0"
