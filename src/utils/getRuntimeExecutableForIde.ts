@@ -16,11 +16,17 @@ async function findGlobalPackagePath(packageName: string) {
         : `which ${packageName}`;
     const { stdout } = await execAsync(command);
 
+    Logger.verbose(
+      `Searching for ${packageName} globally. Executed command: ${command}. Output: ${stdout}`,
+    );
+
     const path = stdout?.trim().split('\n')[0];
+
     if (path) {
       console.log(
         `Global installation path for ${packageName}: ${path.trim()}`,
       );
+      return path;
     }
     return undefined;
   } catch (error) {
