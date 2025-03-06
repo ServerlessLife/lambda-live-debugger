@@ -5,6 +5,8 @@ import { getProjectDirname } from './getDirname.js';
 import { Logger } from './logger.js';
 import { getRuntimeExecutableForIde } from './utils/getRuntimeExecutableForIde.js';
 
+const configName = 'Lambda Live Debugger';
+
 const workspaceXmlPath = path.join(
   getProjectDirname(),
   '.idea',
@@ -69,58 +71,81 @@ async function writeWorkspaceXml(filePath: string, json: any) {
 }
 
 async function isConfigured() {
-  const { json } = await readWorkspaceXml(workspaceXmlPath);
-  if (!json) return false;
+  try {
+    const { json } = await readWorkspaceXml(workspaceXmlPath);
+    if (!json) return false;
 
-  const components = Array.isArray(json.project?.component)
-    ? json.project.component
-    : [json.project?.component];
-  const runManager = components.find((c: any) => c['@_name'] === 'RunManager');
-  if (!runManager) return false;
-
-  const configurations = runManager.configuration || [];
-  return configurations.some(
-    (c: any) => c['@_name'] === 'Lambda Live Debugger',
-  );
+    const { lldConfigExists } = extractWorkspaceData(json);
+    return lldConfigExists;
+  } catch (err) {
+    Logger.error('Error checking JetBrains IDE configuration', err);
+    return true;
+  }
 }
 
 async function addConfiguration() {
-  Logger.verbose('Adding JetBrains IDE run/debug configuration');
-  const { json } = await readWorkspaceXml(workspaceXmlPath);
-  const config = await getJetBrainsLaunchConfig();
+  try {
+    Logger.verbose('Adding JetBrains IDE run/debug configuration');
+    const { json } = await readWorkspaceXml(workspaceXmlPath);
+    const config = await getJetBrainsLaunchConfig();
 
-  if (!config) {
-    Logger.error(
-      'Failed to configure JetBrains IDE. Cannot find a locally installed Lambda Live Debugger. The JetBrains IDE debugger cannot use a globally installed version.',
-    );
-    return;
-  }
+    if (!config) {
+      Logger.error(
+        'Failed to configure JetBrains IDE. Cannot find a locally installed Lambda Live Debugger. The JetBrains IDE debugger cannot use a globally installed version.',
+      );
+      return;
+    }
 
-  if (!json) {
-    // Create new workspace.xml if it does not exist
-    const newJson = {
-      '?xml': { '@_version': '1.0', '@_encoding': 'UTF-8' },
-      project: {
-        '@_version': '4',
-        component: {
-          '@_name': 'RunManager',
-          configuration: [config.configuration],
+    if (!json) {
+      // Create new workspace.xml if it does not exist
+      const newJson = {
+        '?xml': { '@_version': '1.0', '@_encoding': 'UTF-8' },
+        project: {
+          '@_version': '4',
+          component: {
+            '@_name': 'RunManager',
+            configuration: [config.configuration],
+          },
         },
-      },
-    };
-    await fs.mkdir(path.dirname(workspaceXmlPath), { recursive: true });
-    await writeWorkspaceXml(workspaceXmlPath, newJson);
-    return;
+      };
+      await fs.mkdir(path.dirname(workspaceXmlPath), { recursive: true });
+      await writeWorkspaceXml(workspaceXmlPath, newJson);
+      return;
+    }
+
+    const { lldConfigExists, components, runManager, configurations } =
+      extractWorkspaceData(json);
+    json.project.component = components;
+
+    if (!lldConfigExists) {
+      Logger.verbose('Adding new configuration to workspace.xml');
+      runManager.configuration = [...configurations, config.configuration];
+      await writeWorkspaceXml(workspaceXmlPath, json);
+    } else {
+      Logger.verbose('Configuration already exists in workspace.xml');
+    }
+  } catch (err) {
+    Logger.error('Error adding JetBrains IDE configuration', err);
+  }
+}
+
+/**
+ * Extract workspace data from JetBrains IDE configuration
+ * @param json
+ * @returns
+ */
+function extractWorkspaceData(json: any) {
+  let components = json.project.component;
+  if (!Array.isArray(components)) {
+    components = [components];
   }
 
-  let runManager = json.project.component.find(
-    (c: any) => c['@_name'] === 'RunManager',
-  );
+  let runManager = components.find((c: any) => c['@_name'] === 'RunManager');
 
   if (!runManager) {
     Logger.verbose('RunManager not found, creating new RunManager component');
     runManager = { '@_name': 'RunManager', configuration: [] };
-    json.project.component.push(runManager);
+    components.push(runManager);
   }
 
   let configurations;
@@ -132,16 +157,10 @@ async function addConfiguration() {
     configurations = runManager.configuration;
   }
 
-  const exists = configurations.some(
-    (c: any) => c['@_name'] === config.configuration['@_name'],
+  const lldConfigExists = configurations.some(
+    (c: any) => c['@_name'] === configName,
   );
-  if (!exists) {
-    Logger.verbose('Adding new configuration to workspace.xml');
-    runManager.configuration = [...configurations, config.configuration];
-    await writeWorkspaceXml(workspaceXmlPath, json);
-  } else {
-    Logger.verbose('Configuration already exists in workspace.xml');
-  }
+  return { lldConfigExists, runManager, configurations, components };
 }
 
 export const JetBrains = {

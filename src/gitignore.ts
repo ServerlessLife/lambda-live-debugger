@@ -14,7 +14,7 @@ async function doesExistInGitIgnore() {
       'utf-8',
     );
     // split by new line
-    const lines = gitignoreContent.split('\n');
+    const lines = gitignoreContent.split('\n').map((line) => line.trim());
     // check if ".lldebugger" exists
     const exists = lines.includes(outputFolder);
     return exists;
@@ -37,20 +37,24 @@ function getGitIgnoreFileLocation() {
  */
 async function addToGitIgnore() {
   Logger.log(`Adding ${outputFolder} to .gitignore.`);
-  const exists = await doesExistInGitIgnore();
-  if (!exists) {
-    // does file exist?
-    try {
-      await fs.access(getGitIgnoreFileLocation());
-    } catch {
-      await fs.writeFile(getGitIgnoreFileLocation(), `${outputFolder}\n`);
-      return;
-    }
+  try {
+    const exists = await doesExistInGitIgnore();
+    if (!exists) {
+      // does file exist?
+      try {
+        await fs.access(getGitIgnoreFileLocation());
+      } catch {
+        await fs.writeFile(getGitIgnoreFileLocation(), `${outputFolder}\n`);
+        return;
+      }
 
-    // append to existing file
-    await fs.appendFile(getGitIgnoreFileLocation(), `\n${outputFolder}\n`);
-  } else {
-    Logger.log(`${outputFolder} already exists in .gitignore`);
+      // append to existing file
+      await fs.appendFile(getGitIgnoreFileLocation(), `\n${outputFolder}\n`);
+    } else {
+      Logger.log(`${outputFolder} already exists in .gitignore`);
+    }
+  } catch (err) {
+    Logger.error('Error adding to .gitignore', err);
   }
 }
 

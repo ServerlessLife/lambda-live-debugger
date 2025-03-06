@@ -150,40 +150,52 @@ async function getCurrentState(): Promise<
 }
 
 async function isConfigured() {
-  const state = await getCurrentState();
+  try {
+    const state = await getCurrentState();
 
-  if (state.state === 'FILE_EXISTS_CONFIGURATION_EXISTS') {
+    if (state.state === 'FILE_EXISTS_CONFIGURATION_EXISTS') {
+      return true;
+    }
+
+    return false;
+  } catch (err) {
+    Logger.error(
+      'Error checking if configuration exists in .vscode/launch.json',
+      err,
+    );
     return true;
   }
-
-  return false;
 }
 
 async function addConfiguration() {
-  Logger.log('Adding configuration to .vscode/launch.json');
-  const state = await getCurrentState();
+  try {
+    Logger.log('Adding configuration to .vscode/launch.json');
+    const state = await getCurrentState();
 
-  const config = await getVsCodeLaunchConfig();
+    const config = await getVsCodeLaunchConfig();
 
-  if (state.state === 'FILE_EXISTS_CONFIGURATION_DOES_NOT_EXIST') {
-    const { jsonString, filePath, configurationsLength } = state;
+    if (state.state === 'FILE_EXISTS_CONFIGURATION_DOES_NOT_EXIST') {
+      const { jsonString, filePath, configurationsLength } = state;
 
-    await writeConfiguration(
-      filePath,
-      jsonString,
-      config.configurations![0],
-      configurationsLength,
-    );
-  } else if (state.state === 'FILE_DOES_NOT_EXIST') {
-    // crete folder of filePath recursive if not exists
-    await fs.mkdir(path.dirname(state.filePath), { recursive: true });
+      await writeConfiguration(
+        filePath,
+        jsonString,
+        config.configurations![0],
+        configurationsLength,
+      );
+    } else if (state.state === 'FILE_DOES_NOT_EXIST') {
+      // crete folder of filePath recursive if not exists
+      await fs.mkdir(path.dirname(state.filePath), { recursive: true });
 
-    Logger.verbose(`Creating VsCode configuration file: ${state.filePath}`);
-    await fs.writeFile(
-      state.filePath,
-      JSON.stringify(config, null, 2),
-      'utf-8',
-    );
+      Logger.verbose(`Creating VsCode configuration file: ${state.filePath}`);
+      await fs.writeFile(
+        state.filePath,
+        JSON.stringify(config, null, 2),
+        'utf-8',
+      );
+    }
+  } catch (err) {
+    Logger.error('Error adding configuration to .vscode/launch.json', err);
   }
 }
 
