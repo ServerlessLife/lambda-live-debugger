@@ -50,7 +50,6 @@ export async function getRuntimeExecutableForIde(allowGlobal = true) {
   );
 
   //if installed locally
-  Logger.verbose('Lambda Live Debugger is installed locally');
   try {
     Logger.verbose(
       'Checking local folder for runtimeExecutable setting for VsCode configuration',
@@ -58,6 +57,7 @@ export async function getRuntimeExecutableForIde(allowGlobal = true) {
     );
     await fs.access(localFolder, fs.constants.F_OK);
     runtimeExecutable = localRuntimeExecutable;
+    Logger.verbose('Lambda Live Debugger is installed locally');
   } catch {
     // Not found
   }
