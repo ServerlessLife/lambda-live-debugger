@@ -9,11 +9,12 @@ import {
   FormattingOptions,
 } from 'jsonc-parser';
 import { VsCodeLaunch } from './types/vsCodeConfig.js';
-import { getModuleDirname, getProjectDirname } from './getDirname.js';
+import { getProjectDirname } from './getDirname.js';
 import { Logger } from './logger.js';
+import { getRuntimeExecutableForIde } from './utils/getRuntimeExecutableForIde.js';
 
 async function getVsCodeLaunchConfig() {
-  const localRuntimeExecutable = '${workspaceFolder}/node_modules/.bin/lld';
+  const runtimeExecutable = await getRuntimeExecutableForIde();
 
   const config: VsCodeLaunch = {
     version: '0.2.0',
@@ -22,7 +23,7 @@ async function getVsCodeLaunchConfig() {
         name: 'Lambda Live Debugger',
         type: 'node',
         request: 'launch',
-        runtimeExecutable: localRuntimeExecutable,
+        runtimeExecutable: runtimeExecutable!,
         runtimeArgs: [],
         console: 'integratedTerminal',
         skipFiles: ['<node_internals>/**'],
@@ -30,86 +31,6 @@ async function getVsCodeLaunchConfig() {
       },
     ],
   };
-
-  const moduleDirname = getModuleDirname();
-  //Logger.log("Module folder", moduleDirname);
-  const projectDirname = getProjectDirname();
-
-  //Logger.log("Current folder", currentFolder);
-  const localFolder = path.resolve(
-    path.join(projectDirname, 'node_modules/.bin/lld'),
-  );
-
-  let runtimeExecutableSet = false;
-
-  //if installed locally
-  if (moduleDirname.startsWith('/home/')) {
-    Logger.verbose('Lambda Live Debugger is installed locally');
-    // check if file exists
-    try {
-      Logger.verbose(
-        'Checking local folder for runtimeExecutable setting for VsCode configuration',
-        localFolder,
-      );
-      await fs.access(localFolder, fs.constants.F_OK);
-      config.configurations![0].runtimeExecutable = localRuntimeExecutable;
-      runtimeExecutableSet = true;
-      //Logger.log("Found local folder", localFolder);
-    } catch {
-      //Logger.log("Not found", localFolder);
-    }
-  } else {
-    Logger.verbose('Lambda Live Debugger is installed globally');
-  }
-
-  if (!runtimeExecutableSet) {
-    Logger.verbose(
-      `Setting absolute path for runtimeExecutable setting for VsCode configuration`,
-    );
-    const localFolderSubfolder = path.resolve('node_modules/.bin/lld');
-    const globalModule1 = path.join(moduleDirname, '..', '..', '.bin/lld');
-    const globalModule2 = path.join(moduleDirname, '..', '..', 'bin/lld');
-    const globalModule3 = path.join(
-      moduleDirname,
-      '..',
-      '..',
-      '..',
-      '..',
-      'bin/lld',
-    );
-    const possibleFolders = {
-      [localFolder]: '${workspaceFolder}/node_modules/.bin/lld',
-      [localFolderSubfolder]: localFolderSubfolder,
-      [globalModule1]: globalModule1,
-      [globalModule2]: globalModule2,
-      [globalModule3]: globalModule3,
-    };
-
-    Logger.verbose(
-      `Checking the following possible folders for lld executable:`,
-      JSON.stringify(possibleFolders, null, 2),
-    );
-
-    // check each possible folder and set the runtimeExecutable
-    for (const folder in possibleFolders) {
-      try {
-        //Logger.log("Checking folder", folder);
-        await fs.access(folder, fs.constants.F_OK);
-        config.configurations![0].runtimeExecutable = possibleFolders[folder];
-        runtimeExecutableSet = true;
-        Logger.verbose(`Found folder with lld executable: ${folder}`);
-        break;
-      } catch {
-        // Not found
-      }
-    }
-
-    if (!runtimeExecutableSet) {
-      Logger.error(
-        `Could not find lld executable. Please check the setting runtimeExecutable in '.vscode/launch.json'.`,
-      );
-    }
-  }
 
   return config;
 }
@@ -229,40 +150,52 @@ async function getCurrentState(): Promise<
 }
 
 async function isConfigured() {
-  const state = await getCurrentState();
+  try {
+    const state = await getCurrentState();
 
-  if (state.state === 'FILE_EXISTS_CONFIGURATION_EXISTS') {
+    if (state.state === 'FILE_EXISTS_CONFIGURATION_EXISTS') {
+      return true;
+    }
+
+    return false;
+  } catch (err) {
+    Logger.error(
+      'Error checking if configuration exists in .vscode/launch.json',
+      err,
+    );
     return true;
   }
-
-  return false;
 }
 
 async function addConfiguration() {
-  Logger.log('Adding configuration to .vscode/launch.json');
-  const state = await getCurrentState();
+  try {
+    Logger.log('Adding configuration to .vscode/launch.json');
+    const state = await getCurrentState();
 
-  const config = await getVsCodeLaunchConfig();
+    const config = await getVsCodeLaunchConfig();
 
-  if (state.state === 'FILE_EXISTS_CONFIGURATION_DOES_NOT_EXIST') {
-    const { jsonString, filePath, configurationsLength } = state;
+    if (state.state === 'FILE_EXISTS_CONFIGURATION_DOES_NOT_EXIST') {
+      const { jsonString, filePath, configurationsLength } = state;
 
-    await writeConfiguration(
-      filePath,
-      jsonString,
-      config.configurations![0],
-      configurationsLength,
-    );
-  } else if (state.state === 'FILE_DOES_NOT_EXIST') {
-    // crete folder of filePath recursive if not exists
-    await fs.mkdir(path.dirname(state.filePath), { recursive: true });
+      await writeConfiguration(
+        filePath,
+        jsonString,
+        config.configurations![0],
+        configurationsLength,
+      );
+    } else if (state.state === 'FILE_DOES_NOT_EXIST') {
+      // crete folder of filePath recursive if not exists
+      await fs.mkdir(path.dirname(state.filePath), { recursive: true });
 
-    Logger.verbose(`Creating VsCode configuration file: ${state.filePath}`);
-    await fs.writeFile(
-      state.filePath,
-      JSON.stringify(config, null, 2),
-      'utf-8',
-    );
+      Logger.verbose(`Creating VsCode configuration file: ${state.filePath}`);
+      await fs.writeFile(
+        state.filePath,
+        JSON.stringify(config, null, 2),
+        'utf-8',
+      );
+    }
+  } catch (err) {
+    Logger.error('Error adding configuration to .vscode/launch.json', err);
   }
 }
 
