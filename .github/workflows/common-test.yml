@@ -31,6 +31,11 @@ env:
 jobs:
   test-cdk-basic:
     runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        attempt: [1, 2]
     concurrency:
       group: test-cdk-basic
     steps:
@@ -80,6 +85,11 @@ jobs:
 
   test-cdk-esm:
     runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        attempt: [1, 2]
     concurrency:
       group: test-cdk-esm
     steps:
@@ -129,6 +139,11 @@ jobs:
 
   test-sls-basic:
     runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        attempt: [1, 2]
     concurrency:
       group: test-sls-basic
     steps:
@@ -179,6 +194,11 @@ jobs:
 
   test-sls-esbuild-cjs:
     runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        attempt: [1, 2]
     concurrency:
       group: test-sls-esbuild-cjs
     steps:
@@ -229,6 +249,11 @@ jobs:
 
   test-sls-esbuild-esm:
     runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        attempt: [1, 2]
     concurrency:
       group: test-sls-esbuild-esm
     steps:
@@ -279,6 +304,11 @@ jobs:
 
   test-osls-basic:
     runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        attempt: [1, 2]
     concurrency:
       group: test-osls-basic
     steps:
@@ -329,6 +359,11 @@ jobs:
 
   test-osls-esbuild-cjs:
     runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        attempt: [1, 2]
     concurrency:
       group: test-osls-esbuild-cjs
     steps:
@@ -379,6 +414,11 @@ jobs:
 
   test-osls-esbuild-esm:
     runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        attempt: [1, 2]
     concurrency:
       group: test-osls-esbuild-esm
     steps:
@@ -429,6 +469,11 @@ jobs:
 
   test-sam-basic:
     runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        attempt: [1, 2]
     concurrency:
       group: test-sam-basic
     steps:
@@ -482,6 +527,11 @@ jobs:
 
   test-sam-alt:
     runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        attempt: [1, 2]
     concurrency:
       group: test-sam-alt
     steps:
@@ -535,6 +585,11 @@ jobs:
 
   test-terraform-basic:
     runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        attempt: [1, 2]
     concurrency:
       group: test-terraform-basic
     steps:
@@ -591,6 +646,11 @@ jobs:
 
   test-opentofu-basic:
     runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        attempt: [1, 2]
     concurrency:
       group: test-opentofu-basic
     steps:
