@@ -30,14 +30,20 @@ export async function expectInfraDeployed(lambdaName: any) {
       ':layer:LambdaLiveDebugger:',
     );
     expect(policyDocument).toEqual({
+      Version: '2012-10-17',
       Statement: [
         {
-          Action: 'iot:*',
           Effect: 'Allow',
+          Action: [
+            'iot:DescribeEndpoint',
+            'iot:Connect',
+            'iot:Publish',
+            'iot:Subscribe',
+            'iot:Receive',
+          ],
           Resource: '*',
         },
       ],
-      Version: '2012-10-17',
     });
   }
 }

@@ -37,9 +37,15 @@ const policyDocument = {
   Version: '2012-10-17',
   Statement: [
     {
-      Action: 'iot:*',
-      Resource: '*',
       Effect: 'Allow',
+      Action: [
+        'iot:DescribeEndpoint',
+        'iot:Connect',
+        'iot:Publish',
+        'iot:Subscribe',
+        'iot:Receive',
+      ],
+      Resource: '*',
     },
   ],
 };
