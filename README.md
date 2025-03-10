@@ -331,6 +331,7 @@ If you have a new feature idea, please create and issue.
 
 (alphabetical)
 
+- [Ben Moses](https://github.com/benjymoses)
 - [Kristian Dreher](https://www.linkedin.com/in/kristiandreher)
 - [Roger Chi](https://rogerchi.com/)
 - [Sebastian / avocadomaster](https://github.com/avocadomaster)
