@@ -106,6 +106,7 @@ Resources:
                   - ecr:DescribeRepositories
                   - ecr:PutLifecyclePolicy
                   - ecr:SetRepositoryPolicy
+                  - ecr:PutImageTagMutability
                 Resource:
                   - Fn::Sub: arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/cdk-hnb659fds-container-assets-*
               - Effect: Allow
