@@ -326,11 +326,14 @@ export class CdkFramework implements IFramework {
                 // });
               global.lambdas.push(lambdaInfo);` + codeToFind,
             );
-          }
-
-          if (
+          } else if (
             args.path.includes(
-              'aws-cdk-lib/aws-s3-deployment/lib/bucket-deployment.',
+              path.join(
+                'aws-cdk-lib',
+                'aws-s3-deployment',
+                'lib',
+                'bucket-deployment.',
+              ),
             )
           ) {
             const codeToFind = 'super(scope,id),this.requestDestinationArn=!1;';
@@ -341,6 +344,24 @@ export class CdkFramework implements IFramework {
 
             // Inject code to prevent deploying the assets
             contents = contents.replace(codeToFind, codeToFind + `return;`);
+          } else if (
+            args.path.includes(
+              path.join('aws-cdk-lib', 'aws-lambda-nodejs', 'lib', 'bundling.'),
+            )
+          ) {
+            // prevent initializing Docker if esbuild is no installed
+            // Docker is used for bundling if esbuild is not installed, but it is not needed at this point
+            const origCode =
+              'const shouldBuildImage=props.forceDockerBundling||!Bundling.esbuildInstallation;';
+            const replaceCode = 'const shouldBuildImage=false;';
+
+            if (contents.includes(origCode)) {
+              contents = contents.replace(origCode, replaceCode);
+            } else {
+              throw new Error(
+                `Can not find code to inject in ${args.path} to prevent initializing Docker`,
+              );
+            }
           }
 
           return {
