@@ -92,7 +92,7 @@ export default defineConfig({
             link: '#serverless-framework-v3-sls',
           },
           { text: 'SAM', link: '#aws-serverless-application-model-sam' },
-          { text: 'Terraform', link: '#terraform' },
+          { text: 'Terraform and OpenTofu', link: '#terraform-and-opentofu' },
           { text: 'Custom Setup', link: '#custom-setup' },
         ],
       },
