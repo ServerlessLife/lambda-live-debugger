@@ -5,20 +5,30 @@ const markdownItYouTubeEmbed: PluginWithOptions<void> = (md) => {
   const youtubeEmbedRule: RuleCore = (state) => {
     const tokens = state.tokens;
 
-    for (let i = 0; i < tokens.length; i++) {
+    for (let i = 0; i < tokens.length - 2; i++) {
       const token = tokens[i];
+      const next = tokens[i + 1];
+      const nextNext = tokens[i + 2];
 
+      // Look for paragraph_open → inline → paragraph_close
       if (
-        token.type === 'inline' &&
-        token.children &&
-        token.children.length >= 1 &&
-        token.children[0].type === 'link_open'
+        token.type === 'paragraph_open' &&
+        next.type === 'inline' &&
+        next.children &&
+        nextNext.type === 'paragraph_close'
       ) {
-        const linkToken = token.children[0];
-        const href = linkToken.attrGet('href');
+        const firstChild = next.children[0];
 
-        if (href && href.startsWith('https://www.youtube.com/watch?v=')) {
+        if (
+          firstChild &&
+          firstChild.type === 'link_open' &&
+          firstChild
+            .attrGet('href')
+            ?.startsWith('https://www.youtube.com/watch?v=')
+        ) {
+          const href = firstChild.attrGet('href')!;
           const videoId = href.split('v=')[1];
+
           const iframeHtml = `
             <div class="responsive-video">
               <iframe
@@ -27,13 +37,13 @@ const markdownItYouTubeEmbed: PluginWithOptions<void> = (md) => {
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen>
               </iframe>
-            </div>
-          `;
+            </div>`.trim();
 
-          // Replace current token with a new HTML block token
-          const newToken = new state.Token('html_block', '', 0);
-          newToken.content = iframeHtml;
-          tokens[i] = newToken;
+          // Replace the 3 tokens (paragraph_open, inline, paragraph_close)
+          const htmlToken = new state.Token('html_block', '', 0);
+          htmlToken.content = iframeHtml;
+
+          tokens.splice(i, 3, htmlToken);
         }
       }
     }
