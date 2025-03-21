@@ -98,9 +98,28 @@ export default defineConfig({
       },
       { text: 'Authors and Contributors', link: '#authors' },
       { text: 'Disclaimer', link: '#disclaimer' },
+      {
+        text: `
+        <div style="white-space: nowrap; display: flex; align-items: center; gap: 6px;">
+          <img alt="Serverless Life logo" style="height: 27px" src="https://www.serverlesslife.com/img/logo_light.svg">
+          www.serverlesslife.com
+        </div>
+
+        `,
+
+        link: 'https://www.serverlesslife.com',
+      },
     ],
 
     socialLinks: [
+      {
+        icon: {
+          svg: '<img alt="Serverless Life logo" style="height: 26px" src="https://www.serverlesslife.com/img/logo_light.svg">',
+        },
+
+        link: 'https://www.serverlesslife.com',
+        ariaLabel: 'Serverless Life',
+      },
       {
         icon: 'github',
         link: 'https://github.com/ServerlessLife/lambda-live-debugger',
