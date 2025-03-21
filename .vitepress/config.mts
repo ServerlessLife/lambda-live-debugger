@@ -100,13 +100,11 @@ export default defineConfig({
       { text: 'Disclaimer', link: '#disclaimer' },
       {
         text: `
-        <div style="white-space: nowrap; display: flex; align-items: center; gap: 6px;">
-          <img alt="Serverless Life logo" style="height: 27px" src="https://www.serverlesslife.com/img/logo_light.svg">
-          www.serverlesslife.com
-        </div>
-
+          <span style="white-space: nowrap; display: flex; align-items: center; gap: 6px;">
+            <img alt="Serverless Life logo" style="height: 27px" src="https://www.serverlesslife.com/img/logo_light.svg">
+            www.serverlesslife.com
+          </span>
         `,
-
         link: 'https://www.serverlesslife.com',
       },
     ],
