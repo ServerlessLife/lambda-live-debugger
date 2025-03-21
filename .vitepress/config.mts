@@ -101,7 +101,8 @@ export default defineConfig({
       {
         text: `
           <span style="white-space: nowrap; display: flex; align-items: center; gap: 6px;">
-            <img alt="Serverless Life logo" style="height: 27px" src="https://www.serverlesslife.com/img/logo_light.svg">
+            <img alt="Serverless Life logo" style="height: 27px" src="https://www.serverlesslife.com/img/logo_light.svg" class="light-mode">
+            <img alt="Serverless Life logo" style="height: 27px" src="https://www.serverlesslife.com/img/logo_dark.svg" class="dark-mode">
             www.serverlesslife.com
           </span>
         `,
@@ -112,7 +113,10 @@ export default defineConfig({
     socialLinks: [
       {
         icon: {
-          svg: '<img alt="Serverless Life logo" style="height: 26px" src="https://www.serverlesslife.com/img/logo_light.svg">',
+          svg: `
+            <img alt="Serverless Life logo" style="height: 26px" src="https://www.serverlesslife.com/img/logo_light.svg" class="light-mode">
+            <img alt="Serverless Life logo" style="height: 26px" src="https://www.serverlesslife.com/img/logo_dark.svg" class="dark-mode">
+          `,
         },
 
         link: 'https://www.serverlesslife.com',

@@ -42,3 +42,11 @@
   width: 100%;
   height: 100%;
 }
+
+:root:not(.dark) .dark-mode {
+  display: none;
+}
+
+:root:is(.dark) .light-mode {
+  display: none;
+}
