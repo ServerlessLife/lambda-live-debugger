@@ -208,7 +208,7 @@ Use the `context` parameter to pass context to your CDK code. This is a common w
 
 Use the `stage` parameter to pass the stage/environment name.
 
-_Serverless, Inc. has deprecated Serverless Framework v3, and v4 is available only under a commercial license. Fortunately, **[an open-source fork of version 3](https://github.com/oss-serverless/serverless) is available and remains actively maintained. Lambda Live Debugger supports both the official v3 and the fork**, but not v4, which has its own debugging solution._
+_Serverless, Inc. has deprecated Serverless Framework v3, and v4 is available under a commercial license. Fortunately, **[an open-source fork of version 3](https://github.com/oss-serverless/serverless) is available and remains actively maintained. Lambda Live Debugger supports both the official v3 and the fork**, but not v4, which has its own debugging solution._
 
 ### AWS Serverless Application Model (SAM)
 
