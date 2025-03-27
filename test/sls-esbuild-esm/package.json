@@ -15,10 +15,10 @@
     "esbuild": "^0.25.1",
     "serverless": "^3.38.0",
     "serverless-esbuild": "^1.55.0",
-    "@types/aws-lambda": "^8.10.147"
+    "@types/aws-lambda": "^8.10.148"
   },
   "dependencies": {
-    "@tsconfig/node20": "^20.1.4",
-    "@aws-sdk/client-sts": "^3.758.0"
+    "@tsconfig/node20": "^20.1.5",
+    "@aws-sdk/client-sts": "^3.775.0"
   }
 }

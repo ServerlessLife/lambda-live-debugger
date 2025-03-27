@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "type": "commonjs",
   "devDependencies": {
-    "@tsconfig/node20": "^20.1.4"
+    "@tsconfig/node20": "^20.1.5"
   },
   "dependencies": {
-    "@aws-sdk/client-sts": "^3.758.0"
+    "@aws-sdk/client-sts": "^3.775.0"
   }
 }
