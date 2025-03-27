@@ -7,7 +7,7 @@ This tool offers similar functionality to [SST](https://sst.dev/) and [Serverles
 It supports the following frameworks:
 
 - AWS CDK v2
-- Serverless Framework v3 (SLS) and [`osls` fork](https://github.com/oss-serverless/serverless)
+- Serverless Framework v3 (SLS) and [osls fork](https://github.com/oss-serverless/serverless)
 - AWS Serverless Application Model (SAM)
 - Terraform and OpenTofu
 - Any other framework or setup by implementing a simple function in TypeScript
@@ -204,9 +204,11 @@ Set the `subfolder` parameter if your framework is in a subfolder.
 
 Use the `context` parameter to pass context to your CDK code. This is a common way to pass variables to your code, most often the environment name.
 
-### Serverless Framework v3 (SLS)
+### Serverless Framework v3 (SLS) and [osls fork](https://github.com/oss-serverless/serverless)
 
 Use the `stage` parameter to pass the stage/environment name.
+
+_Serverless Framework v3 is now deprecated, and v4 is available only under a commercial license. Fortunately, there is a [fork of version 3](https://github.com/oss-serverless/serverless). Lambda Live Debugger also supports it._
 
 ### AWS Serverless Application Model (SAM)
 
