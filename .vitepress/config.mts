@@ -89,7 +89,7 @@ export default defineConfig({
           { text: 'AWS CDK', link: '#aws-cdk-v2' },
           {
             text: 'Serverless Framework',
-            link: '#serverless-framework-v3-sls',
+            link: '#serverless-framework-v3-sls-and-osls-fork',
           },
           { text: 'SAM', link: '#aws-serverless-application-model-sam' },
           { text: 'Terraform and OpenTofu', link: '#terraform-and-opentofu' },
