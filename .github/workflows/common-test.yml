@@ -302,7 +302,7 @@ jobs:
         if: ${{ inputs.mode == 'global' }}
         run: |
           npm i lambda-live-debugger@${{ inputs.version || 'latest' }} -g
-          npm i osls@3.46.0 -g
+          npm i osls -g
         working-directory: test
       - name: Install lambda-live-debugger locally
         if: ${{ inputs.mode == 'local' }}
@@ -352,7 +352,7 @@ jobs:
         if: ${{ inputs.mode == 'global' }}
         run: |
           npm i lambda-live-debugger@${{ inputs.version || 'latest' }} -g
-          npm i osls@3.46.0 -g
+          npm i osls -g
         working-directory: test
       - name: Install lambda-live-debugger locally
         if: ${{ inputs.mode == 'local' }}
@@ -402,7 +402,7 @@ jobs:
         if: ${{ inputs.mode == 'global' }}
         run: |
           npm i lambda-live-debugger@${{ inputs.version || 'latest' }} -g
-          npm i osls@3.46.0 -g
+          npm i osls -g
         working-directory: test
       - name: Install lambda-live-debugger locally
         if: ${{ inputs.mode == 'local' }}
