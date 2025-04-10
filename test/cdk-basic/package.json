@@ -7,6 +7,7 @@
   "scripts": {
     "deploy": "cdk deploy --all -c environment=test --require-approval never --outputs-file cdk-outputs.json",
     "build": "cdk synth -c environment=test",
+    "deploy-yaml": "bash deploy-yaml.sh",
     "destroy": "cdk destroy --all -c environment=test --force"
   },
   "devDependencies": {

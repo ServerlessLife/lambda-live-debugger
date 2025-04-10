@@ -77,6 +77,11 @@ jobs:
         run: npx vitest --retry 1 test/cdk-basic.test.ts
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 1 test/cdk-basic.test.ts
+      - name: Deploy YAML version
+        run: npm run deploy-yaml
+        working-directory: test/cdk-basic
+      - name: Test YAML
+        run: npx vitest --retry 1 test/cdk-basic.test.ts
 
   test-cdk-esm:
     runs-on: ubuntu-latest
