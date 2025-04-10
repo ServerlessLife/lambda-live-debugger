@@ -6,6 +6,7 @@ import {
 import { AwsCredentials } from './awsCredentials.js';
 import { AwsConfiguration } from './types/awsConfiguration.js';
 import { Logger } from './logger.js';
+import * as yaml from 'yaml';
 
 let cloudFormationClient: CloudFormationClient;
 
@@ -30,7 +31,17 @@ async function getCloudFormationStackTemplate(
       throw new Error(`No template found for stack ${stackName}`);
     }
 
-    const cfTemplate = JSON.parse(response.TemplateBody);
+    let cfTemplate: any;
+    try {
+      cfTemplate = JSON.parse(response.TemplateBody);
+    } catch (parseError: any) {
+      if (parseError.message.includes('is not valid JSON')) {
+        // If the template is not JSON, try parsing it as YAML
+        cfTemplate = yaml.parse(response.TemplateBody);
+      } else {
+        throw parseError;
+      }
+    }
     return cfTemplate;
   } catch (error: any) {
     if (error.name === 'ValidationError') {
