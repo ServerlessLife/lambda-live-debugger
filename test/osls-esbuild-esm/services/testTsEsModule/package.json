@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "devDependencies": {
-    "@tsconfig/node20": "^20.1.5"
+    "@tsconfig/node22": "^22.0.1"
   },
   "dependencies": {
     "@aws-sdk/client-sts": "^3.787.0"

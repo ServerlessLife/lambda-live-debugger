@@ -15,7 +15,7 @@
     "esbuild": "^0.25.2",
     "serverless": "^3.38.0",
     "serverless-esbuild": "^1.55.0",
-    "@tsconfig/node20": "^20.1.5"
+    "@tsconfig/node22": "^22.0.1"
   },
   "dependencies": {
     "@aws-sdk/client-sts": "^3.787.0"

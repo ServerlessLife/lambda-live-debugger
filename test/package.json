@@ -15,6 +15,6 @@
   },
   "dependencies": {
     "@aws-sdk/client-iam": "^3.787.0",
-    "@tsconfig/node20": "^20.1.5"
+    "@tsconfig/node22": "^22.0.1"
   }
 }
