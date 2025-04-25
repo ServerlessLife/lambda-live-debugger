@@ -90,7 +90,13 @@ export class SamFramework implements IFramework {
       samConfig = yaml.parse(samConfigContent);
     }
 
-    const stackName = samConfig[environment]?.global?.parameters?.stack_name;
+    let stackName: string | undefined;
+
+    if (config.samStackName) {
+      stackName = config.samStackName;
+    } else {
+      stackName = samConfig[environment]?.global?.parameters?.stack_name;
+    }
 
     if (!stackName) {
       throw new Error(`Stack name not found in ${samConfigFile}`);
