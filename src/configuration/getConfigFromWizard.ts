@@ -139,6 +139,14 @@ export async function getConfigFromWizard({
           default:
             configFromCliArgs.samTemplateFile ?? currentConfig?.samTemplateFile,
         },
+        {
+          type: 'input',
+          name: 'samStackName',
+          message:
+            'Would you like to enter SAM stack name and not use the one from config?',
+          default:
+            configFromCliArgs.samStackName ?? currentConfig?.samStackName,
+        },
       ]);
 
       answers = { ...answers, ...samAnswers };
@@ -421,6 +429,8 @@ export default {
   samConfigFile: "${config.samConfigFile}",
   // SAM framework template file
   samTemplateFile: "${config.samTemplateFile}",
+  // SAM framework stack name
+  samStackName: "${config.samStackName}",
   // Observable mode
   observable: ${config.observable},
   // Observable mode interval
@@ -468,6 +478,7 @@ function getConfigFromAnswers(answers: any): LldConfigCliArgs {
     configEnv: answers.configEnv,
     samConfigFile: answers.samConfigFile,
     samTemplateFile: answers.samTemplateFile,
+    samStackName: answers.samStackName,
     observable: answers.observable,
     interval:
       answers.interval !== undefined

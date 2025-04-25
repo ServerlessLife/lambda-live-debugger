@@ -57,6 +57,11 @@ export type LldConfigBase = {
   samTemplateFile?: string;
 
   /**
+   * SAM framework cli parameter stack-name
+   */
+  samStackName?: string;
+
+  /**
    * Resources discovery function
    */
   getLambdas?: (

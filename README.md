@@ -120,6 +120,7 @@ The configuration is saved to `lldebugger.config.ts`.
  --config-env <evironment>       SAM environment
  --sam-config-file <file>        SAM configuration file
  --sam-template-file <file>      SAM template file
+ --sam-stack-name <name>         SAM stack name;
  --profile <profile>             AWS profile to use
  --region <region>               AWS region to use
  --role <role>                   AWS role to use
