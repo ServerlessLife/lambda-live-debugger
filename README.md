@@ -19,7 +19,7 @@ It supports the following frameworks:
 
 Serverless is amazing and solves many issues with traditional systems. However, writing code for Lambda functions can be challenging. The cycle of writing, deploying, running, fixing, and redeploying is time-consuming and tedious. You could use tools to run Lambda locally or use unit/integration tests; those approaches often don't replicate the actual environment closely enough.
 
-Lambda Live Debugger provides several features that aren't supported by SST or Serverless Framework v4::
+Lambda Live Debugger provides several features that aren't supported by SST or Serverless Framework v4:
 
 - **Observability mode** – Enables debugging without impacting the system, so it can even be used in production.
 - **Quick toggle** – Debug mode can be turned off and back on almost instantly without requiring a redeploy like other solutions.

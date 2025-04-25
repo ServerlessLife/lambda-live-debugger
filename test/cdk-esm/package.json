@@ -11,7 +11,7 @@
     "destroy": "cdk destroy  --all -c environment=test --force"
   },
   "devDependencies": {
-    "@tsconfig/node20": "^20.1.5",
+    "@tsconfig/node22": "^22.0.1",
     "@types/aws-lambda": "^8.10.149",
     "@types/node": "22.14.0",
     "aws-cdk": "2.1007.0",
