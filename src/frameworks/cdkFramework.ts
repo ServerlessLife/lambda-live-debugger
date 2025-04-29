@@ -14,6 +14,7 @@ import { Worker } from 'node:worker_threads';
 import { getModuleDirname, getProjectDirname } from '../getDirname.js';
 import { findNpmPath } from '../utils/findNpmPath.js';
 import { type BundlingOptions } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { loadSharedConfigFiles } from '@smithy/shared-ini-file-loader';
 
 /**
  * Support for AWS CDK framework
@@ -429,6 +430,8 @@ export class CdkFramework implements IFramework {
       'aws:cdk:bundling-stacks': [],
     };
     process.env.CDK_CONTEXT_JSON = JSON.stringify(CDK_CONTEXT_JSON);
+    process.env.CDK_DEFAULT_REGION =
+      config.region ?? (await this.getRegion(config.profile));
     Logger.verbose(`[CDK] Context:`, JSON.stringify(CDK_CONTEXT_JSON, null, 2));
 
     const awsCdkLibPath = await findNpmPath(
@@ -646,6 +649,70 @@ export class CdkFramework implements IFramework {
     Logger.verbose(`[CDK] Entry file: ${entryFile}`);
 
     return entryFile;
+  }
+
+  /**
+   * Attempts to get the region from a number of sources and falls back to us-east-1 if no region can be found,
+   * as is done in the AWS CLI.
+   *
+   * The order of priority is the following:
+   *
+   * 1. Environment variables specifying region, with both an AWS prefix and AMAZON prefix
+   *    to maintain backwards compatibility, and without `DEFAULT` in the name because
+   *    Lambda and CodeBuild set the $AWS_REGION variable.
+   * 2. Regions listed in the Shared Ini Files - First checking for the profile provided
+   *    and then checking for the default profile.
+   * 3. xxx
+   * 4. us-east-1
+   *
+   * Code from aws-cdk-cli/packages/@aws-cdk/tmp-toolkit-helpers/src/api/aws-auth
+/awscli-compatible.ts
+   */
+  protected async getRegion(
+    maybeProfile?: string,
+  ): Promise<string | undefined> {
+    const profile =
+      maybeProfile ||
+      process.env.AWS_PROFILE ||
+      process.env.AWS_DEFAULT_PROFILE ||
+      'default';
+
+    const region =
+      process.env.AWS_REGION ||
+      process.env.AMAZON_REGION ||
+      process.env.AWS_DEFAULT_REGION ||
+      process.env.AMAZON_DEFAULT_REGION ||
+      (await this.getRegionFromIni(profile));
+
+    return region;
+  }
+
+  /**
+   * Looks up the region of the provided profile. If no region is present,
+   * it will attempt to lookup the default region.
+   * @param profile The profile to use to lookup the region
+   * @returns The region for the profile or default profile, if present. Otherwise returns undefined.
+   *
+   * Code from aws-cdk-cli/packages/@aws-cdk/tmp-toolkit-helpers/src/api/aws-auth
+   */
+  private async getRegionFromIni(profile: string): Promise<string | undefined> {
+    const sharedFiles = await loadSharedConfigFiles({ ignoreCache: true });
+    return (
+      this.getRegionFromIniFile(profile, sharedFiles.credentialsFile) ??
+      this.getRegionFromIniFile(profile, sharedFiles.configFile) ??
+      this.getRegionFromIniFile('default', sharedFiles.credentialsFile) ??
+      this.getRegionFromIniFile('default', sharedFiles.configFile)
+    );
+  }
+
+  /**
+   * Get region from ini file
+   * @param profile
+   * @param data
+   * @returns
+   */
+  private getRegionFromIniFile(profile: string, data?: any) {
+    return data?.[profile]?.region;
   }
 }
 

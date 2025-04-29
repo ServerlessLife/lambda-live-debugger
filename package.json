@@ -110,6 +110,7 @@
     "@aws-sdk/client-lambda": "^3.798.0",
     "@aws-sdk/client-s3": "^3.798.0",
     "@aws-sdk/credential-providers": "^3.798.0",
+    "@smithy/shared-ini-file-loader": "^4.0.2",
     "aws-iot-device-sdk": "^2.2.15",
     "chalk": "^5.4.1",
     "chokidar": "^3.6.0",
