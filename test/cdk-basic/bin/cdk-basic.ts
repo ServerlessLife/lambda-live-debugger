@@ -4,6 +4,11 @@ import * as cdk from 'aws-cdk-lib';
 import { CdkbasicStack } from '../lib/cdk-basic-stack';
 import { CdkbasicStack2 } from '../lib/subfolder/cdk-basic-stack2';
 
+if (process.env.CDK_DEFAULT_REGION !== 'eu-west-1') {
+  // checking if the region is set with Lambda Live Debugger
+  throw new Error('CDK_DEFAULT_REGION must be set to eu-west-1');
+}
+
 const app = new cdk.App();
 
 const environment = app.node.tryGetContext('environment');
