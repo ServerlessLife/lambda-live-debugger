@@ -3,6 +3,6 @@
   "version": "1.0.0",
   "type": "module",
   "dependencies": {
-    "@aws-sdk/client-sts": "^3.798.0"
+    "@aws-sdk/client-sts": "^3.804.0"
   }
 }
