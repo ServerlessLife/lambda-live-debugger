@@ -1,8 +1,6 @@
 # ![Lambda Live Debugger](public/logo_landscape_light.svg)
 
-Lambda Live Debugger is an indispensable tool for debugging AWS Lambda functions from your computer, even though they are deployed in the cloud. It supports Lambdas written in JavaScript or TypeScript. It is free and open source.
-
-This tool offers similar functionality to [SST](https://sst.dev/) and [Serverless Framework v4](https://www.serverless.com/blog/serverless-framework-v4-general-availability), with the addition of an Observability Mode.
+Lambda Live Debugger is an indispensable tool for debugging AWS Lambda functions from your computer, even though they are deployed in the cloud. The code runs with the same IAM permissions as in the cloud environment, and there's no need to redeploy when you make code changes. It supports Lambdas written in JavaScript or TypeScript. It requires almost no configuration. It is free and open source.
 
 It supports the following frameworks:
 
@@ -15,15 +13,15 @@ It supports the following frameworks:
 
 [![Video presentation of Lambda Live Debugger](https://img.youtube.com/vi/BrhybwyDM0I/0.jpg)](https://www.youtube.com/watch?v=BrhybwyDM0I)
 
-## Why?
-
-Serverless is amazing and solves many issues with traditional systems. However, writing code for Lambda functions can be challenging. The cycle of writing, deploying, running, fixing, and redeploying is time-consuming and tedious. You could use tools to run Lambda locally or use unit/integration tests; those approaches often don't replicate the actual environment closely enough.
-
-Lambda Live Debugger provides several features that aren't supported by SST or Serverless Framework v4:
+It offers similar functionality to [SST](https://sst.dev/) and [Serverless Framework v4](https://www.serverless.com/blog/serverless-framework-v4-general-availability), with the following addition features:
 
 - **Observability mode** – Enables debugging without impacting the system, so it can even be used in production.
 - **Quick toggle** – Debug mode can be turned off and back on almost instantly without requiring a redeploy like other solutions.
 - **Selective debugging** – You can debug only one or a few functions at a time, which is crucial for large and complex systems. Running many Lambdas simultaneously on a single machine can be confusing and can slow down your computer.
+
+## Why?
+
+Serverless is amazing and solves many issues with traditional systems. However, writing code for Lambda functions can be challenging. The cycle of writing, deploying, running, fixing, and redeploying is time-consuming and tedious. You could use tools to run Lambda locally or use unit/integration tests; those approaches often don't replicate the actual environment closely enough.
 
 ## How It Works
 
@@ -33,7 +31,7 @@ The tool attaches Lambda Extensions (via a Layer), intercepts, and relays calls 
 
 ![Architecture](./public/architecture.drawio.png)
 
-AWS keys generated on the cloud for Lambda are transferred to the local environment, so the code has the same permissions as it would executed on the cloud. There could be a difference in packaging, mainly regarding static files, which are probably in different locations. You can use additional environment variables to adjust the code:
+AWS keys generated on the cloud for Lambda are transferred to the local environment, so the code has the same IAM permissions as it would executed on the cloud. There could be a difference in packaging, mainly regarding static files, which are probably in different locations. You can use additional environment variables to adjust the code:
 
 - `IS_LOCAL = true` = Lambda is executed locally
 - `LOCAL_PROJECT_DIR` = directory of the project
@@ -193,6 +191,8 @@ To also remove the Layer:
 lld -r=all
 ```
 
+**Note:** Be sure to remove Lambda Live Debugger after use in a high-traffic environment—otherwise, IoT messages could generate significant costs.
+
 ## Development Process
 
 Since you deploy code to a real AWS account, it's best to have a dedicated environment only for yourself. It could be your personal environment or an environment created for a feature. That is [common practice when developing serverless systems](https://theburningmonk.com/2019/09/why-you-should-use-temporary-stacks-when-you-do-serverless/). If that's not feasible due to organizational or technical reasons, use Observability Mode.
@@ -200,6 +200,8 @@ Since you deploy code to a real AWS account, it's best to have a dedicated envir
 ## Observability Mode
 
 In Observability Mode, Lambda Live Debugger intercepts requests and sends them to your computer without waiting for a response. The Lambda continues as usual. The response from your machine is ignored. This mode can be used in the development, testing, or even, if you are adventurous, production environment. It samples requests every 3 seconds by default (configurable with an `interval` setting) to avoid overloading the system.
+
+**Note:** Be sure to remove Lambda Live Debugger after use in a high-traffic environment—otherwise, IoT messages could generate significant costs.
 
 ## Monorepo Setup
 
@@ -219,7 +221,12 @@ _Serverless, Inc. has deprecated Serverless Framework v3, and v4 is available un
 
 ### AWS Serverless Application Model (SAM)
 
-Use the `config-env` parameter to pass the stage/environment name.
+You can use the following parameters:
+
+- `config-env` - stage/environment name.
+- `sam-config-file` - custom configuration file name.
+- `sam-template-file` - custom template file name.
+- `sam-stack-name` - custom stack name.
 
 ### Terraform and OpenTofu
 
