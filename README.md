@@ -13,12 +13,6 @@ It supports the following frameworks:
 
 [![Video presentation of Lambda Live Debugger](https://img.youtube.com/vi/BrhybwyDM0I/0.jpg)](https://www.youtube.com/watch?v=BrhybwyDM0I)
 
-It offers similar functionality to [SST](https://sst.dev/) and [Serverless Framework v4](https://www.serverless.com/blog/serverless-framework-v4-general-availability), with the following addition features:
-
-- **Observability mode** – Enables debugging without impacting the system, so it can even be used in production.
-- **Quick toggle** – Debug mode can be turned off and back on almost instantly without requiring a redeploy like other solutions.
-- **Selective debugging** – You can debug only one or a few functions at a time, which is crucial for large and complex systems. Running many Lambdas simultaneously on a single machine can be confusing and can slow down your computer.
-
 ## Why?
 
 Serverless is amazing and solves many issues with traditional systems. However, writing code for Lambda functions can be challenging. The cycle of writing, deploying, running, fixing, and redeploying is time-consuming and tedious. You could use tools to run Lambda locally or use unit/integration tests; those approaches often don't replicate the actual environment closely enough.
@@ -47,6 +41,14 @@ Lambda Live Debugger makes the following changes to your AWS infrastructure:
 In case you do not want to debug all functions and add the Layer to them, you can limit to the ones you need via the `function` parameter.
 
 The tool generates temporary files in the `.lldebugger` folder, which can be deleted after debugging. The wizard can add `.lldebugger` to `.gitignore` for you.
+
+## Comaring to Alternatives
+
+Lambda Live Debugger offers similar functionality to [SST](https://sst.dev/) and [Serverless Framework v4](https://www.serverless.com/blog/serverless-framework-v4-general-availability), with the following addition features:
+
+- **Observability mode** – Enables debugging without impacting the system, so it can even be used in production.
+- **Quick toggle** – Debug mode can be turned off and back on almost instantly without requiring a redeploy like other solutions.
+- **Selective debugging** – You can debug only one or a few functions at a time, which is crucial for large and complex systems. Running many Lambdas simultaneously on a single machine can be confusing and can slow down your computer.
 
 ## Help and Feedback
 

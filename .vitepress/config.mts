@@ -64,6 +64,10 @@ export default defineConfig({
         items: [
           { text: 'Why?', link: '#why' },
           { text: 'How It Works', link: '#how-it-works' },
+          {
+            text: 'Comparing to Alternatives',
+            link: '#comaring-to-alternatives',
+          },
           { text: 'Help and Feedback', link: '#help-and-feedback' },
         ],
       },
