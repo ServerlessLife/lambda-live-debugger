@@ -50,6 +50,8 @@ Lambda Live Debugger offers similar functionality to [SST](https://sst.dev/) and
 - **Quick toggle** – Debug mode can be turned off and back on almost instantly without requiring a redeploy like other solutions.
 - **Selective debugging** – You can debug only one or a few functions at a time, which is crucial for large and complex systems. Running many Lambdas simultaneously on a single machine can be confusing and can slow down your computer.
 
+AWS now also supports remote debugging for Lambda. [Here's how their solution compares to Lambda Live Debugger.](https://www.serverlesslife.com/Lambda_Live_Debugger_vs_Official_AWS_Remote_Debugging.html)
+
 ## Help and Feedback
 
 **The tool has been thoroughly tested across many scenarios. It is flexible and can be adjusted to fit almost any setup. However, projects and TypeScript settings can be configured in numerous ways. If you need help or encounter a bug, please let me know by opening a [GitHub Issue](https://github.com/ServerlessLife/lambda-live-debugger/issues). This will not only help you but also others, because I can improve the tool and the documentation.**
