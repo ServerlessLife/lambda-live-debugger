@@ -28,6 +28,8 @@ export type LambdaResource = {
      */
     cdkPath?: string;
   };
+
+  filteredOut?: boolean;
 };
 
 export enum BundlingType {

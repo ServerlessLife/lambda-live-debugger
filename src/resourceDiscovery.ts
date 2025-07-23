@@ -62,14 +62,14 @@ async function getLambdas(
     if (config.function && !config.remove) {
       // if we are removing the debugger, we don't want to filter by function name
       const functionNameFilter = config.function.trim();
-      resources = resources.filter(
-        // filter by function name, can use * as wildcard
-        (l) =>
+      resources = resources.map((l) => {
+        const matches =
           l.functionName === functionNameFilter ||
           new RegExp('^' + functionNameFilter.split('*').join('.*') + '$').test(
             l.functionName,
-          ),
-      );
+          );
+        return matches ? l : { ...l, filteredOut: true };
+      });
     }
   } else {
     return undefined;
