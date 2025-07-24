@@ -15,10 +15,41 @@ jobs:
     uses: ./.github/workflows/common-build.yml
     secrets: inherit
 
+  remove-old-layers:
+    runs-on: ubuntu-latest
+    needs: build
+    concurrency:
+      group: remove-all-layers
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.node_version }}
+          registry-url: 'https://registry.npmjs.org'
+      - name: Install dependencies
+        run: npm ci
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-west-1
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: GitHubActions
+      - name: Remove old layers
+        run: |
+          node ../../dist/lldebugger.mjs -r all --config-env=test -v
+        # Picking random test so I can have environment
+        working-directory: test/sam-basic
+
   test:
     uses: ./.github/workflows/common-test.yml
     secrets: inherit
-    needs: build
+    needs: remove-old-layers
     with:
       mode: build
       testMonorepo: false

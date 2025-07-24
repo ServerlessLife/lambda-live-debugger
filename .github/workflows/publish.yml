@@ -6,16 +6,6 @@ run-name: >
 
 on:
   workflow_dispatch:
-    inputs:
-      release-type:
-        description: 'Release type'
-        required: true
-        default: 'stable'
-        type: choice
-        options:
-          - stable
-          - alpha
-          - beta
 
 permissions:
   id-token: write

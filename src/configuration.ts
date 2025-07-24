@@ -1,4 +1,3 @@
-import { LambdaProps } from './types/lambdaProps.js';
 import { LldConfig } from './types/lldConfig.js';
 import { LambdaResource } from './types/resourcesDiscovery.js';
 import * as crypto from 'crypto';
@@ -12,7 +11,7 @@ import { ResourceDiscovery } from './resourceDiscovery.js';
 import { Logger } from './logger.js';
 
 let config: LldConfig;
-const lambdas: Record<string, LambdaProps> = {};
+const lambdas: Record<string, LambdaResource> = {};
 let lambdasList: LambdaResource[] | undefined = undefined;
 
 /**
@@ -103,32 +102,41 @@ async function generateDebuggerId(observableMode: boolean) {
  * Add a Lambda to the configuration
  * @param props
  */
-function addLambda(props: Omit<LambdaProps, 'functionId'>) {
+function addLambda(props: LambdaResource) {
   lambdas[props.functionName] = {
-    functionId: props.functionName,
     ...props,
   };
 }
 
 /**
- * Get a Lambda by functionId
- * @param functionId
+ * Get a Lambda by name
+ * @param functionName
  * @returns
  */
-async function getLambda(functionId: string): Promise<LambdaProps> {
-  const lambda = lambdas[functionId];
+async function getLambda(functionName: string): Promise<LambdaResource> {
+  const lambda = lambdas[functionName];
 
   if (lambda) return lambda;
 
-  throw new Error(`Lambda not found: ${functionId}`);
+  throw new Error(`Lambda not found: ${functionName}`);
 }
 
 /**
  * Get all Lambdas
  * @returns
  */
-function getLambdas() {
+function getLambdasAll(): LambdaResource[] {
   return Object.values(lambdas);
+}
+
+/**
+ * Get filtered Lambdas
+ * @returns
+ */
+function getLambdasFiltered() {
+  const list = Object.values(lambdas);
+
+  return list.filter((l) => !l.filteredOut);
 }
 
 /**
@@ -180,7 +188,7 @@ function saveDiscoveredLambdas(lambdasListNew: LambdaResource[]) {
 
     Logger.log('Found the following Lambdas to debug:');
     Logger.log(
-      ` - ${getLambdas()
+      ` - ${getLambdasFiltered()
         .map((f) => `${f.functionName} code: ${f.codePath}`)
         .join('\n - ')}`,
     );
@@ -205,6 +213,7 @@ export const Configuration = {
   },
   discoverLambdas,
   getLambda,
-  getLambdas,
+  getLambdasAll,
+  getLambdasFiltered,
   setConfig,
 };

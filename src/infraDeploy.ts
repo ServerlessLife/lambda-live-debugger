@@ -51,6 +51,36 @@ const policyDocument = {
 };
 
 /**
+ * Type for Lambda update data
+ */
+export type InfraLambdaUpdate = {
+  functionName: string;
+  layers: string[];
+  environmentVariables: Record<string, string>;
+  timeout: number;
+};
+
+/**
+ * Type for infrastructure changes when adding Lambda Live Debugger
+ */
+export type InfraAddingChanges = {
+  deployLayer: boolean;
+  existingLayerVersionArn: string | undefined;
+  lambdasToAdd: InfraLambdaUpdate[];
+  rolesToAdd: string[];
+  lambdasToRemove: InfraLambdaUpdate[];
+  rolesToRemove: string[];
+};
+
+/**
+ * Type for infrastructure changes when removing Lambda Live Debugger
+ */
+export type InfraRemovalChanges = {
+  lambdasToRemove: InfraLambdaUpdate[];
+  rolesToRemove: string[];
+};
+
+/**
  * Get the Lambda client
  * @returns
  */
@@ -116,23 +146,25 @@ async function findExistingLayerVersion() {
     nextMarker = response.NextMarker;
   } while (nextMarker);
 
-  Logger.verbose('No existing layer found.');
+  Logger.verbose(
+    `No matching layer version found with description ${layerDescription}`,
+  );
 
   return undefined;
 }
 
 /**
- * Get the description of the Lambda Layer that is set to the layer
+ * Get the description of the Lambda layer that is set to the layer
  * @returns
  */
 async function getLayerDescription() {
   if (!layerDescription) {
-    layerDescription = `Lambda Live Debugger Layer version ${await getVersion()}`;
+    layerDescription = `Lambda Live Debugger layer version ${await getVersion()}`;
   }
 
   if ((await getVersion()) === '0.0.1') {
     // add a random string to the description to make it unique
-    layerDescription = `Lambda Live Debugger Layer - development ${crypto.randomUUID()}`;
+    layerDescription = `Lambda Live Debugger layer - development ${crypto.randomUUID()}`;
   }
 
   return layerDescription;
@@ -144,13 +176,6 @@ async function getLayerDescription() {
  */
 async function deployLayer() {
   const layerDescription = await getLayerDescription();
-
-  // Check if the layer already exists
-  const existingLayer = await findExistingLayerVersion();
-  if (existingLayer && existingLayer.LayerVersionArn) {
-    Logger.verbose(`${layerDescription} already deployed.`);
-    return existingLayer.LayerVersionArn;
-  }
 
   // check the ZIP
   let layerZipPathFullPath = path.resolve(
@@ -171,7 +196,7 @@ async function deployLayer() {
       await fs.access(layerZipPathFullPath2);
       layerZipPathFullPath = layerZipPathFullPath2;
     } catch {
-      throw new Error(`File for the layer not found: ${layerZipPathFullPath}`);
+      throw new Error(`File for the layer not found: ${layerZipPathFullPath}.`);
     }
   }
 
@@ -196,7 +221,7 @@ async function deployLayer() {
   const response = await getLambdaClient().send(publishLayerVersionCommand);
 
   if (!response.LayerVersionArn) {
-    throw new Error('Failed to retrieve the layer version ARN');
+    throw new Error('Failed to retrieve the layer version ARN.');
   }
 
   Logger.verbose(
@@ -206,7 +231,7 @@ async function deployLayer() {
 }
 
 /**
- * Delete the Lambda Layer
+ * Delete the Lambda layer
  */
 async function deleteLayer() {
   let nextMarker: string | undefined;
@@ -214,7 +239,6 @@ async function deleteLayer() {
     const layers = await getLambdaClient().send(
       new ListLayersCommand({
         Marker: nextMarker,
-        MaxItems: 10,
       }),
     );
 
@@ -241,7 +265,6 @@ async function deleteAllVersionsOfLayer(layerArn: string): Promise<void> {
       new ListLayerVersionsCommand({
         LayerName: layerArn,
         Marker: nextMarker,
-        //MaxItems: 5,
       }),
     );
 
@@ -280,114 +303,466 @@ async function deleteLayerVersion(
 }
 
 /**
- * Remove the layer from the Lambda function
+ * Get the role name from a Lambda function
  * @param functionName
+ * @returns role name
  */
-async function removeLayerFromLambda(functionName: string) {
+async function getRoleNameFromFunction(functionName: string): Promise<string> {
   try {
-    let needToUpdate: boolean = false;
+    Logger.verbose(`[Function ${functionName}] Getting role from function`);
 
+    const getFunctionResponse = await getLambdaClient().send(
+      new GetFunctionCommand({
+        FunctionName: functionName,
+      }),
+    );
+    const roleArn = getFunctionResponse.Configuration?.Role;
+    if (!roleArn) {
+      throw new Error(
+        `Failed to retrieve the role ARN for lambda ${functionName}.`,
+      );
+    }
+
+    // Extract the role name from the role ARN
+    const roleName = roleArn.split('/').pop();
+
+    if (!roleName) {
+      throw new Error(
+        `Failed to extract role name from role ARN: ${roleArn} for lambda ${functionName}.`,
+      );
+    }
+
+    Logger.verbose(`[Function ${functionName}] Found role: ${roleName}`);
+    return roleName;
+  } catch (error: any) {
+    throw new Error(`Failed to get role name from function ${functionName}.`, {
+      cause: error,
+    });
+  }
+}
+
+/**
+ * Check if policy needs to be removed from the Lambda role
+ * @param roleName
+ * @returns
+ */
+async function analyzeRoleRemove(roleName: string) {
+  try {
+    Logger.verbose(
+      `[Role ${roleName}] Analyzing policy removal from Lambda role`,
+    );
+
+    const existingPolicy = await createPolicyDocument(roleName);
+
+    const needToRemovePolicy = !!existingPolicy;
+    Logger.verbose(
+      `[Role ${roleName}] Policy ${needToRemovePolicy ? 'needs to be removed' : 'not found to remove'} from role ${roleName}`,
+    );
+
+    return {
+      needToRemovePolicy,
+      roleName,
+    };
+  } catch (error: any) {
+    throw new Error(`Failed to analyze removal policy from role ${roleName}.`, {
+      cause: error,
+    });
+  }
+}
+
+/**
+ * Remove the policy from the Lambda role
+ * @param roleData
+ * @returns
+ */
+async function removePolicyFromLambdaRole(roleName: string) {
+  Logger.verbose(`[Role ${roleName}] Removing policy from the role`);
+  try {
+    await getIAMClient().send(
+      new DeleteRolePolicyCommand({
+        RoleName: roleName,
+        PolicyName: inlinePolicyName,
+      }),
+    );
+  } catch (error: any) {
+    throw new Error(`Failed to remove policy from the role ${roleName}.`, {
+      cause: error,
+    });
+  }
+}
+
+/**
+ * Create policy document needed to attach to the Lambda role needed for the Lambda Live Debugger
+ * @param roleName
+ * @returns
+ */
+async function createPolicyDocument(roleName: string) {
+  try {
+    Logger.verbose(`[Role ${roleName}] Checking for existing policy document`);
+
+    const policy = await getIAMClient().send(
+      new GetRolePolicyCommand({
+        RoleName: roleName,
+        PolicyName: inlinePolicyName,
+      }),
+    );
+
+    if (policy.PolicyDocument) {
+      Logger.verbose(`[Role ${roleName}] Found existing policy document`);
+      const policyDocument = JSON.parse(
+        decodeURIComponent(policy.PolicyDocument),
+      );
+      return policyDocument;
+    } else {
+      Logger.verbose(`[Role ${roleName}] No policy document found`);
+      return undefined;
+    }
+  } catch (error: any) {
+    if (error.name === 'NoSuchEntityException') {
+      Logger.verbose(`[Role ${roleName}] Policy does not exist`);
+      return undefined;
+    } else {
+      throw new Error(
+        `Failed to create policy document for role ${roleName}.`,
+        { cause: error },
+      );
+    }
+  }
+}
+
+/**
+ * Deploy the infrastructure
+ */
+async function applyAddingInfra(changes: InfraAddingChanges) {
+  Logger.verbose(
+    'Starting infrastructure deployment for adding Lambda Live Debugger',
+  );
+
+  let layerVersionArn: string;
+
+  if (changes.deployLayer) {
+    Logger.verbose('Deploying new layer version');
+    layerVersionArn = await deployLayer();
+  } else {
+    if (!changes.existingLayerVersionArn) {
+      throw new Error('Expected existing layer ARN but none provided.');
+    }
+    Logger.verbose(
+      `Using existing layer version: ${changes.existingLayerVersionArn}`,
+    );
+    layerVersionArn = changes.existingLayerVersionArn;
+  }
+
+  const promises: Promise<void>[] = [];
+
+  // Add LLD to functions
+  for (const lambdaData of changes.lambdasToAdd) {
+    promises.push(
+      addLayerToLambda({
+        ...lambdaData,
+        layers: [
+          layerVersionArn,
+          // remove LLD layer if exist
+          ...lambdaData.layers.filter(
+            (arn) => !arn.includes(`:layer:${layerName}:`),
+          ),
+        ],
+      }),
+    );
+  }
+
+  // Remove LLD from filtered functions
+  for (const lambdaData of changes.lambdasToRemove) {
+    promises.push(removeLayerFromLambda(lambdaData));
+  }
+
+  // Add policies to roles
+  for (const roleName of changes.rolesToAdd) {
+    promises.push(addPolicyToRole(roleName));
+  }
+
+  // Remove policies from roles
+  for (const roleName of changes.rolesToRemove) {
+    promises.push(removePolicyFromLambdaRole(roleName));
+  }
+
+  await Promise.all(promises);
+}
+
+/**
+ * Get the planned infrastructure changes including removal from filtered functions
+ */
+async function getInfraChangesForAdding(): Promise<InfraAddingChanges> {
+  Logger.verbose(
+    'Analyzing infrastructure changes for adding Lambda Live Debugger',
+  );
+
+  const existingLayer = await findExistingLayerVersion();
+
+  const configLambdasAll = Configuration.getLambdasAll();
+
+  const configLambdasUpdate = configLambdasAll.filter(
+    (l) => !(l.filteredOut === true),
+  );
+  const configLambdasRemove = configLambdasAll.filter(
+    (l) => l.filteredOut === true,
+  );
+
+  const lambdasToUpdatePromise = Promise.all(
+    configLambdasUpdate.map(async (func) => {
+      const lambdaUpdate = await analyzeLambdaAdd(
+        func.functionName,
+        existingLayer?.LayerVersionArn,
+      );
+      return lambdaUpdate;
+    }),
+  );
+
+  const lambdasToRemovePromise = Promise.all(
+    configLambdasRemove.map(async (func) => {
+      return analyzeLambdaRemove(func.functionName);
+    }),
+  );
+
+  // Get all role names for lambdas to update, ensure uniqueness, then analyze
+  const roleNamesToAddSet = new Set<string>();
+  const roleNamesToAddPromise = Promise.all(
+    configLambdasUpdate.map(async (func) => {
+      const roleName = await getRoleNameFromFunction(func.functionName);
+      roleNamesToAddSet.add(roleName);
+    }),
+  );
+
+  // Get all role names for lambdas to remove, ensure uniqueness, then analyze
+  const roleNamesToRemoveSet = new Set<string>();
+  const roleNamesToRemovePromise = Promise.all(
+    configLambdasRemove.map(async (func) => {
+      const roleName = await getRoleNameFromFunction(func.functionName);
+      roleNamesToRemoveSet.add(roleName);
+    }),
+  );
+
+  // Analyze roles to add
+  await roleNamesToAddPromise;
+
+  const roleNamesToAdd = Array.from(roleNamesToAddSet);
+  const rolesToAddPromise = Promise.all(
+    roleNamesToAdd.map(async (roleName) => {
+      const roleUpdate = await analyzeRoleAdd(roleName);
+      return roleUpdate.addPolicy ? roleUpdate.roleName : undefined;
+    }),
+  );
+
+  // Analyze roles to remove
+  await roleNamesToRemovePromise;
+
+  let roleNamesToRemove = Array.from(roleNamesToRemoveSet);
+
+  // make sure that roles removed are not in the list to add
+  roleNamesToRemove = roleNamesToRemove.filter(
+    (role) => !roleNamesToAdd.includes(role),
+  );
+
+  const rolesToRemovePromise = Promise.all(
+    roleNamesToRemove.map(async (roleName) => {
+      const roleRemoval = await analyzeRoleRemove(roleName);
+      return roleRemoval.needToRemovePolicy ? roleRemoval.roleName : undefined;
+    }),
+  );
+
+  const lambdasToUpdate = await lambdasToUpdatePromise;
+  const lambdasToAddFiltered = lambdasToUpdate.filter(
+    (l) => l,
+  ) as InfraLambdaUpdate[];
+
+  const rolesToAdd = await rolesToAddPromise;
+  const rolesToAddFiltered = [
+    ...new Set(rolesToAdd.filter((r) => r)),
+  ] as string[];
+
+  const lambdasToRemove = await lambdasToRemovePromise;
+  const lambdasToRemoveFiltered = lambdasToRemove.filter(
+    (l) => l,
+  ) as InfraLambdaUpdate[];
+
+  const rolesToRemove = await rolesToRemovePromise;
+  const rolesToRemoveFiltered = rolesToRemove.filter((r) => r) as string[];
+
+  return {
+    deployLayer: !existingLayer,
+    existingLayerVersionArn: existingLayer?.LayerVersionArn,
+    lambdasToAdd: lambdasToAddFiltered,
+    rolesToAdd: rolesToAddFiltered,
+    lambdasToRemove: lambdasToRemoveFiltered,
+    rolesToRemove: rolesToRemoveFiltered,
+  };
+}
+
+/**
+ * Check what needs to be removed from a Lambda function
+ * @param func - Lambda function properties
+ * @returns Lambda update configuration or undefined if no update needed
+ */
+async function analyzeLambdaRemove(functionName: string) {
+  try {
     const {
       environmentVariables,
       ddlLayerArns,
       otherLayerArns,
       initialTimeout,
-    } = await getLambdaCongfiguration(functionName);
+    } = await getLambdaConfiguration(functionName);
 
-    if (ddlLayerArns.length > 0) {
-      needToUpdate = true;
-      Logger.verbose(`Detaching layer from the function ${functionName}`);
+    const needToRemoveLayer = ddlLayerArns.length > 0;
+    let needToRemoveEnvironmentVariables = false;
+
+    if (needToRemoveLayer) {
+      Logger.verbose(
+        `[Function ${functionName}] Lambda Live Debugger layer(s) detected: ${ddlLayerArns.join(', ')}. Marked for removal.`,
+      );
     } else {
       Logger.verbose(
-        `Skipping detaching layer from the function ${functionName}, no layer attached`,
+        `[Function ${functionName}] No Lambda Live Debugger layer(s) to remove.`,
       );
     }
 
-    const initalExecWraper =
-      environmentVariables.LLD_INITIAL_AWS_LAMBDA_EXEC_WRAPPER;
-
-    const ddlEnvironmentVariables = getEnvironmentVarablesForDebugger({
+    const ddlEnvironmentVariables = getEnvironmentVariablesForDebugger({
       // set dummy data, so we just get the list of environment variables
-      functionId: 'xxx',
+      functionName: 'xxx',
       timeout: 0,
       verbose: true,
-      initalExecWraper: 'test',
+      initialExecWrapper: 'test',
     });
 
     // check if environment variables are set for each property
     for (const [key] of Object.entries(ddlEnvironmentVariables)) {
       if (environmentVariables && environmentVariables[key]) {
-        needToUpdate = true;
+        needToRemoveEnvironmentVariables = true;
         break;
       }
     }
 
-    if (needToUpdate) {
-      Logger.verbose(
-        `Updating function configuration for ${functionName} to remove layer and reset environment variables`,
-      );
-
-      Logger.verbose(
-        'Existing environment variables',
+    Logger.verbose(
+      `[Function ${functionName}] ${needToRemoveEnvironmentVariables ? 'Environment variables needed to be removed' : 'No environment variables to remove'}. Existing environment variables: ` +
         JSON.stringify(environmentVariables, null, 2),
-      );
+    );
 
-      //remove environment variables
+    const needToRemove = needToRemoveLayer || needToRemoveEnvironmentVariables;
+
+    if (needToRemove) {
+      const initialExecWrapper =
+        environmentVariables.LLD_INITIAL_AWS_LAMBDA_EXEC_WRAPPER;
+      const ddlEnvironmentVariables = getEnvironmentVariablesForDebugger({
+        functionName: 'xxx',
+        timeout: 0,
+        verbose: true,
+        initialExecWrapper: 'test',
+      });
+
+      // Remove LLD environment variables
+      const cleanedEnvironmentVariables = { ...environmentVariables };
       for (const [key] of Object.entries(ddlEnvironmentVariables)) {
-        if (environmentVariables && environmentVariables[key]) {
-          if (key === 'AWS_LAMBDA_EXEC_WRAPPER') {
-            if (environmentVariables[key] === lldWrapperPath) {
-              delete environmentVariables[key];
-            } else {
-              // do not remove the original AWS_LAMBDA_EXEC_WRAPPER that was set before LLD
-            }
-          } else {
-            delete environmentVariables[key];
+        if (key === 'AWS_LAMBDA_EXEC_WRAPPER') {
+          if (cleanedEnvironmentVariables[key] === lldWrapperPath) {
+            delete cleanedEnvironmentVariables[key];
           }
+        } else {
+          delete cleanedEnvironmentVariables[key];
         }
       }
 
-      if (initalExecWraper) {
-        environmentVariables.AWS_LAMBDA_EXEC_WRAPPER = initalExecWraper;
+      if (initialExecWrapper) {
+        cleanedEnvironmentVariables.AWS_LAMBDA_EXEC_WRAPPER =
+          initialExecWrapper;
       }
 
-      Logger.verbose(
-        'New environment variables',
-        JSON.stringify(environmentVariables, null, 2),
-      );
-
-      const updateFunctionConfigurationCommand =
-        new UpdateFunctionConfigurationCommand({
-          FunctionName: functionName,
-          Layers: otherLayerArns,
-          Environment: {
-            Variables: {
-              ...environmentVariables,
-            },
-          },
-          Timeout: initialTimeout,
-        });
-
-      await getLambdaClient().send(updateFunctionConfigurationCommand);
-
-      Logger.verbose(`Function configuration cleared ${functionName}`);
-    } else {
-      Logger.verbose(`Function ${functionName} configuration already cleared.`);
+      return {
+        functionName,
+        layers: otherLayerArns,
+        environmentVariables: cleanedEnvironmentVariables,
+        timeout: initialTimeout,
+      };
     }
+    return undefined;
   } catch (error: any) {
-    throw new Error(
-      `Failed to remove layer from lambda ${functionName}: ${error.message}`,
-      { cause: error },
-    );
+    throw new Error(`Failed to analyze removal from lambda ${functionName}.`, {
+      cause: error,
+    });
   }
 }
 
 /**
- * Get the Lambda configuration
- * @param functionName
- * @returns
+ * Get the planned removal changes
  */
-async function getLambdaCongfiguration(functionName: string) {
+async function getInfraChangesForRemoving(): Promise<InfraRemovalChanges> {
+  Logger.verbose(
+    'Analyzing infrastructure changes for removing Lambda Live Debugger',
+  );
+
+  const allLambdas = Configuration.getLambdasAll();
+
+  const lambdasToRemovePromise = Promise.all(
+    allLambdas.map(async (func) => {
+      return analyzeLambdaRemove(func.functionName);
+    }),
+  );
+
+  // Get all role names for lambdas to remove, ensure uniqueness, then analyze
+  const roleNamesToRemoveSet = new Set<string>();
+  await Promise.all(
+    allLambdas.map(async (func) => {
+      const roleName = await getRoleNameFromFunction(func.functionName);
+      roleNamesToRemoveSet.add(roleName);
+    }),
+  );
+
+  const roleNamesToRemove = Array.from(roleNamesToRemoveSet);
+
+  const rolesToRemovePromise = Promise.all(
+    roleNamesToRemove.map(async (roleName) => {
+      const roleRemoval = await analyzeRoleRemove(roleName);
+      return roleRemoval.needToRemovePolicy ? roleRemoval.roleName : undefined;
+    }),
+  );
+
+  const lambdasToRemove = await lambdasToRemovePromise;
+  const lambdasToRemoveFiltered = lambdasToRemove.filter(
+    (l) => l,
+  ) as InfraLambdaUpdate[];
+
+  const rolesToRemove = await rolesToRemovePromise;
+  const rolesToRemoveFiltered = rolesToRemove.filter((r) => r) as string[];
+
+  return {
+    lambdasToRemove: lambdasToRemoveFiltered,
+    rolesToRemove: rolesToRemoveFiltered,
+  };
+}
+
+/**
+ * Remove the infrastructure
+ */
+async function applyRemoveInfra(changes: InfraRemovalChanges) {
+  Logger.verbose('Starting infrastructure removal');
+
+  const promises: Promise<void>[] = [];
+
+  for (const lambdaData of changes.lambdasToRemove) {
+    promises.push(removeLayerFromLambda(lambdaData));
+  }
+
+  for (const roleName of changes.rolesToRemove) {
+    promises.push(removePolicyFromLambdaRole(roleName));
+  }
+
+  await Promise.all(promises);
+}
+
+/**
+ * Get the Lambda function configuration including layers, environment variables, and timeout
+ * @param functionName - The name of the Lambda function
+ * @returns Lambda configuration details
+ */
+async function getLambdaConfiguration(functionName: string) {
   try {
     const getFunctionResponse = await getLambdaClient().send(
       new GetFunctionCommand({
@@ -397,7 +772,7 @@ async function getLambdaCongfiguration(functionName: string) {
 
     const timeout = getFunctionResponse.Configuration?.Timeout;
 
-    // get all layers this fuction has by name
+    // get all layers this function has by name
     const layers = getFunctionResponse.Configuration?.Layers || [];
     const layerArns = layers.map((l) => l.Arn).filter((arn) => arn) as string[];
     const ddlLayerArns = layerArns.filter((arn) =>
@@ -428,214 +803,249 @@ async function getLambdaCongfiguration(functionName: string) {
       initialTimeout,
     };
   } catch (error: any) {
+    throw new Error(`Failed to get lambda configuration ${functionName}.`, {
+      cause: error,
+    });
+  }
+}
+
+/**
+ * Attach the layer to the Lambda function and update the environment variables
+ * @param lambdaData
+ */
+async function addLayerToLambda(lambdaData: InfraLambdaUpdate) {
+  Logger.verbose(
+    `[Function ${lambdaData.functionName}] Adding layer and environment variables`,
+  );
+  try {
+    await updateLambda(lambdaData);
+  } catch (error: any) {
     throw new Error(
-      `Failed to get lambda configuration ${functionName}: ${error.message}`,
+      `Failed to update add layer to lambda ${lambdaData.functionName}.`,
+      { cause: error },
+    );
+  }
+}
+/**
+ * Remove the layer from the Lambda function and update the environment variables
+ * @param lambdaData
+ */
+async function removeLayerFromLambda(lambdaData: InfraLambdaUpdate) {
+  Logger.verbose(
+    `[Function ${lambdaData.functionName}] Removing layer and environment variables`,
+  );
+  try {
+    await updateLambda(lambdaData);
+  } catch (error: any) {
+    throw new Error(
+      `Failed to remove layer from lambda ${lambdaData.functionName}.`,
       { cause: error },
     );
   }
 }
 
 /**
- * Attach the layer to the Lambda function and update the environment variables
+ * General function to update the Lambda function configuration
  */
-async function updateLambda({
-  functionName,
-  functionId,
-  layerVersionArn,
-}: {
-  functionName: string;
-  functionId: string;
-  layerVersionArn: string;
-}) {
-  const { needToUpdate, layers, environmentVariables, initialTimeout } =
-    await prepareLambdaUpdate({
-      functionName,
-      functionId,
-      layerVersionArn,
+async function updateLambda(lambdaData: InfraLambdaUpdate) {
+  const updateFunctionConfigurationCommand =
+    new UpdateFunctionConfigurationCommand({
+      FunctionName: lambdaData.functionName,
+      Layers: lambdaData.layers,
+      Environment: {
+        Variables: lambdaData.environmentVariables,
+      },
+      Timeout: lambdaData.timeout,
     });
 
-  if (needToUpdate) {
-    try {
-      const updateFunctionConfigurationCommand =
-        new UpdateFunctionConfigurationCommand({
-          FunctionName: functionName,
-          Layers: layers,
-          Environment: {
-            Variables: environmentVariables,
-          },
-          //Timeout: LlDebugger.argOptions.observable ? undefined : 300, // Increase the timeout to 5 minutes
-          Timeout: Math.max(initialTimeout, 300), // Increase the timeout to min. 5 minutes
-        });
-
-      await getLambdaClient().send(updateFunctionConfigurationCommand);
-
-      Logger.verbose(
-        `[Function ${functionName}] Lambda layer and environment variables updated`,
-      );
-    } catch (error: any) {
-      throw new Error(
-        `Failed to update Lambda ${functionName}: ${error.message}`,
-        { cause: error },
-      );
-    }
-  } else {
-    Logger.verbose(
-      `[Function ${functionName}] Lambda layer and environment already up to date`,
-    );
-  }
+  await getLambdaClient().send(updateFunctionConfigurationCommand);
 }
 
 /**
- * Prepare the Lambda function for the update
+ * Analyze the Lambda function to determine if it needs to be updated
+ * @param func - Lambda function properties
+ * @param existingLayerVersionArn - ARN of existing layer version if available
+ * @returns Lambda update configuration or undefined if no update needed
  */
-async function prepareLambdaUpdate({
-  functionName,
-  functionId,
-  layerVersionArn,
-}: {
-  functionName: string;
-  functionId: string;
-  layerVersionArn: string;
-}) {
-  let needToUpdate: boolean = false;
-
+async function analyzeLambdaAdd(
+  functionName: string,
+  existingLayerVersionArn: string | undefined,
+) {
   const { environmentVariables, ddlLayerArns, otherLayerArns, initialTimeout } =
-    await getLambdaCongfiguration(functionName);
+    await getLambdaConfiguration(functionName);
 
-  // check if layer is already attached
-  if (!ddlLayerArns?.find((arn) => arn === layerVersionArn)) {
-    needToUpdate = true;
+  if (!existingLayerVersionArn) {
+    const ddlEnvironmentVariables = getEnvironmentVariablesForDebugger({
+      functionName,
+      timeout: initialTimeout,
+      verbose: Configuration.config.verbose,
+      initialExecWrapper:
+        environmentVariables.AWS_LAMBDA_EXEC_WRAPPER !== lldWrapperPath
+          ? environmentVariables.AWS_LAMBDA_EXEC_WRAPPER
+          : undefined,
+    });
+
     Logger.verbose(
-      `[Function ${functionName}] Layer not attached to the function`,
+      `[Function ${functionName}] The layer for this version does not exist in the account. We need to add it and attach it to the function`,
     );
+
+    return {
+      functionName,
+      layers: otherLayerArns,
+      environmentVariables: {
+        ...environmentVariables,
+        ...ddlEnvironmentVariables,
+      },
+      timeout: Math.max(initialTimeout, 300),
+    };
   } else {
-    Logger.verbose(
-      `[Function ${functionName}] Layer already attached to the function`,
-    );
-  }
+    let needToUpdateLayer: boolean = false;
 
-  // check if layers with the wrong version are attached
-  if (!needToUpdate && ddlLayerArns.find((arn) => arn !== layerVersionArn)) {
-    needToUpdate = true;
-    Logger.verbose('Layer with the wrong version attached to the function');
-  }
-
-  // support for multiple internal Lambda extensions
-  const initalExecWraper =
-    environmentVariables.AWS_LAMBDA_EXEC_WRAPPER !== lldWrapperPath
-      ? environmentVariables.AWS_LAMBDA_EXEC_WRAPPER
-      : undefined;
-
-  if (initalExecWraper) {
-    Logger.warn(
-      `[Function ${functionName}] Another internal Lambda extension is already attached to the function, which might cause unpredictable behavior.`,
-    );
-  }
-
-  const ddlEnvironmentVariables = getEnvironmentVarablesForDebugger({
-    functionId,
-    timeout: initialTimeout,
-    verbose: Configuration.config.verbose,
-    initalExecWraper,
-  });
-
-  // check if environment variables are already set for each property
-  for (const [key, value] of Object.entries(ddlEnvironmentVariables)) {
-    if (!environmentVariables || environmentVariables[key] !== value) {
-      needToUpdate = true;
+    // check if layer is already attached
+    if (!ddlLayerArns?.find((arn) => arn === existingLayerVersionArn)) {
+      needToUpdateLayer = true;
       Logger.verbose(
-        `[Function ${functionName}] need to update environment variables`,
+        `[Function ${functionName}] Layer not attached to the function`,
       );
-      break;
+    } else {
+      Logger.verbose(
+        `[Function ${functionName}] Layer already attached to the function`,
+      );
     }
-  }
 
-  return {
-    needToUpdate,
-    layers: [layerVersionArn, ...otherLayerArns],
-    environmentVariables: {
-      ...environmentVariables,
-      ...ddlEnvironmentVariables,
-    },
-    initialTimeout,
-  };
+    // check if layers with the wrong version are attached
+    if (
+      !needToUpdateLayer &&
+      ddlLayerArns.find((arn) => arn !== existingLayerVersionArn)
+    ) {
+      needToUpdateLayer = true;
+      Logger.verbose(
+        `[Function ${functionName}] Layer with the wrong version attached to the function`,
+      );
+    }
+
+    // support for multiple internal Lambda extensions
+    const initialExecWrapper =
+      environmentVariables.AWS_LAMBDA_EXEC_WRAPPER !== lldWrapperPath
+        ? environmentVariables.AWS_LAMBDA_EXEC_WRAPPER
+        : undefined;
+
+    if (initialExecWrapper) {
+      Logger.warn(
+        `[Function ${functionName}] Another internal Lambda extension is already attached to the function, which might cause unpredictable behavior.`,
+      );
+    }
+
+    const ddlEnvironmentVariables = getEnvironmentVariablesForDebugger({
+      functionName,
+      timeout: initialTimeout,
+      verbose: Configuration.config.verbose,
+      initialExecWrapper,
+    });
+
+    let needToUpdateEnvironmentVariables = false;
+
+    // check if environment variables are already set for each property
+    for (const [key, value] of Object.entries(ddlEnvironmentVariables)) {
+      if (!environmentVariables || environmentVariables[key] !== value) {
+        needToUpdateEnvironmentVariables = true;
+        break;
+      }
+    }
+    Logger.verbose(
+      `[Function ${functionName}] ${needToUpdateEnvironmentVariables ? 'Need to update environment variables' : 'No need to update environment variables'}. Existing environment variables: ` +
+        JSON.stringify(environmentVariables, null, 2),
+    );
+
+    return needToUpdateLayer || needToUpdateEnvironmentVariables
+      ? {
+          functionName,
+          layers: [existingLayerVersionArn, ...otherLayerArns],
+          environmentVariables: {
+            ...environmentVariables,
+            ...ddlEnvironmentVariables,
+          },
+          timeout: Math.max(initialTimeout, 300),
+        }
+      : undefined;
+  }
 }
 
 /**
  * Add the policy to the Lambda role
  */
-async function lambdaRoleUpdate(roleName: string) {
-  // add inline policy to the role using PutRolePolicyCommand
-  Logger.verbose(`[Role ${roleName}] Attaching policy to the role ${roleName}`);
-
-  await getIAMClient().send(
-    new PutRolePolicyCommand({
-      RoleName: roleName,
-      PolicyName: inlinePolicyName,
-      PolicyDocument: JSON.stringify(policyDocument),
-    }),
-  );
+async function addPolicyToRole(roleName: string) {
+  Logger.verbose(`[Role ${roleName}] Attaching policy to the role`);
+  try {
+    await getIAMClient().send(
+      new PutRolePolicyCommand({
+        RoleName: roleName,
+        PolicyName: inlinePolicyName,
+        PolicyDocument: JSON.stringify(policyDocument),
+      }),
+    );
+  } catch (error: any) {
+    throw new Error(`Failed to attach policy to role ${roleName}.`, {
+      cause: error,
+    });
+  }
 }
 
 /**
  * Prepare the Lambda role for the update
- * @param functionName
+ * @param roleName
  * @returns
  */
-async function prepareLambdaRoleUpdate(functionName: string) {
-  const getFunctionResponse = await getLambdaClient().send(
-    new GetFunctionCommand({
-      FunctionName: functionName,
-    }),
-  );
-  const roleArn = getFunctionResponse.Configuration?.Role;
-  if (!roleArn) {
-    throw new Error(
-      `Failed to retrieve the role ARN for Lambda ${functionName}`,
-    );
-  }
+async function analyzeRoleAdd(roleName: string) {
+  try {
+    Logger.verbose(`[Role ${roleName}] Analyzing role for policy attachment`);
 
-  // Extract the role name from the role ARN
-  const roleName = roleArn.split('/').pop();
+    const existingPolicy = await createPolicyDocument(roleName);
 
-  if (!roleName) {
-    throw new Error(
-      `Failed to extract role name from role ARN: ${roleArn} for lambda ${functionName}`,
-    );
-  }
+    let addPolicy: boolean = true;
 
-  const existingPolicy = await getPolicyDocument(roleName);
-
-  let addPolicy: boolean = true;
-
-  // compare existing policy with the new one
-  if (existingPolicy) {
-    if (JSON.stringify(existingPolicy) === JSON.stringify(policyDocument)) {
-      Logger.verbose(
-        `[Function ${functionName}] Policy already attached to the role ${roleName}`,
-      );
-      addPolicy = false;
+    // compare existing policy with the new one
+    if (existingPolicy) {
+      if (JSON.stringify(existingPolicy) === JSON.stringify(policyDocument)) {
+        Logger.verbose(
+          `[Role ${roleName}] Policy already attached to the role`,
+        );
+        addPolicy = false;
+      } else {
+        Logger.verbose(
+          `[Role ${roleName}] Different policy found on role, will update`,
+        );
+      }
+    } else {
+      Logger.verbose(`[Role ${roleName}] No policy found on role, will attach`);
     }
+    return { addPolicy, roleName };
+  } catch (error: any) {
+    throw new Error(
+      `Failed to analyze role ${roleName} for policy attachment.`,
+      {
+        cause: error,
+      },
+    );
   }
-  return { addPolicy, roleName };
 }
 
 /**
  * Get the environment variables for the Lambda function
  */
-function getEnvironmentVarablesForDebugger({
-  functionId,
+function getEnvironmentVariablesForDebugger({
+  functionName,
   timeout,
   verbose,
-  initalExecWraper,
+  initialExecWrapper,
 }: {
-  functionId: string;
+  functionName: string;
   timeout: number | undefined;
   verbose: boolean | undefined;
-  initalExecWraper: string | undefined;
+  initialExecWrapper: string | undefined;
 }): Record<string, string> {
   const env: Record<string, string> = {
-    LLD_FUNCTION_ID: functionId,
+    LLD_FUNCTION_ID: functionName,
     AWS_LAMBDA_EXEC_WRAPPER: lldWrapperPath,
     LLD_DEBUGGER_ID: Configuration.config.debuggerId,
     LLD_INITIAL_TIMEOUT: timeout ? timeout.toString() : '-1', // should never be negative
@@ -643,8 +1053,8 @@ function getEnvironmentVarablesForDebugger({
     LLD_OBSERVABLE_INTERVAL: Configuration.config.interval.toString(),
   };
 
-  if (initalExecWraper) {
-    env.LLD_INITIAL_AWS_LAMBDA_EXEC_WRAPPER = initalExecWraper;
+  if (initialExecWrapper) {
+    env.LLD_INITIAL_AWS_LAMBDA_EXEC_WRAPPER = initialExecWrapper;
   }
 
   if (verbose) {
@@ -654,224 +1064,10 @@ function getEnvironmentVarablesForDebugger({
   return env;
 }
 
-/**
- * Remove the policy from the Lambda role
- * @param functionName
- * @returns
- */
-async function removePolicyFromLambdaRole(functionName: string) {
-  try {
-    // Retrieve the Lambda function's execution role ARN
-    const getFunctionResponse = await getLambdaClient().send(
-      new GetFunctionCommand({
-        FunctionName: functionName,
-      }),
-    );
-    const roleArn = getFunctionResponse.Configuration?.Role;
-    if (!roleArn) {
-      throw new Error(
-        `Failed to retrieve the role ARN for lambda ${functionName}`,
-      );
-    }
-
-    // Extract the role name from the role ARN
-    const roleName = roleArn.split('/').pop();
-
-    if (!roleName) {
-      Logger.error(
-        `Failed to extract role name from role ARN: ${roleArn} for Lambda ${functionName}`,
-      );
-      return;
-    }
-
-    const existingPolicy = await getPolicyDocument(roleName);
-
-    if (existingPolicy) {
-      try {
-        Logger.verbose(
-          `[Function ${functionName}] Removing policy from the role ${roleName}`,
-        );
-        await getIAMClient().send(
-          new DeleteRolePolicyCommand({
-            RoleName: roleName,
-            PolicyName: inlinePolicyName,
-          }),
-        );
-      } catch (error: any) {
-        Logger.error(
-          `Failed to delete inline policy ${inlinePolicyName} from role ${roleName} for Lambda ${functionName}:`,
-          error,
-        );
-      }
-    } else {
-      Logger.verbose(
-        `[Function ${functionName}] No need to remove policy from the role ${roleName}, policy not found`,
-      );
-    }
-  } catch (error: any) {
-    throw new Error(
-      `Failed to remove policy from the role for Lambda ${functionName}: ${error.message}`,
-      { cause: error },
-    );
-  }
-}
-
-/**
- * Get the policy document needed to attach to the Lambda role needed for the Lambda Live Debugger
- * @param roleName
- * @returns
- */
-async function getPolicyDocument(roleName: string) {
-  try {
-    const policy = await getIAMClient().send(
-      new GetRolePolicyCommand({
-        RoleName: roleName,
-        PolicyName: inlinePolicyName,
-      }),
-    );
-
-    if (policy.PolicyDocument) {
-      const policyDocument = JSON.parse(
-        decodeURIComponent(policy.PolicyDocument),
-      );
-      return policyDocument;
-    } else {
-      return undefined;
-    }
-  } catch (error: any) {
-    if (error.name === 'NoSuchEntityException') {
-      return undefined;
-    } else {
-      throw error;
-    }
-  }
-}
-
-/**
- * Deploy the infrastructure
- */
-async function deployInfrastructure() {
-  const layerVersionArn = await deployLayer();
-
-  const promises: Promise<void>[] = [];
-
-  for (const func of Configuration.getLambdas()) {
-    const p = updateLambda({
-      functionName: func.functionName,
-      functionId: func.functionId,
-      layerVersionArn: layerVersionArn,
-    });
-    if (process.env.DISABLE_PARALLEL_DEPLOY === 'true') {
-      await p;
-    } else {
-      promises.push(p);
-    }
-  }
-
-  const rolesToUpdatePromise = Promise.all(
-    Configuration.getLambdas().map(async (func) => {
-      const roleUpdate = await prepareLambdaRoleUpdate(func.functionName);
-
-      return roleUpdate.addPolicy ? roleUpdate.roleName : undefined;
-    }),
-  );
-  const rolesToUpdate = await rolesToUpdatePromise;
-  const rolesToUpdateFiltered = [
-    // unique roles
-    ...new Set(rolesToUpdate.filter((r) => r)),
-  ] as string[];
-
-  for (const roleName of rolesToUpdateFiltered) {
-    const p = lambdaRoleUpdate(roleName);
-    if (process.env.DISABLE_PARALLEL_DEPLOY === 'true') {
-      await p;
-    } else {
-      promises.push(p);
-    }
-  }
-
-  await Promise.all(promises);
-}
-
-/**
- * Get the planed infrastructure changes
- */
-async function getPlanedInfrastructureChanges() {
-  const existingLayer = await findExistingLayerVersion();
-
-  const lambdasToUpdatePromise = Promise.all(
-    Configuration.getLambdas().map(async (func) => {
-      if (!existingLayer?.LayerVersionArn) {
-        return func.functionName;
-      } else {
-        const lambdaUpdate = await prepareLambdaUpdate({
-          functionName: func.functionName,
-          functionId: func.functionId,
-          layerVersionArn: existingLayer.LayerVersionArn,
-        });
-
-        return lambdaUpdate.needToUpdate ? func.functionName : undefined;
-      }
-    }),
-  );
-
-  const rolesToUpdatePromise = Promise.all(
-    Configuration.getLambdas().map(async (func) => {
-      const roleUpdate = await prepareLambdaRoleUpdate(func.functionName);
-
-      return roleUpdate.addPolicy ? roleUpdate.roleName : undefined;
-    }),
-  );
-
-  const lambdasToUpdate = await lambdasToUpdatePromise;
-  const lambdasToUpdateFiltered = lambdasToUpdate.filter((l) => l) as string[];
-
-  const rolesToUpdate = await rolesToUpdatePromise;
-  const rolesToUpdateFiltered = [
-    ...new Set(rolesToUpdate.filter((r) => r)),
-  ] as string[];
-
-  return {
-    deployLayer: !existingLayer,
-    lambdasToUpdate: lambdasToUpdateFiltered,
-    rolesToUpdate: rolesToUpdateFiltered,
-  };
-}
-
-/**
- * Remove the infrastructure
- */
-async function removeInfrastructure() {
-  Logger.verbose('Removing Lambda Live Debugger infrastructure.');
-  const promises: Promise<void>[] = [];
-
-  for (const func of Configuration.getLambdas()) {
-    const p = removeLayerFromLambda(func.functionName);
-    if (process.env.DISABLE_PARALLEL_DEPLOY === 'true') {
-      await p;
-    } else {
-      promises.push(p);
-    }
-  }
-
-  const p = (async () => {
-    // do not do it in parallel, because Lambdas could share the same role
-    for (const func of Configuration.getLambdas()) {
-      await removePolicyFromLambdaRole(func.functionName);
-    }
-  })(); // creates one promise
-  if (process.env.DISABLE_PARALLEL_DEPLOY === 'true') {
-    await p;
-  } else {
-    promises.push(p);
-  }
-
-  await Promise.all(promises);
-}
-
 export const InfraDeploy = {
-  getPlanedInfrastructureChanges,
-  deployInfrastructure,
-  removeInfrastructure,
+  getInfraChangesForAdding,
+  getInfraChangesForRemoving,
+  applyAddingInfra,
+  applyRemoveInfra,
   deleteLayer,
 };
