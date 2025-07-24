@@ -544,7 +544,7 @@ async function getInfraChangesForAdding(): Promise<InfraAddingChanges> {
 
   // Filter out roles that are being added to avoid conflicts
   rolesToRemoveFiltered = rolesToRemoveFiltered.filter(
-    (r) => !rolesToAddFiltered.includes(r),
+    (r) => !rolesToAdd.includes(r),
   );
 
   return {
