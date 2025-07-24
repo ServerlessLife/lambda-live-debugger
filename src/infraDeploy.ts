@@ -146,23 +146,25 @@ async function findExistingLayerVersion() {
     nextMarker = response.NextMarker;
   } while (nextMarker);
 
-  Logger.verbose('No existing layer found.');
+  Logger.verbose(
+    `No matching layer version found with description ${layerDescription}`,
+  );
 
   return undefined;
 }
 
 /**
- * Get the description of the Lambda Layer that is set to the layer
+ * Get the description of the Lambda layer that is set to the layer
  * @returns
  */
 async function getLayerDescription() {
   if (!layerDescription) {
-    layerDescription = `Lambda Live Debugger Layer version ${await getVersion()}`;
+    layerDescription = `Lambda Live Debugger layer version ${await getVersion()}`;
   }
 
   if ((await getVersion()) === '0.0.1') {
     // add a random string to the description to make it unique
-    layerDescription = `Lambda Live Debugger Layer - development ${crypto.randomUUID()}`;
+    layerDescription = `Lambda Live Debugger layer - development ${crypto.randomUUID()}`;
   }
 
   return layerDescription;
@@ -229,7 +231,7 @@ async function deployLayer() {
 }
 
 /**
- * Delete the Lambda Layer
+ * Delete the Lambda layer
  */
 async function deleteLayer() {
   let nextMarker: string | undefined;
@@ -366,7 +368,6 @@ async function removePolicyFromLambdaRole(roleName: string) {
         PolicyName: inlinePolicyName,
       }),
     );
-    Logger.verbose(`[Role ${roleName}] Policy removed successfully`);
   } catch (error: any) {
     throw new Error(`Failed to remove policy from the role ${roleName}.`, {
       cause: error,
@@ -402,9 +403,7 @@ async function createPolicyDocument(roleName: string) {
     }
   } catch (error: any) {
     if (error.name === 'NoSuchEntityException') {
-      Logger.verbose(
-        `[Role ${roleName}] Policy does not exist (NoSuchEntityException)`,
-      );
+      Logger.verbose(`[Role ${roleName}] Policy does not exist`);
       return undefined;
     } else {
       throw new Error(
@@ -837,7 +836,7 @@ async function analyzeLambdaAdd(
     });
 
     Logger.verbose(
-      `[Function ${functionName}] Layer does not exist at all, need to add it and attach to the function`,
+      `[Function ${functionName}] The layer for this version does not exist in the account. We need to add it and attach it to the function`,
     );
 
     return {
@@ -899,7 +898,7 @@ async function analyzeLambdaAdd(
       if (!environmentVariables || environmentVariables[key] !== value) {
         needToUpdate = true;
         Logger.verbose(
-          `[Function ${functionName}] need to update environment variables`,
+          `[Function ${functionName}] Need to update environment variables`,
         );
         break;
       }

@@ -84,7 +84,7 @@ async function run() {
       removalChanges.rolesToRemove.length ||
       Configuration.config.remove === 'all';
 
-    const changesMessage = `\nThe following changes will be applied to your AWS account:${
+    const changesMessage = `The following changes will be applied to your AWS account:${
       (removalChanges.lambdasToRemove.length
         ? `\n - Remove LLD layer and environment variables from Lambdas:\n${removalChanges.lambdasToRemove
             .map((l) => `   - ${l.functionName}`)
@@ -161,7 +161,7 @@ async function run() {
     changes.lambdasToRemove.length ||
     changes.rolesToRemove.length;
 
-  const changesMessage = `\nThe following changes will be applied to your AWS account:${
+  const changesMessage = `The following changes will be applied to your AWS account:${
     (changes.deployLayer
       ? `\n - Deploy Lambda Live Debugger layer version ${version}`
       : '') +
