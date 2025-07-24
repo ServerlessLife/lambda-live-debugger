@@ -303,15 +303,13 @@ async function deleteLayerVersion(
 }
 
 /**
- * Check if policy needs to be removed from the Lambda role
+ * Get the role name from a Lambda function
  * @param functionName
- * @returns
+ * @returns role name
  */
-async function analyzeRemovePolicyFromLambdaRole(functionName: string) {
+async function getRoleNameFromFunction(functionName: string): Promise<string> {
   try {
-    Logger.verbose(
-      `[Function ${functionName}] Analyzing policy removal from Lambda role`,
-    );
+    Logger.verbose(`[Function ${functionName}] Getting role from function`);
 
     const getFunctionResponse = await getLambdaClient().send(
       new GetFunctionCommand({
@@ -325,6 +323,7 @@ async function analyzeRemovePolicyFromLambdaRole(functionName: string) {
       );
     }
 
+    // Extract the role name from the role ARN
     const roleName = roleArn.split('/').pop();
 
     if (!roleName) {
@@ -334,12 +333,30 @@ async function analyzeRemovePolicyFromLambdaRole(functionName: string) {
     }
 
     Logger.verbose(`[Function ${functionName}] Found role: ${roleName}`);
+    return roleName;
+  } catch (error: any) {
+    throw new Error(`Failed to get role name from function ${functionName}.`, {
+      cause: error,
+    });
+  }
+}
+
+/**
+ * Check if policy needs to be removed from the Lambda role
+ * @param roleName
+ * @returns
+ */
+async function analyzeRoleRemove(roleName: string) {
+  try {
+    Logger.verbose(
+      `[Role ${roleName}] Analyzing policy removal from Lambda role`,
+    );
 
     const existingPolicy = await createPolicyDocument(roleName);
 
     const needToRemovePolicy = !!existingPolicy;
     Logger.verbose(
-      `[Function ${functionName}] Policy ${needToRemovePolicy ? 'needs to be removed' : 'not found to remove'} from role ${roleName}`,
+      `[Role ${roleName}] Policy ${needToRemovePolicy ? 'needs to be removed' : 'not found to remove'} from role ${roleName}`,
     );
 
     return {
@@ -347,10 +364,9 @@ async function analyzeRemovePolicyFromLambdaRole(functionName: string) {
       roleName,
     };
   } catch (error: any) {
-    throw new Error(
-      `Failed to analyze removal policy from Lambda ${functionName}.`,
-      { cause: error },
-    );
+    throw new Error(`Failed to analyze removal policy from role ${roleName}.`, {
+      cause: error,
+    });
   }
 }
 
@@ -502,24 +518,54 @@ async function getInfraChangesForAdding(): Promise<InfraAddingChanges> {
     }),
   );
 
-  const rolesToAddPromise = Promise.all(
+  const lambdasToRemovePromise = Promise.all(
+    configLambdasRemove.map(async (func) => {
+      return analyzeLambdaRemove(func.functionName);
+    }),
+  );
+
+  // Get all role names for lambdas to update, ensure uniqueness, then analyze
+  const roleNamesToAddSet = new Set<string>();
+  const roleNamesToAddPromise = Promise.all(
     configLambdasUpdate.map(async (func) => {
-      const roleUpdate = await analyzeLambdaRoleAdd(func.functionName);
+      const roleName = await getRoleNameFromFunction(func.functionName);
+      roleNamesToAddSet.add(roleName);
+    }),
+  );
+
+  // Get all role names for lambdas to remove, ensure uniqueness, then analyze
+  const roleNamesToRemoveSet = new Set<string>();
+  const roleNamesToRemovePromise = Promise.all(
+    configLambdasRemove.map(async (func) => {
+      const roleName = await getRoleNameFromFunction(func.functionName);
+      roleNamesToRemoveSet.add(roleName);
+    }),
+  );
+
+  // Analyze roles to add
+  await roleNamesToAddPromise;
+
+  const roleNamesToAdd = Array.from(roleNamesToAddSet);
+  const rolesToAddPromise = Promise.all(
+    roleNamesToAdd.map(async (roleName) => {
+      const roleUpdate = await analyzeRoleAdd(roleName);
       return roleUpdate.addPolicy ? roleUpdate.roleName : undefined;
     }),
   );
 
-  const lambdasToRemovePromise = Promise.all(
-    configLambdasRemove.map(async (func) => {
-      return analyzeRemoveLambda(func.functionName);
-    }),
+  // Analyze roles to remove
+  await roleNamesToRemovePromise;
+
+  let roleNamesToRemove = Array.from(roleNamesToRemoveSet);
+
+  // make sure that roles removed are not in the list to add
+  roleNamesToRemove = roleNamesToRemove.filter(
+    (role) => !roleNamesToAdd.includes(role),
   );
 
   const rolesToRemovePromise = Promise.all(
-    configLambdasRemove.map(async (func) => {
-      const roleRemoval = await analyzeRemovePolicyFromLambdaRole(
-        func.functionName,
-      );
+    roleNamesToRemove.map(async (roleName) => {
+      const roleRemoval = await analyzeRoleRemove(roleName);
       return roleRemoval.needToRemovePolicy ? roleRemoval.roleName : undefined;
     }),
   );
@@ -540,12 +586,7 @@ async function getInfraChangesForAdding(): Promise<InfraAddingChanges> {
   ) as InfraLambdaUpdate[];
 
   const rolesToRemove = await rolesToRemovePromise;
-  let rolesToRemoveFiltered = rolesToRemove.filter((r) => r) as string[];
-
-  // Filter out roles that are being added to avoid conflicts
-  rolesToRemoveFiltered = rolesToRemoveFiltered.filter(
-    (r) => !rolesToAdd.includes(r),
-  );
+  const rolesToRemoveFiltered = rolesToRemove.filter((r) => r) as string[];
 
   return {
     deployLayer: !existingLayer,
@@ -562,7 +603,7 @@ async function getInfraChangesForAdding(): Promise<InfraAddingChanges> {
  * @param func - Lambda function properties
  * @returns Lambda update configuration or undefined if no update needed
  */
-async function analyzeRemoveLambda(functionName: string) {
+async function analyzeLambdaRemove(functionName: string) {
   try {
     const {
       environmentVariables,
@@ -601,8 +642,8 @@ async function analyzeRemoveLambda(functionName: string) {
     }
 
     Logger.verbose(
-      `[Function ${functionName}] ${needToRemoveEnvironmentVariables ? 'Removing environment variables' : 'No environment variables to remove'}. Existing environment variables: `,
-      JSON.stringify(ddlEnvironmentVariables, null, 2),
+      `[Function ${functionName}] ${needToRemoveEnvironmentVariables ? 'Environment variables needed to be removed' : 'No environment variables to remove'}. Existing environment variables: ` +
+        JSON.stringify(environmentVariables, null, 2),
     );
 
     const needToRemove = needToRemoveLayer || needToRemoveEnvironmentVariables;
@@ -661,15 +702,24 @@ async function getInfraChangesForRemoving(): Promise<InfraRemovalChanges> {
 
   const lambdasToRemovePromise = Promise.all(
     allLambdas.map(async (func) => {
-      return analyzeRemoveLambda(func.functionName);
+      return analyzeLambdaRemove(func.functionName);
     }),
   );
 
-  const rolesToRemovePromise = Promise.all(
+  // Get all role names for lambdas to remove, ensure uniqueness, then analyze
+  const roleNamesToRemoveSet = new Set<string>();
+  await Promise.all(
     allLambdas.map(async (func) => {
-      const roleRemoval = await analyzeRemovePolicyFromLambdaRole(
-        func.functionName,
-      );
+      const roleName = await getRoleNameFromFunction(func.functionName);
+      roleNamesToRemoveSet.add(roleName);
+    }),
+  );
+
+  const roleNamesToRemove = Array.from(roleNamesToRemoveSet);
+
+  const rolesToRemovePromise = Promise.all(
+    roleNamesToRemove.map(async (roleName) => {
+      const roleRemoval = await analyzeRoleRemove(roleName);
       return roleRemoval.needToRemovePolicy ? roleRemoval.roleName : undefined;
     }),
   );
@@ -849,11 +899,11 @@ async function analyzeLambdaAdd(
       timeout: Math.max(initialTimeout, 300),
     };
   } else {
-    let needToUpdate: boolean = false;
+    let needToUpdateLayer: boolean = false;
 
     // check if layer is already attached
     if (!ddlLayerArns?.find((arn) => arn === existingLayerVersionArn)) {
-      needToUpdate = true;
+      needToUpdateLayer = true;
       Logger.verbose(
         `[Function ${functionName}] Layer not attached to the function`,
       );
@@ -865,10 +915,10 @@ async function analyzeLambdaAdd(
 
     // check if layers with the wrong version are attached
     if (
-      !needToUpdate &&
+      !needToUpdateLayer &&
       ddlLayerArns.find((arn) => arn !== existingLayerVersionArn)
     ) {
-      needToUpdate = true;
+      needToUpdateLayer = true;
       Logger.verbose(
         `[Function ${functionName}] Layer with the wrong version attached to the function`,
       );
@@ -893,18 +943,21 @@ async function analyzeLambdaAdd(
       initialExecWrapper,
     });
 
+    let needToUpdateEnvironmentVariables = false;
+
     // check if environment variables are already set for each property
     for (const [key, value] of Object.entries(ddlEnvironmentVariables)) {
       if (!environmentVariables || environmentVariables[key] !== value) {
-        needToUpdate = true;
-        Logger.verbose(
-          `[Function ${functionName}] Need to update environment variables`,
-        );
+        needToUpdateEnvironmentVariables = true;
         break;
       }
     }
+    Logger.verbose(
+      `[Function ${functionName}] ${needToUpdateEnvironmentVariables ? 'Need to update environment variables' : 'No need to update environment variables'}. Existing environment variables: ` +
+        JSON.stringify(environmentVariables, null, 2),
+    );
 
-    return needToUpdate
+    return needToUpdateLayer || needToUpdateEnvironmentVariables
       ? {
           functionName,
           layers: [existingLayerVersionArn, ...otherLayerArns],
@@ -940,59 +993,41 @@ async function addPolicyToRole(roleName: string) {
 
 /**
  * Prepare the Lambda role for the update
- * @param functionName
+ * @param roleName
  * @returns
  */
-async function analyzeLambdaRoleAdd(functionName: string) {
-  Logger.verbose(
-    `[Function ${functionName}] Analyzing role for policy attachment`,
-  );
+async function analyzeRoleAdd(roleName: string) {
+  try {
+    Logger.verbose(`[Role ${roleName}] Analyzing role for policy attachment`);
 
-  const getFunctionResponse = await getLambdaClient().send(
-    new GetFunctionCommand({
-      FunctionName: functionName,
-    }),
-  );
-  const roleArn = getFunctionResponse.Configuration?.Role;
-  if (!roleArn) {
-    throw new Error(
-      `[Function ${functionName}] Failed to retrieve the role ARN.`,
-    );
-  }
+    const existingPolicy = await createPolicyDocument(roleName);
 
-  // Extract the role name from the role ARN
-  const roleName = roleArn.split('/').pop();
+    let addPolicy: boolean = true;
 
-  if (!roleName) {
-    throw new Error(
-      `[Function ${functionName}] Failed to extract role name from role ARN: ${roleArn}.`,
-    );
-  }
-
-  Logger.verbose(`[Function ${functionName}] Found role: ${roleName}`);
-
-  const existingPolicy = await createPolicyDocument(roleName);
-
-  let addPolicy: boolean = true;
-
-  // compare existing policy with the new one
-  if (existingPolicy) {
-    if (JSON.stringify(existingPolicy) === JSON.stringify(policyDocument)) {
-      Logger.verbose(
-        `[Function ${functionName}] Policy already attached to the role ${roleName}`,
-      );
-      addPolicy = false;
+    // compare existing policy with the new one
+    if (existingPolicy) {
+      if (JSON.stringify(existingPolicy) === JSON.stringify(policyDocument)) {
+        Logger.verbose(
+          `[Role ${roleName}] Policy already attached to the role`,
+        );
+        addPolicy = false;
+      } else {
+        Logger.verbose(
+          `[Role ${roleName}] Different policy found on role, will update`,
+        );
+      }
     } else {
-      Logger.verbose(
-        `[Function ${functionName}] Different policy found on role ${roleName}, will update`,
-      );
+      Logger.verbose(`[Role ${roleName}] No policy found on role, will attach`);
     }
-  } else {
-    Logger.verbose(
-      `[Function ${functionName}] No policy found on role ${roleName}, will attach`,
+    return { addPolicy, roleName };
+  } catch (error: any) {
+    throw new Error(
+      `Failed to analyze role ${roleName} for policy attachment.`,
+      {
+        cause: error,
+      },
     );
   }
-  return { addPolicy, roleName };
 }
 
 /**
