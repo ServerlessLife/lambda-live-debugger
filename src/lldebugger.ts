@@ -135,8 +135,13 @@ async function run() {
     // await GitIgnore.removeFromGitIgnore();
     // delete folder .lldebugger
     const folder = path.join(getProjectDirname(), '.lldebugger');
-    Logger.verbose(`Removing ${folder} folder...`);
-    await fs.rm(folder, { recursive: true });
+    try {
+      Logger.verbose(`Removing ${folder} folder...`);
+      await fs.access(folder);
+      await fs.rm(folder, { recursive: true });
+    } catch {
+      Logger.verbose(`${folder} does not exist, skipping removal.`);
+    }
 
     if (Configuration.config.remove === 'all') {
       await InfraDeploy.deleteLayer();
