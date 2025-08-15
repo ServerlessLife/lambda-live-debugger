@@ -21,7 +21,7 @@ Serverless is amazing and solves many issues with traditional systems. However, 
 
 Lambda Live Debugger connects to your deployed Lambda, routes requests to your computer, and sends responses back to the deployed Lambda. This allows you to debug locally, but the system behaves as if the code is running in the cloud with the same permissions. In case of code changes, you do not have to redeploy. The code is reloaded automatically without deploying or even restarting the debugger.
 
-The tool attaches Lambda Extensions (via a Layer), intercepts, and relays calls to AWS IoT. AWS IoT transfers messages between your Lambda and the local machine. If the Lambda is written in TypeScript, it's transpiled to JavaScript. The code is executed via the Node Worker Thread.
+The tool attaches Lambda Extensions (via a layer), intercepts, and relays calls to AWS IoT. AWS IoT transfers messages between your Lambda and the local machine. If the Lambda is written in TypeScript, it's transpiled to JavaScript. The code is executed via the Node Worker Thread.
 
 ![Architecture](./public/architecture.drawio.png)
 
@@ -34,11 +34,11 @@ AWS keys generated on the cloud for Lambda are transferred to the local environm
 
 Lambda Live Debugger makes the following changes to your AWS infrastructure:
 
-- Deploys the Lambda Layer
-- Attaches the Layer to each Lambda you're debugging
+- Deploys the Lambda layer
+- Attaches the layer to each Lambda you're debugging
 - Adds a policy to the Lambda Role for AWS IoT access
 
-In case you do not want to debug all functions and add the Layer to them, you can limit to the ones you need via the `function` parameter.
+In case you do not want to debug all functions and add the layer to them, you can limit to the ones you need via the `function` parameter.
 
 The tool generates temporary files in the `.lldebugger` folder, which can be deleted after debugging. The wizard can add `.lldebugger` to `.gitignore` for you.
 
@@ -109,7 +109,7 @@ The configuration is saved to `lldebugger.config.ts`.
 
 ```
  -V, --version                   output the version number
- -r, --remove [option]           Remove Lambda Live Debugger infrastructure. Options: 'keep-layer' (default), 'all'. The latest also removes the Lambda Layer
+ -r, --remove [option]           Remove Lambda Live Debugger infrastructure. Options: 'keep-layer' (default), 'all'. The latest also removes the Lambda layer
  -w, --wizard                    Program interactively asks for each parameter and saves it to lldebugger.config.ts
  -v, --verbose                   Verbose logging
  -c, --context <context>         AWS CDK context (default: [])
@@ -187,9 +187,9 @@ When you no longer want to debug and want Lambda to execute the code deployed to
 lld -r
 ```
 
-This detaches the Layer from your Lambdas and removes the IoT permission policy. It will not remove the Layer because others might use it.
+This detaches the layer from your Lambdas and removes the IoT permission policy. It will not remove the layer because others might use it.
 
-To also remove the Layer:
+To also remove the layer:
 
 ```
 lld -r=all

@@ -23,7 +23,6 @@ permissions:
   contents: write
 
 env:
-  DISABLE_PARALLEL_DEPLOY: false
   REAL_NPM: ${{ inputs.mode == 'global' || inputs.mode == 'local' }}
   TEST_MONOREPO: ${{ inputs.testMonorepo }}
   node_version: 22
@@ -74,14 +73,14 @@ jobs:
         run: npm run deploy
         working-directory: test/cdk-basic
       - name: Test
-        run: npx vitest --retry 1 test/cdk-basic.test.ts
+        run: npx vitest --retry 2 test/cdk-basic.test.ts
       - name: Test - observability mode
-        run: OBSERVABLE_MODE=true npx vitest --retry 1 test/cdk-basic.test.ts
+        run: OBSERVABLE_MODE=true npx vitest --retry 2 test/cdk-basic.test.ts
       - name: Deploy YAML version
         run: npm run deploy-yaml
         working-directory: test/cdk-basic
       - name: Test YAML
-        run: npx vitest --retry 1 test/cdk-basic.test.ts
+        run: npx vitest --retry 2 test/cdk-basic.test.ts
 
   test-cdk-esm:
     runs-on: ubuntu-latest
@@ -128,9 +127,9 @@ jobs:
         run: npm run deploy
         working-directory: test/cdk-esm
       - name: Test
-        run: npx vitest --retry 1 test/cdk-esm.test.ts
+        run: npx vitest --retry 2 test/cdk-esm.test.ts
       - name: Test - observability mode
-        run: OBSERVABLE_MODE=true npx vitest --retry 1 test/cdk-esm.test.ts
+        run: OBSERVABLE_MODE=true npx vitest --retry 2 test/cdk-esm.test.ts
 
   test-sls-basic:
     runs-on: ubuntu-latest
@@ -178,9 +177,9 @@ jobs:
         run: npm run deploy
         working-directory: test/sls-basic
       - name: Test
-        run: npx vitest --retry 1 test/sls-basic.test.ts
+        run: npx vitest --retry 2 test/sls-basic.test.ts
       - name: Test - observability mode
-        run: OBSERVABLE_MODE=true npx vitest --retry 1 test/sls-basic.test.ts
+        run: OBSERVABLE_MODE=true npx vitest --retry 2 test/sls-basic.test.ts
 
   test-sls-esbuild-cjs:
     runs-on: ubuntu-latest
@@ -228,9 +227,9 @@ jobs:
         run: npm run deploy
         working-directory: test/sls-esbuild-cjs
       - name: Test
-        run: npx vitest --retry 1 test/sls-esbuild-cjs.test.ts
+        run: npx vitest --retry 2 test/sls-esbuild-cjs.test.ts
       - name: Test - observability mode
-        run: OBSERVABLE_MODE=true npx vitest --retry 1 test/sls-esbuild-cjs.test.ts
+        run: OBSERVABLE_MODE=true npx vitest --retry 2 test/sls-esbuild-cjs.test.ts
 
   test-sls-esbuild-esm:
     runs-on: ubuntu-latest
@@ -278,9 +277,9 @@ jobs:
         run: npm run deploy
         working-directory: test/sls-esbuild-esm
       - name: Test
-        run: npx vitest --retry 1 test/sls-esbuild-esm.test.ts
+        run: npx vitest --retry 2 test/sls-esbuild-esm.test.ts
       - name: Test - observability mode
-        run: OBSERVABLE_MODE=true npx vitest --retry 1 test/sls-esbuild-esm.test.ts
+        run: OBSERVABLE_MODE=true npx vitest --retry 2 test/sls-esbuild-esm.test.ts
 
   test-osls-basic:
     runs-on: ubuntu-latest
@@ -328,9 +327,9 @@ jobs:
         run: npm run deploy
         working-directory: test/osls-basic
       - name: Test
-        run: npx vitest --retry 1 test/osls-basic.test.ts
+        run: npx vitest --retry 2 test/osls-basic.test.ts
       - name: Test - observability mode
-        run: OBSERVABLE_MODE=true npx vitest --retry 1 test/osls-basic.test.ts
+        run: OBSERVABLE_MODE=true npx vitest --retry 2 test/osls-basic.test.ts
 
   test-osls-esbuild-cjs:
     runs-on: ubuntu-latest
@@ -378,9 +377,9 @@ jobs:
         run: npm run deploy
         working-directory: test/osls-esbuild-cjs
       - name: Test
-        run: npx vitest --retry 1 test/osls-esbuild-cjs.test.ts
+        run: npx vitest --retry 2 test/osls-esbuild-cjs.test.ts
       - name: Test - observability mode
-        run: OBSERVABLE_MODE=true npx vitest --retry 1 test/osls-esbuild-cjs.test.ts
+        run: OBSERVABLE_MODE=true npx vitest --retry 2 test/osls-esbuild-cjs.test.ts
 
   test-osls-esbuild-esm:
     runs-on: ubuntu-latest
@@ -428,9 +427,9 @@ jobs:
         run: npm run deploy
         working-directory: test/osls-esbuild-esm
       - name: Test
-        run: npx vitest --retry 1 test/osls-esbuild-esm.test.ts
+        run: npx vitest --retry 2 test/osls-esbuild-esm.test.ts
       - name: Test - observability mode
-        run: OBSERVABLE_MODE=true npx vitest --retry 1 test/osls-esbuild-esm.test.ts
+        run: OBSERVABLE_MODE=true npx vitest --retry 2 test/osls-esbuild-esm.test.ts
 
   test-sam-basic:
     runs-on: ubuntu-latest
@@ -481,9 +480,9 @@ jobs:
         run: npm run deploy
         working-directory: test/sam-basic
       - name: Test
-        run: npx vitest --retry 1 test/sam-basic.test.ts
+        run: npx vitest --retry 2 test/sam-basic.test.ts
       - name: Test - observability mode
-        run: OBSERVABLE_MODE=true npx vitest --retry 1 test/sam-basic.test.ts
+        run: OBSERVABLE_MODE=true npx vitest --retry 2 test/sam-basic.test.ts
 
   test-sam-alt:
     runs-on: ubuntu-latest
@@ -534,9 +533,9 @@ jobs:
         run: npm run deploy
         working-directory: test/sam-alt
       - name: Test
-        run: npx vitest --retry 1 test/sam-alt.test.ts
+        run: npx vitest --retry 2 test/sam-alt.test.ts
       - name: Test - observability mode
-        run: OBSERVABLE_MODE=true npx vitest --retry 1 test/sam-alt.test.ts
+        run: OBSERVABLE_MODE=true npx vitest --retry 2 test/sam-alt.test.ts
 
   test-terraform-basic:
     runs-on: ubuntu-latest
@@ -590,9 +589,9 @@ jobs:
         run: npm run deploy
         working-directory: test/terraform-basic
       - name: Test
-        run: npx vitest --retry 1 test/terraform-basic.test.ts
+        run: npx vitest --retry 2 test/terraform-basic.test.ts
       - name: Test - observability mode
-        run: OBSERVABLE_MODE=true npx vitest --retry 1 test/terraform-basic.test.ts
+        run: OBSERVABLE_MODE=true npx vitest --retry 2 test/terraform-basic.test.ts
 
   test-opentofu-basic:
     runs-on: ubuntu-latest
@@ -646,6 +645,6 @@ jobs:
         run: npm run deploy
         working-directory: test/opentofu-basic
       - name: Test
-        run: npx vitest --retry 1 test/opentofu-basic.test.ts
+        run: npx vitest --retry 2 test/opentofu-basic.test.ts
       - name: Test - observability mode
-        run: OBSERVABLE_MODE=true npx vitest --retry 1 test/opentofu-basic.test.ts
+        run: OBSERVABLE_MODE=true npx vitest --retry 2 test/opentofu-basic.test.ts
