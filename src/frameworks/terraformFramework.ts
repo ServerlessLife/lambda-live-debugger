@@ -67,13 +67,13 @@ export class TerraformFramework implements IFramework {
    * @returns
    */
   public async canHandle(): Promise<boolean> {
-    // is there any filey with *.tf extension
+    // check for any files with .tf or .tf.json extension
     const files = await fs.readdir(process.cwd());
-    const r = files.some((f) => f.endsWith('.tf'));
+    const r = files.some((f) => f.endsWith('.tf') || f.endsWith('.tf.json'));
 
     if (!r) {
       Logger.verbose(
-        `[${this.logName}] This is not a ${this.logName} project. There are no *.tf files in ${path.resolve('.')} folder.`,
+        `[${this.logName}] This is not a ${this.logName} project. There are no *.tf or *.tf.json files in ${path.resolve('.')} folder.`,
       );
       return false;
     } else {
