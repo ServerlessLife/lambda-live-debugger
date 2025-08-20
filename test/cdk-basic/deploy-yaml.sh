@@ -12,4 +12,10 @@ awk '
   }
   { print }
 ' CdkbasicStack.yaml > template.patched.yaml && mv template.patched.yaml CdkbasicStack.yaml
+
+echo "Deploying stack with the following template:"
+echo "-------------------------------------------"
+cat CdkbasicStack.yaml
+echo "-------------------------------------------"
+
 aws cloudformation deploy --template-file CdkbasicStack.yaml --stack-name test-lld-cdk-basic --capabilities CAPABILITY_NAMED_IAM
