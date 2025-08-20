@@ -13,9 +13,9 @@
     "@types/aws-lambda": "^8.10.152"
   },
   "dependencies": {
-    "@aws-sdk/client-iot": "^3.863.0",
-    "@aws-sdk/client-lambda": "^3.863.0",
-    "@aws-sdk/client-s3": "^3.863.0",
+    "@aws-sdk/client-iot": "^3.864.0",
+    "@aws-sdk/client-lambda": "^3.865.0",
+    "@aws-sdk/client-s3": "^3.864.0",
     "aws-iot-device-sdk": "^2.2.15"
   }
 }
