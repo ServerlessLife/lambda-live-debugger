@@ -18,4 +18,9 @@ awk '
 # Remove the first part of the template up to and including the Resources section
 awk 'f{print} /^Resources:/ {f=1; print}' template.patched.yaml > CdkbasicStack.yaml
 
+echo "Deploying stack with the following template:"
+echo "-------------------------------------------"
+cat CdkbasicStack.yaml
+echo "-------------------------------------------"
+
 aws cloudformation deploy --template-file CdkbasicStack.yaml --stack-name test-lld-cdk-basic --capabilities CAPABILITY_NAMED_IAM
