@@ -9,12 +9,12 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@aws-sdk/client-lambda": "^3.865.0",
+    "@aws-sdk/client-lambda": "^3.879.0",
     "vitest": "^3.2.4",
     "typescript": "~5.9.2"
   },
   "dependencies": {
-    "@aws-sdk/client-iam": "^3.864.0",
+    "@aws-sdk/client-iam": "^3.879.0",
     "@tsconfig/node22": "^22.0.2"
   }
 }
