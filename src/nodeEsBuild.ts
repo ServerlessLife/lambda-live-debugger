@@ -1,4 +1,3 @@
-import { LambdaProps } from './types/lambdaProps.js';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import * as esbuild from 'esbuild';
@@ -11,6 +10,7 @@ import { combineArray } from './utils/combineArray.js';
 import { combineObject } from './utils/combineObject.js';
 import { combineObjectStrings } from './utils/combineObjectStrings.js';
 import { removeUndefinedProperties } from './utils/removeUndefinedProperties.js';
+import { LambdaResource } from './types/resourcesDiscovery.js';
 
 type BuiltOutput = {
   result: Promise<esbuild.BuildResult>;
@@ -95,7 +95,7 @@ async function getBuild(functionId: string) {
  */
 async function build(input: {
   functionId: string;
-  function: LambdaProps;
+  function: LambdaResource;
   oldCtx?: esbuild.BuildContext;
 }): Promise<{
   result: esbuild.BuildResult;

@@ -77,62 +77,43 @@ async function run() {
   await Configuration.discoverLambdas();
 
   if (Configuration.config.remove) {
-    await InfraDeploy.removeInfrastructure();
-    // await GitIgnore.removeFromGitIgnore();
-    // delete folder .lldebugger
-    const folder = path.join(getProjectDirname(), '.lldebugger');
-    Logger.verbose(`Removing ${folder} folder...`);
-    await fs.rm(folder, { recursive: true });
+    const removalChanges = await InfraDeploy.getInfraChangesForRemoving();
 
-    if (Configuration.config.remove === 'all') {
-      await InfraDeploy.deleteLayer();
-    }
+    const hasChanges =
+      removalChanges.lambdasToRemove.length ||
+      removalChanges.rolesToRemove.length ||
+      Configuration.config.remove === 'all';
 
-    Logger.log('Lambda Live Debugger removed!');
+    const changesMessage = `The following changes will be applied to your AWS account:${
+      (removalChanges.lambdasToRemove.length
+        ? `\n - Remove LLD layer and environment variables from Lambdas:\n${removalChanges.lambdasToRemove
+            .map((l) => `   - ${l.functionName}`)
+            .join('\n')}`
+        : '') +
+      (removalChanges.rolesToRemove.length
+        ? `\n - Remove IoT permissions from IAM Roles:\n${removalChanges.rolesToRemove
+            .map((r) => `   - ${r}`)
+            .join('\n')}`
+        : '') +
+      (Configuration.config.remove === 'all'
+        ? `\n - Delete Lambda Live Debugger layer`
+        : '')
+    }`;
 
-    return;
-  }
-
-  if (!Configuration.getLambdas().length) {
-    Logger.error('No Lambdas found. Exiting...');
-    return;
-  }
-
-  if (Configuration.config.approval === true) {
-    const changes = await InfraDeploy.getPlanedInfrastructureChanges();
-
-    if (
-      !changes.deployLayer &&
-      !changes.lambdasToUpdate.length &&
-      !changes.rolesToUpdate.length
-    ) {
-      Logger.verbose('No infrastructure changes required.');
-    } else {
-      // list all changes and ask for approval
+    if (!hasChanges) {
+      Logger.log('No infrastructure to remove.');
+    } else if (Configuration.config.approval === true) {
+      // ask for approval with changes shown in the prompt
       try {
-        const confirn = await inquirer.prompt([
+        const confirm = await inquirer.prompt([
           {
             type: 'confirm',
             name: 'approval',
-            message: `\nThe following changes will be applied to your AWS account:${
-              (changes.deployLayer
-                ? `\n - Deploy Lambda Live Debugger layer version ${version}`
-                : '') +
-              (changes.lambdasToUpdate.length
-                ? `\n - Attach the layer and add environment variables to the Lambdas:\n${changes.lambdasToUpdate
-                    .map((l) => `   - ${l}`)
-                    .join('\n')}`
-                : '') +
-              (changes.rolesToUpdate.length
-                ? `\n - Add IoT permissions to IAM Roles:\n${changes.rolesToUpdate
-                    .map((r) => `   - ${r}`)
-                    .join('\n')}`
-                : '')
-            }\n\nDo you want to continue?`,
+            message: `${changesMessage}\n\nDo you want to continue?`,
           },
         ]);
 
-        if (!confirn.approval) {
+        if (!confirm.approval) {
           Logger.log('Exiting...');
           return;
         }
@@ -145,19 +126,113 @@ async function run() {
           throw error;
         }
       }
+    } else {
+      // show changes without approval
+      Logger.log(changesMessage);
     }
+
+    await InfraDeploy.applyRemoveInfra(removalChanges);
+    // await GitIgnore.removeFromGitIgnore();
+    // delete folder .lldebugger
+    const folder = path.join(getProjectDirname(), '.lldebugger');
+    try {
+      Logger.verbose(`Removing ${folder} folder...`);
+      await fs.access(folder);
+      await fs.rm(folder, { recursive: true });
+    } catch {
+      Logger.verbose(`${folder} does not exist, skipping removal.`);
+    }
+
+    if (Configuration.config.remove === 'all') {
+      await InfraDeploy.deleteLayer();
+    }
+
+    Logger.log('Lambda Live Debugger removed!');
+
+    return;
   }
 
-  await InfraDeploy.deployInfrastructure();
+  if (!Configuration.getLambdasFiltered().length) {
+    Logger.error('No Lambdas found. Exiting...');
+    return;
+  }
+
+  const changes = await InfraDeploy.getInfraChangesForAdding();
+
+  const hasChanges =
+    changes.deployLayer ||
+    changes.lambdasToAdd.length ||
+    changes.rolesToAdd.length ||
+    changes.lambdasToRemove.length ||
+    changes.rolesToRemove.length;
+
+  const changesMessage = `The following changes will be applied to your AWS account:${
+    (changes.deployLayer
+      ? `\n - Deploy Lambda Live Debugger layer version ${version}`
+      : '') +
+    (changes.lambdasToAdd.length
+      ? `\n - Attach the layer and add environment variables to the Lambdas:\n${changes.lambdasToAdd
+          .map((l) => `   - ${l.functionName}`)
+          .join('\n')}`
+      : '') +
+    (changes.rolesToAdd.length
+      ? `\n - Add IoT permissions to IAM Roles:\n${changes.rolesToAdd
+          .map((r) => `   - ${r}`)
+          .join('\n')}`
+      : '') +
+    (changes.lambdasToRemove.length
+      ? `\n - Remove the layer and environment variables from Lambdas no longer in scope:\n${changes.lambdasToRemove
+          .map((f) => `   - ${f.functionName}`)
+          .join('\n')}`
+      : '') +
+    (changes.rolesToRemove.length
+      ? `\n - Remove IoT permissions from IAM Roles no longer in scope:\n${changes.rolesToRemove
+          .map((r) => `   - ${r}`)
+          .join('\n')}`
+      : '')
+  }`;
+
+  if (!hasChanges) {
+    Logger.log('No infrastructure changes required.');
+  } else if (Configuration.config.approval === true) {
+    // ask for approval with changes shown in the prompt
+    try {
+      const confirm = await inquirer.prompt([
+        {
+          type: 'confirm',
+          name: 'approval',
+          message: `${changesMessage}\n\nDo you want to continue?`,
+        },
+      ]);
+
+      if (!confirm.approval) {
+        Logger.log('Exiting...');
+        return;
+      }
+    } catch (error: any) {
+      if (error.name === 'ExitPromptError') {
+        // user canceled the prompt
+        Logger.log('Exiting...');
+        return;
+      } else {
+        throw error;
+      }
+    }
+  } else {
+    // show changes without approval
+    Logger.log(changesMessage);
+  }
+
+  await InfraDeploy.applyAddingInfra(changes);
 
   const folders = [
     path.resolve('.'),
-    ...Configuration.getLambdas().map((l) => l.codePath),
+    ...Configuration.getLambdasFiltered().map((l) => l.codePath),
   ];
 
   // get the uppermost folder of all lambdas or the project root to watch for changes
-  const rootFolderForWarchingChanges = getRootFolder(folders);
-  FileWatcher.watchForFileChanges(rootFolderForWarchingChanges);
+  const rootFolderForWatchingChanges = getRootFolder(folders);
+  FileWatcher.watchForFileChanges(rootFolderForWatchingChanges);
 
   await LambdaConnection.connect();
   Logger.log('Debugger started!');
