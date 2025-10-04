@@ -25,6 +25,8 @@ parentPort.on('message', async (data) => {
       handler: lambda.handler,
       stackName: lambda.stackName,
       codePath: lambda.codePath,
+      stackCdkPath: lambda.stackCdkPath,
+      rootStackName: lambda.rootStackName,
       code: {
         path: lambda.code?.path,
       },

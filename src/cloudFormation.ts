@@ -159,7 +159,54 @@ async function getLambdasInStack(
   );
 }
 
+/**
+ * Get CloudFormation stack template
+ * @param stackName
+ * @param awsConfiguration
+ * @returns
+ */
+async function getStackResourcePhysicalResourceId(
+  stackName: string,
+  logicalResourceId: string,
+  awsConfiguration: AwsConfiguration,
+) {
+  const { DescribeStackResourceCommand } = await import(
+    '@aws-sdk/client-cloudformation'
+  );
+  const command = new DescribeStackResourceCommand({
+    StackName: stackName,
+    LogicalResourceId: logicalResourceId,
+  });
+  const cloudFormationClient = await getCloudFormationClient(awsConfiguration);
+
+  try {
+    const response = await cloudFormationClient.send(command);
+
+    if (!response.StackResourceDetail) {
+      throw new Error(
+        `No resource details found in stack ${stackName} for ${logicalResourceId}`,
+      );
+    }
+
+    const physicalResourceId = response.StackResourceDetail.PhysicalResourceId;
+    if (!physicalResourceId)
+      throw new Error(
+        `No physicalResourceId found in stack ${stackName} for ${logicalResourceId}`,
+      );
+    return physicalResourceId;
+  } catch (error: any) {
+    if (error.name === 'ValidationError') {
+      Logger.error(
+        `Stack ${stackName} and/or ${logicalResourceId} not found. Try specifying a region. Error: ${error.message}`,
+        error,
+      );
+    }
+    throw error;
+  }
+}
+
 export const CloudFormation = {
   getCloudFormationStackTemplate,
   getLambdasInStack,
+  getStackResourcePhysicalResourceId: getStackResourcePhysicalResourceId,
 };
