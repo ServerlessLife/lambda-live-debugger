@@ -70,6 +70,26 @@
       "cwd": "${workspaceRoot}/test/cdk-esm"
     },
     {
+      "name": "LLDebugger - CDK nested",
+      "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
+      "args": ["../../src/lldebugger.ts", "-c environment=test"],
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal",
+      "type": "node",
+      "cwd": "${workspaceRoot}/test/cdk-nested"
+    },
+    {
+      "name": "LLDebugger - CDK nested - observability",
+      "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
+      "args": ["../../src/lldebugger.ts", "-c environment=test", "-o"],
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal",
+      "type": "node",
+      "cwd": "${workspaceRoot}/test/cdk-nested"
+    },
+    {
       "name": "LLDebugger - SLS basic",
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": ["../../src/lldebugger.ts", "--stage=test"],
