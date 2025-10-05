@@ -353,6 +353,7 @@ If you have a new feature idea, please create and issue.
 
 - [Ben Moses](https://github.com/benjymoses)
 - [Kristian Dreher](https://www.linkedin.com/in/kristiandreher)
+- [Hugo Lewenhaupt](https://www.linkedin.com/in/hugo-lewenhaupt-84751289)
 - [Roger Chi](https://rogerchi.com/)
 - [Sebastian / avocadomaster](https://github.com/avocadomaster)
 - [Sebastian Bille](https://blog.sebastianbille.com)
