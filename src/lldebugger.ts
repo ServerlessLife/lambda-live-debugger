@@ -76,6 +76,15 @@ async function run() {
 
   await Configuration.discoverLambdas();
 
+  if (!Configuration.config.remove) {
+    Logger.log('Found the following Lambdas to debug:');
+    Logger.log(
+      ` - ${Configuration.getLambdasFiltered()
+        .map((f) => `${f.functionName} code: ${f.codePath}`)
+        .join('\n - ')}`,
+    );
+  }
+
   if (Configuration.config.remove) {
     const removalChanges = await InfraDeploy.getInfraChangesForRemoving();
 

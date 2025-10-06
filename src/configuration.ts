@@ -185,13 +185,6 @@ function saveDiscoveredLambdas(lambdasListNew: LambdaResource[]) {
     for (const lambda of lambdasListNew) {
       addLambda(lambda);
     }
-
-    Logger.log('Found the following Lambdas to debug:');
-    Logger.log(
-      ` - ${getLambdasFiltered()
-        .map((f) => `${f.functionName} code: ${f.codePath}`)
-        .join('\n - ')}`,
-    );
   }
 }
 
