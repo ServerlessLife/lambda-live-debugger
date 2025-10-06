@@ -71,47 +71,17 @@ export class CdkFramework implements IFramework {
     );
 
     const cdkTokenRegex = /^\${Token\[TOKEN\.\d+\]}$/;
-    const stackTokensCdkPathMappings = Object.fromEntries(
-      lambdasInCdk
-        .filter((lambda) => cdkTokenRegex.test(lambda.stackName))
-        .map((lambda) => [lambda.stackName, lambda.stackCdkPath]),
-    );
-    const realStackNames = [
-      ...new Set(
-        lambdasInCdk.map((lambda) => {
-          return lambda.rootStackName;
-        }),
-      ),
-    ];
 
-    const unresolvedTokens = new Set(Object.keys(stackTokensCdkPathMappings));
-    const resolvedTokenizedStackNames = new Set<string>();
-
-    if (Object.keys(stackTokensCdkPathMappings).length) {
-      Logger.verbose(
-        `[CDK] Found tokenized stackNames: ${[...unresolvedTokens].join(', ')}`,
-      );
-      Logger.verbose(
-        `[CDK] Will look for tokenized stackNames in ${realStackNames.join(
-          ', ',
-        )}`,
-      );
-      for (const realStackName of realStackNames) {
-        if (!unresolvedTokens.size) break;
-        await this.resolveTokenizedStackNames(
-          unresolvedTokens,
-          resolvedTokenizedStackNames,
-          stackTokensCdkPathMappings,
-          awsConfiguration,
-          realStackName,
-        );
+    const stackNamesDuplicated = lambdasInCdk.map((lambda) => {
+      if (cdkTokenRegex.test(lambda.stackName)) {
+        return lambda.rootStackName;
+      } else {
+        return lambda.stackName;
       }
-    }
+    });
 
-    //get all stack names
-    const stackNames = [
-      ...new Set(realStackNames.concat([...resolvedTokenizedStackNames])), // unique
-    ];
+    const stackNames = [...new Set(stackNamesDuplicated)];
+
     Logger.verbose(
       `[CDK] Found the following stacks in CDK: ${stackNames.join(', ')}`,
     );
@@ -119,35 +89,48 @@ export class CdkFramework implements IFramework {
     const lambdasDeployed = (
       await Promise.all(
         stackNames.map(async (stackName) => {
-          const lambdasInStackPromise = CloudFormation.getLambdasInStack(
+          const lambdasInStack = await CloudFormation.getLambdasInStack(
             stackName,
             awsConfiguration,
           );
-          const lambdasMetadataPromise =
-            this.getLambdaCdkPathFromTemplateMetadata(
-              stackName,
-              awsConfiguration,
-            );
 
-          const lambdasInStack = await lambdasInStackPromise;
+          const stackAndNestedStackNames = [
+            ...new Set(lambdasInStack.map((l) => l.stackName)),
+          ];
+
+          const lambdasMetadata = (
+            await Promise.all(
+              stackAndNestedStackNames.map((stackOrNestedStackName) =>
+                this.getLambdaCdkPathFromTemplateMetadata(
+                  stackOrNestedStackName,
+                  awsConfiguration,
+                ),
+              ),
+            )
+          ).flat();
+
           Logger.verbose(
             `[CDK] Found Lambda functions in the stack ${stackName}:`,
             JSON.stringify(lambdasInStack, null, 2),
           );
-          const lambdasMetadata = await lambdasMetadataPromise;
+
           Logger.verbose(
             `[CDK] Found Lambda functions in the stack ${stackName} in the template metadata:`,
             JSON.stringify(lambdasMetadata, null, 2),
           );
 
-          return lambdasInStack.map((lambda) => {
+          const lambdasPhysicalResourceIds = lambdasInStack.map((lambda) => {
             return {
               lambdaName: lambda.lambdaName,
               cdkPath: lambdasMetadata.find(
-                (lm) => lm.logicalId === lambda.logicalId,
+                (lm) =>
+                  lm.logicalId === lambda.logicalId &&
+                  lm.stackName === lambda.stackName,
               )?.cdkPath,
             };
           });
+
+          return lambdasPhysicalResourceIds;
         }),
       )
     ).flat();
@@ -204,61 +187,6 @@ export class CdkFramework implements IFramework {
     return lambdasDiscovered;
   }
 
-  protected async resolveTokenizedStackNames(
-    unresolvedTokens: Set<string>,
-    resolvedTokenizedStackNames: Set<string>,
-    stackTokensCdkPathMappings: Record<string, string>,
-    awsConfiguration: AwsConfiguration,
-    stackName: string,
-  ): Promise<void> {
-    if (!unresolvedTokens.size) {
-      return;
-    }
-
-    const cfTemplate = await CloudFormation.getCloudFormationStackTemplate(
-      stackName,
-      awsConfiguration,
-    );
-
-    if (cfTemplate) {
-      const nestedStacks = Object.entries(cfTemplate.Resources)
-        .filter(
-          ([, resource]: [string, any]) =>
-            resource.Type === 'AWS::CloudFormation::Stack',
-        )
-        .map(([key, resource]: [string, any]) => {
-          return {
-            logicalId: key,
-            cdkPath: resource.Metadata['aws:cdk:path'],
-          };
-        });
-
-      for (const nestedStack of nestedStacks) {
-        const mapping = Object.entries(stackTokensCdkPathMappings).find(
-          (f) => f[1] === nestedStack.cdkPath,
-        );
-
-        if (mapping) {
-          unresolvedTokens.delete(mapping[0]);
-          const physicalResourceId =
-            await CloudFormation.getStackResourcePhysicalResourceId(
-              stackName,
-              nestedStack.logicalId,
-              awsConfiguration,
-            );
-          resolvedTokenizedStackNames.add(physicalResourceId);
-          await this.resolveTokenizedStackNames(
-            unresolvedTokens,
-            resolvedTokenizedStackNames,
-            stackTokensCdkPathMappings,
-            awsConfiguration,
-            physicalResourceId,
-          );
-        }
-      }
-    }
-  }
-
   /**
    * Getz Lambda functions from the CloudFormation template metadata
    * @param stackName
@@ -272,6 +200,7 @@ export class CdkFramework implements IFramework {
     Array<{
       logicalId: string;
       cdkPath: string;
+      stackName: string;
     }>
   > {
     const cfTemplate = await CloudFormation.getCloudFormationStackTemplate(
@@ -289,8 +218,10 @@ export class CdkFramework implements IFramework {
           return {
             logicalId: key,
             cdkPath: resource.Metadata['aws:cdk:path'],
+            stackName: stackName,
           };
         });
+
       return lambdas;
     }
 
@@ -399,12 +330,13 @@ export class CdkFramework implements IFramework {
 
               let rootStack = this.stack;
               while (rootStack.nestedStackParent) {
-                rootStack = rootStack.nestedStackParent;     
+                rootStack = rootStack.nestedStackParent;
               }
               const lambdaInfo = {
                 //cdkPath: this.node.defaultChild?.node.path ?? this.node.path,
-                stackCdkPath: this.stack.node.defaultChild?.node.path ?? this.stack.node.path,
                 stackName: this.stack.stackName,
+                stack: this.stack,
+                rootStack: rootStack,
                 rootStackName: rootStack.stackName,
                 codePath: props.entry,
                 code: props.code,
@@ -415,7 +347,6 @@ export class CdkFramework implements IFramework {
 
               // console.log("CDK INFRA: ", {
                 //   stackName: lambdaInfo.stackName,
-                //   stackCdkPath: lambdaInfo.stackCdkPath,
                 //   rootStackName: lambdaInfo.rootStackName,
                 //   codePath: lambdaInfo.codePath,
                 //   code: lambdaInfo.code,

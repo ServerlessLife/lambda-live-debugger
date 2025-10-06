@@ -139,24 +139,48 @@ async function getLambdasInStack(
   Array<{
     lambdaName: string;
     logicalId: string;
+    stackName: string;
   }>
 > {
   const response = await getCloudFormationResources(
     stackName,
     awsConfiguration,
   );
+
   const lambdaResources = response?.filter(
     (resource) => resource.ResourceType === 'AWS::Lambda::Function',
   );
 
-  return (
+  const nestedStacks = response?.filter(
+    (resource) => resource.ResourceType === 'AWS::CloudFormation::Stack',
+  );
+
+  const lambdas =
     lambdaResources?.map((resource) => {
       return {
         lambdaName: resource.PhysicalResourceId!,
         logicalId: resource.LogicalResourceId!,
+        stackName: stackName,
       };
-    }) ?? []
+    }) ?? [];
+
+  const lambdasInNestedStacks = await Promise.all(
+    (nestedStacks ?? []).map(async (nestedStack) => {
+      if (!nestedStack.PhysicalResourceId) return [];
+
+      const lambdasInNestedStack = await getLambdasInStack(
+        nestedStack.PhysicalResourceId,
+        awsConfiguration,
+      );
+
+      return lambdasInNestedStack;
+    }),
   );
+
+  const flattenedLambdasInNestedStacks = lambdasInNestedStacks.flat();
+
+  const allLambdas = [...lambdas, ...flattenedLambdasInNestedStacks];
+  return allLambdas;
 }
 
 /**
