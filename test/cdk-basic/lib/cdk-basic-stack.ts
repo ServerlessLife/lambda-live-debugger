@@ -46,6 +46,24 @@ export class CdkbasicStack extends cdk.Stack {
       },
     );
 
+    const functionInlineCode = new lambda.Function(this, 'TestInlineCode', {
+      runtime: lambda.Runtime.NODEJS_22_X,
+      handler: 'index.handler',
+      code: lambda.Code.fromInline(`
+        exports.handler = async (event) => {
+          const response = {
+            statusCode: 200,
+            body: JSON.stringify({
+              message: 'Hello from inline Lambda function!',
+              timestamp: new Date().toISOString(),
+              event: event
+            }),
+          };
+        };
+      `),
+      logRetention: log.RetentionDays.ONE_DAY,
+    });
+
     new cdk.CfnOutput(this, 'FunctionNameTestTsCommonJs', {
       value: functionTestTsCommonJs.functionName,
     });
@@ -56,6 +74,10 @@ export class CdkbasicStack extends cdk.Stack {
 
     new cdk.CfnOutput(this, 'FunctionNameTestJsCommonJs', {
       value: functionTestJsCommonJs.functionName,
+    });
+
+    new cdk.CfnOutput(this, 'FunctionNameTestInlineCode', {
+      value: functionInlineCode.functionName,
     });
   }
 }

@@ -476,29 +476,40 @@ export class CdkFramework implements IFramework {
                 .then(() => true)
                 .catch(() => false),
             );
-
-          if (!codePath) {
-            throw new Error(
-              `Code file not found for Lambda function ${lambda.code.path}`,
-            );
-          }
         }
 
-        const packageJsonPath = await findPackageJson(codePath);
-        Logger.verbose(`[CDK] package.json path: ${packageJsonPath}`);
+        let packageJsonPath: string | undefined;
+        if (codePath) {
+          packageJsonPath = await findPackageJson(codePath);
+          Logger.verbose(`[CDK] package.json path: ${packageJsonPath}`);
+        }
 
         return {
           cdkPath: lambda.cdkPath,
           stackName: lambda.stackName,
           packageJsonPath,
-          codePath,
+          codePath: codePath,
           handler,
           bundling: lambda.bundling,
         };
       }),
     );
 
-    return list;
+    const filteredList = list.filter((lambda) => lambda.codePath);
+    const noCodeList = list.filter((lambda) => !lambda.codePath);
+
+    if (noCodeList.length > 0) {
+      Logger.warn(
+        `[CDK] For the following Lambda functions the code file could not be determined and they will be ignored. Inline code is not supported.\n - ${noCodeList
+          .map((l) => `${l.cdkPath}`)
+          .join('\n - ')}`,
+      );
+    }
+
+    return filteredList.map((lambda) => ({
+      ...lambda,
+      codePath: lambda.codePath!,
+    }));
   }
 
   /**
