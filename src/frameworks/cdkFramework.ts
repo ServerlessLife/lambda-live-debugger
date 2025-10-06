@@ -335,8 +335,6 @@ export class CdkFramework implements IFramework {
               const lambdaInfo = {
                 //cdkPath: this.node.defaultChild?.node.path ?? this.node.path,
                 stackName: this.stack.stackName,
-                stack: this.stack,
-                rootStack: rootStack,
                 rootStackName: rootStack.stackName,
                 codePath: props.entry,
                 code: props.code,
@@ -518,7 +516,6 @@ export class CdkFramework implements IFramework {
         return {
           cdkPath: lambda.cdkPath,
           stackName: lambda.stackName,
-          stackCdkPath: lambda.stackCdkPath,
           rootStackName: lambda.rootStackName,
           packageJsonPath,
           codePath,
@@ -602,7 +599,6 @@ export class CdkFramework implements IFramework {
     return lambdas as {
       cdkPath: string;
       stackName: string;
-      stackCdkPath: string;
       rootStackName: string;
       codePath?: string;
       code: {
