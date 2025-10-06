@@ -70,14 +70,18 @@ export class CdkFramework implements IFramework {
       JSON.stringify(lambdasInCdk, null, 2),
     );
 
-    //get all stack names
-    const stackNames = [
-      ...new Set( // unique
-        lambdasInCdk.map((lambda) => {
-          return lambda.stackName;
-        }),
-      ),
-    ];
+    const cdkTokenRegex = /^\${Token\[TOKEN\.\d+\]}$/;
+
+    const stackNamesDuplicated = lambdasInCdk.map((lambda) => {
+      if (cdkTokenRegex.test(lambda.stackName)) {
+        return lambda.rootStackName;
+      } else {
+        return lambda.stackName;
+      }
+    });
+
+    const stackNames = [...new Set(stackNamesDuplicated)];
+
     Logger.verbose(
       `[CDK] Found the following stacks in CDK: ${stackNames.join(', ')}`,
     );
@@ -85,35 +89,48 @@ export class CdkFramework implements IFramework {
     const lambdasDeployed = (
       await Promise.all(
         stackNames.map(async (stackName) => {
-          const lambdasInStackPromise = CloudFormation.getLambdasInStack(
+          const lambdasInStack = await CloudFormation.getLambdasInStack(
             stackName,
             awsConfiguration,
           );
-          const lambdasMetadataPromise =
-            this.getLambdaCdkPathFromTemplateMetadata(
-              stackName,
-              awsConfiguration,
-            );
 
-          const lambdasInStack = await lambdasInStackPromise;
+          const stackAndNestedStackNames = [
+            ...new Set(lambdasInStack.map((l) => l.stackName)),
+          ];
+
+          const lambdasMetadata = (
+            await Promise.all(
+              stackAndNestedStackNames.map((stackOrNestedStackName) =>
+                this.getLambdaCdkPathFromTemplateMetadata(
+                  stackOrNestedStackName,
+                  awsConfiguration,
+                ),
+              ),
+            )
+          ).flat();
+
           Logger.verbose(
             `[CDK] Found Lambda functions in the stack ${stackName}:`,
             JSON.stringify(lambdasInStack, null, 2),
           );
-          const lambdasMetadata = await lambdasMetadataPromise;
+
           Logger.verbose(
             `[CDK] Found Lambda functions in the stack ${stackName} in the template metadata:`,
             JSON.stringify(lambdasMetadata, null, 2),
           );
 
-          return lambdasInStack.map((lambda) => {
+          const lambdasPhysicalResourceIds = lambdasInStack.map((lambda) => {
             return {
               lambdaName: lambda.lambdaName,
               cdkPath: lambdasMetadata.find(
-                (lm) => lm.logicalId === lambda.logicalId,
+                (lm) =>
+                  lm.logicalId === lambda.logicalId &&
+                  lm.stackName === lambda.stackName,
               )?.cdkPath,
             };
           });
+
+          return lambdasPhysicalResourceIds;
         }),
       )
     ).flat();
@@ -183,6 +200,7 @@ export class CdkFramework implements IFramework {
     Array<{
       logicalId: string;
       cdkPath: string;
+      stackName: string;
     }>
   > {
     const cfTemplate = await CloudFormation.getCloudFormationStackTemplate(
@@ -200,8 +218,10 @@ export class CdkFramework implements IFramework {
           return {
             logicalId: key,
             cdkPath: resource.Metadata['aws:cdk:path'],
+            stackName: stackName,
           };
         });
+
       return lambdas;
     }
 
@@ -308,9 +328,14 @@ export class CdkFramework implements IFramework {
               `;
               global.lambdas = global.lambdas ?? [];
 
+              let rootStack = this.stack;
+              while (rootStack.nestedStackParent) {
+                rootStack = rootStack.nestedStackParent;
+              }
               const lambdaInfo = {
                 //cdkPath: this.node.defaultChild?.node.path ?? this.node.path,
                 stackName: this.stack.stackName,
+                rootStackName: rootStack.stackName,
                 codePath: props.entry,
                 code: props.code,
                 node: this.node,
@@ -320,6 +345,7 @@ export class CdkFramework implements IFramework {
 
               // console.log("CDK INFRA: ", {
                 //   stackName: lambdaInfo.stackName,
+                //   rootStackName: lambdaInfo.rootStackName,
                 //   codePath: lambdaInfo.codePath,
                 //   code: lambdaInfo.code,
                 //   handler: lambdaInfo.handler,
@@ -487,6 +513,7 @@ export class CdkFramework implements IFramework {
         return {
           cdkPath: lambda.cdkPath,
           stackName: lambda.stackName,
+          rootStackName: lambda.rootStackName,
           packageJsonPath,
           codePath: codePath,
           handler,
@@ -583,6 +610,7 @@ export class CdkFramework implements IFramework {
     return lambdas as {
       cdkPath: string;
       stackName: string;
+      rootStackName: string;
       codePath?: string;
       code: {
         path?: string;

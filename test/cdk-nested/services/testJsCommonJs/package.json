@@ -1,0 +1,8 @@
+{
+  "name": "cdk-basic-test-js-commonjs",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "dependencies": {
+    "@aws-sdk/client-sts": "^3.879.0"
+  }
+}

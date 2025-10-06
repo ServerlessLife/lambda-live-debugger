@@ -1,0 +1,27 @@
+{
+  "name": "cdk-nested",
+  "version": "0.0.1",
+  "bin": {
+    "cdk-nested": "bin/cdk-nested.js"
+  },
+  "scripts": {
+    "deploy": "cdk deploy --all -c environment=test --require-approval never --outputs-file cdk-outputs.json",
+    "build": "cdk synth -c environment=test",
+    "deploy-yaml": "bash deploy-yaml.sh",
+    "destroy": "cdk destroy --all -c environment=test --force"
+  },
+  "devDependencies": {
+    "@types/node": "24.3.0",
+    "@tsconfig/node22": "^22.0.2",
+    "aws-cdk": "2.1027.0",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.9.2",
+    "@types/aws-lambda": "^8.10.152"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.213.0",
+    "constructs": "^10.4.2",
+    "source-map-support": "^0.5.21",
+    "@aws-sdk/client-sts": "^3.879.0"
+  }
+}

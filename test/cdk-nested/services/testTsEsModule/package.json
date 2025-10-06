@@ -1,0 +1,11 @@
+{
+  "name": "cdk-basic-test-ts-esmodule",
+  "version": "1.0.0",
+  "type": "module",
+  "devDependencies": {
+    "@tsconfig/node22": "^22.0.2"
+  },
+  "dependencies": {
+    "@aws-sdk/client-sts": "^3.879.0"
+  }
+}
