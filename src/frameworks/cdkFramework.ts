@@ -363,7 +363,12 @@ export class CdkFramework implements IFramework {
               ),
             )
           ) {
-            const codeToFind = 'super(scope,id),this.requestDestinationArn=!1;';
+            let codeToFind = 'super(scope,id),this.requestDestinationArn=!1;';
+
+            if (!contents.includes(codeToFind)) {
+              // newer CDK version
+              codeToFind = 'super(scope,id);';
+            }
 
             if (!contents.includes(codeToFind)) {
               throw new Error(`Can not find code to inject in ${args.path}`);
