@@ -1,16 +1,11 @@
 /// <reference types="vitest" />
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
     testTimeout: 60000,
     hookTimeout: 300000,
     silent: false,
-    poolOptions: {
-      threads: {
-        minThreads: 1,
-        maxThreads: 1,
-      },
-    },
+    maxConcurrency: 1,
   },
 });
