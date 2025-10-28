@@ -13,6 +13,6 @@
     "@types/aws-lambda": "^8.10.156"
   },
   "dependencies": {
-    "@aws-sdk/client-sts": "^3.917.0"
+    "@aws-sdk/client-sts": "^3.918.0"
   }
 }
