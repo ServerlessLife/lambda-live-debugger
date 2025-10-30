@@ -10,9 +10,9 @@
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.2",
-    "@types/aws-lambda": "^8.10.156"
+    "@types/aws-lambda": "^8.10.157"
   },
   "dependencies": {
-    "@aws-sdk/client-sts": "^3.918.0"
+    "@aws-sdk/client-sts": "^3.920.0"
   }
 }
