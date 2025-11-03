@@ -9,6 +9,7 @@ import { getConfigTsFromConfigFile } from './configuration/getConfigFromTsConfig
 import { configFileDefaultName } from './constants.js';
 import { ResourceDiscovery } from './resourceDiscovery.js';
 import { Logger } from './logger.js';
+import { AwsCredentials } from './awsCredentials.js';
 
 let config: LldConfig;
 const lambdas: Record<string, LambdaResource> = {};
@@ -41,9 +42,15 @@ async function readConfig() {
     });
 
     const debuggerId = await generateDebuggerId(!!configFromWizard.observable);
+    const localStack = await AwsCredentials.isLocalStackDetected({
+      profile: configFromWizard.profile,
+      region: configFromWizard.region,
+      role: configFromWizard.role,
+    });
     setConfig({
       ...configFromWizard,
       debuggerId,
+      localStack,
       start: false, // don't start the debugger after the wizard
     });
   } else {
@@ -63,9 +70,15 @@ async function readConfig() {
           : configFromConfigFile?.context,
     };
     const debuggerId = await generateDebuggerId(!!configMerged.observable);
+    const localStack = await AwsCredentials.isLocalStackDetected({
+      profile: configMerged.profile,
+      region: configMerged.region,
+      role: configMerged.role,
+    });
     setConfig({
       ...configMerged,
       debuggerId,
+      localStack,
       start: true,
     });
   }

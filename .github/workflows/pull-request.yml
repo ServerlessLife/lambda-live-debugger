@@ -53,3 +53,13 @@ jobs:
     with:
       mode: build
       testMonorepo: false
+      useLocalStack: false
+
+  test-localstack:
+    uses: ./.github/workflows/common-test.yml
+    secrets: inherit
+    needs: remove-old-layers
+    with:
+      mode: build
+      testMonorepo: false
+      useLocalStack: true

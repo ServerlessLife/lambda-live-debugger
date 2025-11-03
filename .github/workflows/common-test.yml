@@ -13,6 +13,11 @@ on:
         description: 'Test monorepo by specifying folder in config'
         type: string
         required: true
+      useLocalStack:
+        description: 'Use LocalStack instead of AWS'
+        type: boolean
+        required: false
+        default: false
       version:
         description: 'Specify the version of the package'
         type: string
@@ -25,6 +30,7 @@ permissions:
 env:
   REAL_NPM: ${{ inputs.mode == 'global' || inputs.mode == 'local' }}
   TEST_MONOREPO: ${{ inputs.testMonorepo }}
+  USE_LOCALSTACK: ${{ inputs.useLocalStack }}
   node_version: 22
 
 jobs:
@@ -34,6 +40,17 @@ jobs:
       group: test-cdk-basic
     steps:
       - uses: actions/checkout@v4
+      - name: Start LocalStack
+        if: ${{ inputs.useLocalStack }}
+        run: |
+          pip install localstack awscli-local
+          docker pull localstack/localstack:latest
+          localstack start -d
+          echo "Waiting for LocalStack to be ready..."
+          localstack wait -t 30
+          localstack status services
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
@@ -60,11 +77,20 @@ jobs:
           npm i lambda-live-debugger@${{ inputs.version || 'latest' }}
         working-directory: test
       - name: Configure AWS Credentials
+        if: ${{ !inputs.useLocalStack }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: eu-west-1
           role-to-assume: ${{ secrets.AWS_ROLE }}
           role-session-name: GitHubActions
+      - name: Configure LocalStack AWS Credentials
+        if: ${{ inputs.useLocalStack }}
+        run: |
+          aws configure set aws_access_key_id test
+          aws configure set aws_secret_access_key test
+          aws configure set region us-east-1
+        env:
+          AWS_ENDPOINT_URL: http://localhost:4566
       - name: Destroy
         run: npm run destroy
         working-directory: test/cdk-basic
@@ -72,15 +98,25 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/cdk-basic
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/cdk-basic.test.ts
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/cdk-basic.test.ts
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Deploy YAML version
         run: npm run deploy-yaml
         working-directory: test/cdk-basic
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test YAML
         run: npx vitest --retry 2 test/cdk-basic.test.ts
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
 
   test-cdk-esm:
     runs-on: ubuntu-latest
@@ -88,6 +124,17 @@ jobs:
       group: test-cdk-esm
     steps:
       - uses: actions/checkout@v4
+      - name: Start LocalStack
+        if: ${{ inputs.useLocalStack }}
+        run: |
+          pip install localstack awscli-local
+          docker pull localstack/localstack:latest
+          localstack start -d
+          echo "Waiting for LocalStack to be ready..."
+          localstack wait -t 30
+          localstack status services
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
@@ -114,11 +161,20 @@ jobs:
           npm i lambda-live-debugger@${{ inputs.version || 'latest' }}
         working-directory: test
       - name: Configure AWS Credentials
+        if: ${{ !inputs.useLocalStack }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: eu-west-1
           role-to-assume: ${{ secrets.AWS_ROLE }}
           role-session-name: GitHubActions
+      - name: Configure LocalStack AWS Credentials
+        if: ${{ inputs.useLocalStack }}
+        run: |
+          aws configure set aws_access_key_id test
+          aws configure set aws_secret_access_key test
+          aws configure set region us-east-1
+        env:
+          AWS_ENDPOINT_URL: http://localhost:4566
       - name: Destroy
         run: npm run destroy
         working-directory: test/cdk-esm
@@ -126,10 +182,16 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/cdk-esm
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/cdk-esm.test.ts
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/cdk-esm.test.ts
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
 
   test-sls-basic:
     runs-on: ubuntu-latest
@@ -137,6 +199,17 @@ jobs:
       group: test-sls-basic
     steps:
       - uses: actions/checkout@v4
+      - name: Start LocalStack
+        if: ${{ inputs.useLocalStack }}
+        run: |
+          pip install localstack awscli-local
+          docker pull localstack/localstack:latest
+          localstack start -d
+          echo "Waiting for LocalStack to be ready..."
+          localstack wait -t 30
+          localstack status services
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
@@ -164,11 +237,20 @@ jobs:
           npm i lambda-live-debugger@${{ inputs.version || 'latest' }}
         working-directory: test
       - name: Configure AWS Credentials
+        if: ${{ !inputs.useLocalStack }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: eu-west-1
           role-to-assume: ${{ secrets.AWS_ROLE }}
           role-session-name: GitHubActions
+      - name: Configure LocalStack AWS Credentials
+        if: ${{ inputs.useLocalStack }}
+        run: |
+          aws configure set aws_access_key_id test
+          aws configure set aws_secret_access_key test
+          aws configure set region us-east-1
+        env:
+          AWS_ENDPOINT_URL: http://localhost:4566
       - name: Destroy
         run: npm run destroy
         working-directory: test/sls-basic
@@ -176,10 +258,16 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/sls-basic
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/sls-basic.test.ts
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/sls-basic.test.ts
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
 
   test-sls-esbuild-cjs:
     runs-on: ubuntu-latest
@@ -187,6 +275,17 @@ jobs:
       group: test-sls-esbuild-cjs
     steps:
       - uses: actions/checkout@v4
+      - name: Start LocalStack
+        if: ${{ inputs.useLocalStack }}
+        run: |
+          pip install localstack awscli-local
+          docker pull localstack/localstack:latest
+          localstack start -d
+          echo "Waiting for LocalStack to be ready..."
+          localstack wait -t 30
+          localstack status services
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
@@ -214,11 +313,20 @@ jobs:
           npm i lambda-live-debugger@${{ inputs.version || 'latest' }}
         working-directory: test
       - name: Configure AWS Credentials
+        if: ${{ !inputs.useLocalStack }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: eu-west-1
           role-to-assume: ${{ secrets.AWS_ROLE }}
           role-session-name: GitHubActions
+      - name: Configure LocalStack AWS Credentials
+        if: ${{ inputs.useLocalStack }}
+        run: |
+          aws configure set aws_access_key_id test
+          aws configure set aws_secret_access_key test
+          aws configure set region us-east-1
+        env:
+          AWS_ENDPOINT_URL: http://localhost:4566
       - name: Destroy
         run: npm run destroy
         working-directory: test/sls-esbuild-cjs
@@ -226,10 +334,16 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/sls-esbuild-cjs
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/sls-esbuild-cjs.test.ts
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/sls-esbuild-cjs.test.ts
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
 
   test-sls-esbuild-esm:
     runs-on: ubuntu-latest
@@ -237,6 +351,17 @@ jobs:
       group: test-sls-esbuild-esm
     steps:
       - uses: actions/checkout@v4
+      - name: Start LocalStack
+        if: ${{ inputs.useLocalStack }}
+        run: |
+          pip install localstack awscli-local
+          docker pull localstack/localstack:latest
+          localstack start -d
+          echo "Waiting for LocalStack to be ready..."
+          localstack wait -t 30
+          localstack status services
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
@@ -264,11 +389,20 @@ jobs:
           npm i lambda-live-debugger@${{ inputs.version || 'latest' }}
         working-directory: test
       - name: Configure AWS Credentials
+        if: ${{ !inputs.useLocalStack }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: eu-west-1
           role-to-assume: ${{ secrets.AWS_ROLE }}
           role-session-name: GitHubActions
+      - name: Configure LocalStack AWS Credentials
+        if: ${{ inputs.useLocalStack }}
+        run: |
+          aws configure set aws_access_key_id test
+          aws configure set aws_secret_access_key test
+          aws configure set region us-east-1
+        env:
+          AWS_ENDPOINT_URL: http://localhost:4566
       - name: Destroy
         run: npm run destroy
         working-directory: test/sls-esbuild-esm
@@ -276,10 +410,16 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/sls-esbuild-esm
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/sls-esbuild-esm.test.ts
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/sls-esbuild-esm.test.ts
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
 
   test-osls-basic:
     runs-on: ubuntu-latest
@@ -287,6 +427,17 @@ jobs:
       group: test-osls-basic
     steps:
       - uses: actions/checkout@v4
+      - name: Start LocalStack
+        if: ${{ inputs.useLocalStack }}
+        run: |
+          pip install localstack awscli-local
+          docker pull localstack/localstack:latest
+          localstack start -d
+          echo "Waiting for LocalStack to be ready..."
+          localstack wait -t 30
+          localstack status services
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
@@ -314,11 +465,20 @@ jobs:
           npm i lambda-live-debugger@${{ inputs.version || 'latest' }}
         working-directory: test
       - name: Configure AWS Credentials
+        if: ${{ !inputs.useLocalStack }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: eu-west-1
           role-to-assume: ${{ secrets.AWS_ROLE }}
           role-session-name: GitHubActions
+      - name: Configure LocalStack AWS Credentials
+        if: ${{ inputs.useLocalStack }}
+        run: |
+          aws configure set aws_access_key_id test
+          aws configure set aws_secret_access_key test
+          aws configure set region us-east-1
+        env:
+          AWS_ENDPOINT_URL: http://localhost:4566
       - name: Destroy
         run: npm run destroy
         working-directory: test/osls-basic
@@ -326,10 +486,16 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/osls-basic
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/osls-basic.test.ts
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/osls-basic.test.ts
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
 
   test-osls-esbuild-cjs:
     runs-on: ubuntu-latest
@@ -337,6 +503,17 @@ jobs:
       group: test-osls-esbuild-cjs
     steps:
       - uses: actions/checkout@v4
+      - name: Start LocalStack
+        if: ${{ inputs.useLocalStack }}
+        run: |
+          pip install localstack awscli-local
+          docker pull localstack/localstack:latest
+          localstack start -d
+          echo "Waiting for LocalStack to be ready..."
+          localstack wait -t 30
+          localstack status services
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
@@ -364,11 +541,20 @@ jobs:
           npm i lambda-live-debugger@${{ inputs.version || 'latest' }}
         working-directory: test
       - name: Configure AWS Credentials
+        if: ${{ !inputs.useLocalStack }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: eu-west-1
           role-to-assume: ${{ secrets.AWS_ROLE }}
           role-session-name: GitHubActions
+      - name: Configure LocalStack AWS Credentials
+        if: ${{ inputs.useLocalStack }}
+        run: |
+          aws configure set aws_access_key_id test
+          aws configure set aws_secret_access_key test
+          aws configure set region us-east-1
+        env:
+          AWS_ENDPOINT_URL: http://localhost:4566
       - name: Destroy
         run: npm run destroy
         working-directory: test/osls-esbuild-cjs
@@ -376,10 +562,16 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/osls-esbuild-cjs
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/osls-esbuild-cjs.test.ts
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/osls-esbuild-cjs.test.ts
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
 
   test-osls-esbuild-esm:
     runs-on: ubuntu-latest
@@ -387,6 +579,17 @@ jobs:
       group: test-osls-esbuild-esm
     steps:
       - uses: actions/checkout@v4
+      - name: Start LocalStack
+        if: ${{ inputs.useLocalStack }}
+        run: |
+          pip install localstack awscli-local
+          docker pull localstack/localstack:latest
+          localstack start -d
+          echo "Waiting for LocalStack to be ready..."
+          localstack wait -t 30
+          localstack status services
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
@@ -414,11 +617,20 @@ jobs:
           npm i lambda-live-debugger@${{ inputs.version || 'latest' }}
         working-directory: test
       - name: Configure AWS Credentials
+        if: ${{ !inputs.useLocalStack }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: eu-west-1
           role-to-assume: ${{ secrets.AWS_ROLE }}
           role-session-name: GitHubActions
+      - name: Configure LocalStack AWS Credentials
+        if: ${{ inputs.useLocalStack }}
+        run: |
+          aws configure set aws_access_key_id test
+          aws configure set aws_secret_access_key test
+          aws configure set region us-east-1
+        env:
+          AWS_ENDPOINT_URL: http://localhost:4566
       - name: Destroy
         run: npm run destroy
         working-directory: test/osls-esbuild-esm
@@ -426,10 +638,16 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/osls-esbuild-esm
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/osls-esbuild-esm.test.ts
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/osls-esbuild-esm.test.ts
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
 
   test-sam-basic:
     runs-on: ubuntu-latest
@@ -437,6 +655,17 @@ jobs:
       group: test-sam-basic
     steps:
       - uses: actions/checkout@v4
+      - name: Start LocalStack
+        if: ${{ inputs.useLocalStack }}
+        run: |
+          pip install localstack awscli-local
+          docker pull localstack/localstack:latest
+          localstack start -d
+          echo "Waiting for LocalStack to be ready..."
+          localstack wait -t 30
+          localstack status services
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
       - uses: aws-actions/setup-sam@v2
         with:
           use-installer: true
@@ -467,11 +696,20 @@ jobs:
           npm i lambda-live-debugger@${{ inputs.version || 'latest' }}
         working-directory: test
       - name: Configure AWS Credentials
+        if: ${{ !inputs.useLocalStack }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: eu-west-1
           role-to-assume: ${{ secrets.AWS_ROLE }}
           role-session-name: GitHubActions
+      - name: Configure LocalStack AWS Credentials
+        if: ${{ inputs.useLocalStack }}
+        run: |
+          aws configure set aws_access_key_id test
+          aws configure set aws_secret_access_key test
+          aws configure set region us-east-1
+        env:
+          AWS_ENDPOINT_URL: http://localhost:4566
       - name: Destroy
         run: npm run destroy
         working-directory: test/sam-basic
@@ -479,10 +717,16 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/sam-basic
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/sam-basic.test.ts
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/sam-basic.test.ts
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
 
   test-sam-alt:
     runs-on: ubuntu-latest
@@ -490,6 +734,17 @@ jobs:
       group: test-sam-alt
     steps:
       - uses: actions/checkout@v4
+      - name: Start LocalStack
+        if: ${{ inputs.useLocalStack }}
+        run: |
+          pip install localstack awscli-local
+          docker pull localstack/localstack:latest
+          localstack start -d
+          echo "Waiting for LocalStack to be ready..."
+          localstack wait -t 30
+          localstack status services
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
       - uses: aws-actions/setup-sam@v2
         with:
           use-installer: true
@@ -520,11 +775,20 @@ jobs:
           npm i lambda-live-debugger@${{ inputs.version || 'latest' }}
         working-directory: test
       - name: Configure AWS Credentials
+        if: ${{ !inputs.useLocalStack }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: eu-west-1
           role-to-assume: ${{ secrets.AWS_ROLE }}
           role-session-name: GitHubActions
+      - name: Configure LocalStack AWS Credentials
+        if: ${{ inputs.useLocalStack }}
+        run: |
+          aws configure set aws_access_key_id test
+          aws configure set aws_secret_access_key test
+          aws configure set region us-east-1
+        env:
+          AWS_ENDPOINT_URL: http://localhost:4566
       - name: Destroy
         run: npm run destroy
         working-directory: test/sam-alt
@@ -532,10 +796,16 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/sam-alt
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/sam-alt.test.ts
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/sam-alt.test.ts
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
 
   test-terraform-basic:
     runs-on: ubuntu-latest
@@ -543,6 +813,17 @@ jobs:
       group: test-terraform-basic
     steps:
       - uses: actions/checkout@v4
+      - name: Start LocalStack
+        if: ${{ inputs.useLocalStack }}
+        run: |
+          pip install localstack awscli-local
+          docker pull localstack/localstack:latest
+          localstack start -d
+          echo "Waiting for LocalStack to be ready..."
+          localstack wait -t 30
+          localstack status services
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
@@ -569,11 +850,20 @@ jobs:
           npm i lambda-live-debugger@${{ inputs.version || 'latest' }}
         working-directory: test
       - name: Configure AWS Credentials
+        if: ${{ !inputs.useLocalStack }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: eu-west-1
           role-to-assume: ${{ secrets.AWS_ROLE }}
           role-session-name: GitHubActions
+      - name: Configure LocalStack AWS Credentials
+        if: ${{ inputs.useLocalStack }}
+        run: |
+          aws configure set aws_access_key_id test
+          aws configure set aws_secret_access_key test
+          aws configure set region us-east-1
+        env:
+          AWS_ENDPOINT_URL: http://localhost:4566
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
       - name: Terraform Init
@@ -588,10 +878,16 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/terraform-basic
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/terraform-basic.test.ts
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/terraform-basic.test.ts
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
 
   test-opentofu-basic:
     runs-on: ubuntu-latest
@@ -599,6 +895,17 @@ jobs:
       group: test-opentofu-basic
     steps:
       - uses: actions/checkout@v4
+      - name: Start LocalStack
+        if: ${{ inputs.useLocalStack }}
+        run: |
+          pip install localstack awscli-local
+          docker pull localstack/localstack:latest
+          localstack start -d
+          echo "Waiting for LocalStack to be ready..."
+          localstack wait -t 30
+          localstack status services
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
@@ -625,11 +932,20 @@ jobs:
           npm i lambda-live-debugger@${{ inputs.version || 'latest' }}
         working-directory: test
       - name: Configure AWS Credentials
+        if: ${{ !inputs.useLocalStack }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: eu-west-1
           role-to-assume: ${{ secrets.AWS_ROLE }}
           role-session-name: GitHubActions
+      - name: Configure LocalStack AWS Credentials
+        if: ${{ inputs.useLocalStack }}
+        run: |
+          aws configure set aws_access_key_id test
+          aws configure set aws_secret_access_key test
+          aws configure set region us-east-1
+        env:
+          AWS_ENDPOINT_URL: http://localhost:4566
       - name: Setup OpenTofu
         uses: opentofu/setup-opentofu@v1
       - name: OpenTofu Init
@@ -644,7 +960,13 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/opentofu-basic
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/opentofu-basic.test.ts
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/opentofu-basic.test.ts
+        env:
+          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}

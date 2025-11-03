@@ -16,6 +16,10 @@ on:
         description: 'Test monorepo by specifying folder in config'
         type: boolean
         default: false
+      useLocalStack:
+        description: 'Use LocalStack instead of AWS'
+        type: boolean
+        default: false
       version:
         description: 'Specify the version of the package'
         type: string
@@ -32,4 +36,5 @@ jobs:
       mode: ${{ inputs.mode }}
       testMonorepo: ${{ inputs.testMonorepo }}
       version: ${{ inputs.version }}
+      useLocalStack: ${{ inputs.useLocalStack }}
     secrets: inherit
