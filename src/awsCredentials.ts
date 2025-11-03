@@ -30,11 +30,11 @@ async function isLocalStackDetected(
   // Enable LocalStack response header to detect LocalStack
   process.env.LOCALSTACK_RESPONSE_HEADER_ENABLED = 'true';
 
-  const { STSClient, GetCallerIdentityCommand } = await import(
-    '@aws-sdk/client-sts'
+  const { IAMClient, ListAccountAliasesCommand } = await import(
+    '@aws-sdk/client-iam'
   );
 
-  const client = new STSClient({
+  const client = new IAMClient({
     region: awsConfiguration.region,
     credentials: fromNodeProviderChain({
       clientConfig: { region: awsConfiguration.region },
@@ -43,7 +43,7 @@ async function isLocalStackDetected(
     }),
   });
 
-  const command = new GetCallerIdentityCommand({});
+  const command = new ListAccountAliasesCommand({});
   const response = await client.send(command);
 
   // Check for x-localstack header in response metadata
