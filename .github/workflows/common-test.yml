@@ -91,6 +91,13 @@ jobs:
           aws configure set region us-east-1
         env:
           AWS_ENDPOINT_URL: http://localhost:4566
+      - name: Bootstrap CDK for LocalStack
+        if: ${{ inputs.useLocalStack }}
+        run: npx cdk bootstrap aws://000000000000/us-east-1
+        working-directory: test/cdk-basic
+        env:
+          AWS_ENDPOINT_URL: http://localhost:4566
+          CDK_DEFAULT_REGION: eu-west-1
       - name: Destroy
         run: npm run destroy
         working-directory: test/cdk-basic
@@ -100,6 +107,7 @@ jobs:
         working-directory: test/cdk-basic
         env:
           AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
+          CDK_DEFAULT_REGION: ${{ inputs.useLocalStack && 'eu-west-1' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/cdk-basic.test.ts
         env:
@@ -113,6 +121,7 @@ jobs:
         working-directory: test/cdk-basic
         env:
           AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
+          CDK_DEFAULT_REGION: ${{ inputs.useLocalStack && 'eu-west-1' || '' }}
       - name: Test YAML
         run: npx vitest --retry 2 test/cdk-basic.test.ts
         env:
@@ -175,6 +184,13 @@ jobs:
           aws configure set region us-east-1
         env:
           AWS_ENDPOINT_URL: http://localhost:4566
+      - name: Bootstrap CDK for LocalStack
+        if: ${{ inputs.useLocalStack }}
+        run: npx cdk bootstrap aws://000000000000/us-east-1
+        working-directory: test/cdk-esm
+        env:
+          AWS_ENDPOINT_URL: http://localhost:4566
+          CDK_DEFAULT_REGION: eu-west-1
       - name: Destroy
         run: npm run destroy
         working-directory: test/cdk-esm
@@ -184,6 +200,7 @@ jobs:
         working-directory: test/cdk-esm
         env:
           AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
+          CDK_DEFAULT_REGION: ${{ inputs.useLocalStack && 'eu-west-1' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/cdk-esm.test.ts
         env:
