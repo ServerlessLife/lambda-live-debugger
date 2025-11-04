@@ -95,6 +95,7 @@ jobs:
             echo "AWS_REGION=eu-west-1"
             echo "AWS_DEFAULT_REGION=eu-west-1"
             echo "AWS_ENDPOINT_URL=http://localhost:4566"
+            echo "AWS_ENDPOINT_URL_S3=http://localhost:4566"
           } >> "$GITHUB_ENV"
       - name: Bootstrap CDK for LocalStack
         if: ${{ inputs.useLocalStack }}
@@ -179,6 +180,7 @@ jobs:
             echo "AWS_REGION=eu-west-1"
             echo "AWS_DEFAULT_REGION=eu-west-1"
             echo "AWS_ENDPOINT_URL=http://localhost:4566"
+            echo "AWS_ENDPOINT_URL_S3=http://localhost:4566"
           } >> "$GITHUB_ENV"
       - name: Bootstrap CDK for LocalStack
         if: ${{ inputs.useLocalStack }}
@@ -256,6 +258,7 @@ jobs:
             echo "AWS_REGION=eu-west-1"
             echo "AWS_DEFAULT_REGION=eu-west-1"
             echo "AWS_ENDPOINT_URL=http://localhost:4566"
+            echo "AWS_ENDPOINT_URL_S3=http://localhost:4566"
           } >> "$GITHUB_ENV"
       - name: Destroy
         if: ${{ !inputs.useLocalStack }}
@@ -335,6 +338,7 @@ jobs:
             echo "AWS_REGION=eu-west-1"
             echo "AWS_DEFAULT_REGION=eu-west-1"
             echo "AWS_ENDPOINT_URL=http://localhost:4566"
+            echo "AWS_ENDPOINT_URL_S3=http://localhost:4566"
           } >> "$GITHUB_ENV"
       - name: Destroy
         if: ${{ !inputs.useLocalStack }}
@@ -414,6 +418,7 @@ jobs:
             echo "AWS_REGION=eu-west-1"
             echo "AWS_DEFAULT_REGION=eu-west-1"
             echo "AWS_ENDPOINT_URL=http://localhost:4566"
+            echo "AWS_ENDPOINT_URL_S3=http://localhost:4566"
           } >> "$GITHUB_ENV"
       - name: Destroy
         if: ${{ !inputs.useLocalStack }}
@@ -493,6 +498,7 @@ jobs:
             echo "AWS_REGION=eu-west-1"
             echo "AWS_DEFAULT_REGION=eu-west-1"
             echo "AWS_ENDPOINT_URL=http://localhost:4566"
+            echo "AWS_ENDPOINT_URL_S3=http://localhost:4566"
           } >> "$GITHUB_ENV"
       - name: Destroy
         if: ${{ !inputs.useLocalStack }}
@@ -572,6 +578,7 @@ jobs:
             echo "AWS_REGION=eu-west-1"
             echo "AWS_DEFAULT_REGION=eu-west-1"
             echo "AWS_ENDPOINT_URL=http://localhost:4566"
+            echo "AWS_ENDPOINT_URL_S3=http://localhost:4566"
           } >> "$GITHUB_ENV"
       - name: Destroy
         if: ${{ !inputs.useLocalStack }}
@@ -651,6 +658,7 @@ jobs:
             echo "AWS_REGION=eu-west-1"
             echo "AWS_DEFAULT_REGION=eu-west-1"
             echo "AWS_ENDPOINT_URL=http://localhost:4566"
+            echo "AWS_ENDPOINT_URL_S3=http://localhost:4566"
           } >> "$GITHUB_ENV"
       - name: Destroy
         if: ${{ !inputs.useLocalStack }}
@@ -733,6 +741,7 @@ jobs:
             echo "AWS_REGION=eu-west-1"
             echo "AWS_DEFAULT_REGION=eu-west-1"
             echo "AWS_ENDPOINT_URL=http://localhost:4566"
+            echo "AWS_ENDPOINT_URL_S3=http://localhost:4566"
           } >> "$GITHUB_ENV"
       - name: Destroy
         if: ${{ !inputs.useLocalStack }}
@@ -809,6 +818,7 @@ jobs:
             echo "AWS_REGION=eu-west-1"
             echo "AWS_DEFAULT_REGION=eu-west-1"
             echo "AWS_ENDPOINT_URL=http://localhost:4566"
+            echo "AWS_ENDPOINT_URL_S3=http://localhost:4566"
           } >> "$GITHUB_ENV"
       - name: Destroy
         if: ${{ !inputs.useLocalStack }}
@@ -881,6 +891,7 @@ jobs:
             echo "AWS_REGION=eu-west-1"
             echo "AWS_DEFAULT_REGION=eu-west-1"
             echo "AWS_ENDPOINT_URL=http://localhost:4566"
+            echo "AWS_ENDPOINT_URL_S3=http://localhost:4566"
           } >> "$GITHUB_ENV"
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -960,6 +971,7 @@ jobs:
             echo "AWS_REGION=eu-west-1"
             echo "AWS_DEFAULT_REGION=eu-west-1"
             echo "AWS_ENDPOINT_URL=http://localhost:4566"
+            echo "AWS_ENDPOINT_URL_S3=http://localhost:4566"
           } >> "$GITHUB_ENV"
       - name: Setup OpenTofu
         uses: opentofu/setup-opentofu@v1
