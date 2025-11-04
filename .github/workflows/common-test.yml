@@ -88,7 +88,7 @@ jobs:
         run: |
           aws configure set aws_access_key_id test
           aws configure set aws_secret_access_key test
-          aws configure set region us-east-1
+          aws configure set region eu-west-1
         env:
           AWS_ENDPOINT_URL: http://localhost:4566
       - name: Bootstrap CDK for LocalStack
@@ -179,7 +179,7 @@ jobs:
         run: |
           aws configure set aws_access_key_id test
           aws configure set aws_secret_access_key test
-          aws configure set region us-east-1
+          aws configure set region eu-west-1
         env:
           AWS_ENDPOINT_URL: http://localhost:4566
       - name: Bootstrap CDK for LocalStack
@@ -262,7 +262,7 @@ jobs:
         run: |
           aws configure set aws_access_key_id test
           aws configure set aws_secret_access_key test
-          aws configure set region us-east-1
+          aws configure set region eu-west-1
         env:
           AWS_ENDPOINT_URL: http://localhost:4566
       - name: Destroy
@@ -338,7 +338,7 @@ jobs:
         run: |
           aws configure set aws_access_key_id test
           aws configure set aws_secret_access_key test
-          aws configure set region us-east-1
+          aws configure set region eu-west-1
         env:
           AWS_ENDPOINT_URL: http://localhost:4566
       - name: Destroy
@@ -414,7 +414,7 @@ jobs:
         run: |
           aws configure set aws_access_key_id test
           aws configure set aws_secret_access_key test
-          aws configure set region us-east-1
+          aws configure set region eu-west-1
         env:
           AWS_ENDPOINT_URL: http://localhost:4566
       - name: Destroy
@@ -490,7 +490,7 @@ jobs:
         run: |
           aws configure set aws_access_key_id test
           aws configure set aws_secret_access_key test
-          aws configure set region us-east-1
+          aws configure set region eu-west-1
         env:
           AWS_ENDPOINT_URL: http://localhost:4566
       - name: Destroy
@@ -566,7 +566,7 @@ jobs:
         run: |
           aws configure set aws_access_key_id test
           aws configure set aws_secret_access_key test
-          aws configure set region us-east-1
+          aws configure set region eu-west-1
         env:
           AWS_ENDPOINT_URL: http://localhost:4566
       - name: Destroy
@@ -642,7 +642,7 @@ jobs:
         run: |
           aws configure set aws_access_key_id test
           aws configure set aws_secret_access_key test
-          aws configure set region us-east-1
+          aws configure set region eu-west-1
         env:
           AWS_ENDPOINT_URL: http://localhost:4566
       - name: Destroy
@@ -721,7 +721,7 @@ jobs:
         run: |
           aws configure set aws_access_key_id test
           aws configure set aws_secret_access_key test
-          aws configure set region us-east-1
+          aws configure set region eu-west-1
         env:
           AWS_ENDPOINT_URL: http://localhost:4566
       - name: Destroy
@@ -800,7 +800,7 @@ jobs:
         run: |
           aws configure set aws_access_key_id test
           aws configure set aws_secret_access_key test
-          aws configure set region us-east-1
+          aws configure set region eu-west-1
         env:
           AWS_ENDPOINT_URL: http://localhost:4566
       - name: Destroy
@@ -875,7 +875,7 @@ jobs:
         run: |
           aws configure set aws_access_key_id test
           aws configure set aws_secret_access_key test
-          aws configure set region us-east-1
+          aws configure set region eu-west-1
         env:
           AWS_ENDPOINT_URL: http://localhost:4566
       - name: Setup Terraform
@@ -957,7 +957,7 @@ jobs:
         run: |
           aws configure set aws_access_key_id test
           aws configure set aws_secret_access_key test
-          aws configure set region us-east-1
+          aws configure set region eu-west-1
         env:
           AWS_ENDPOINT_URL: http://localhost:4566
       - name: Setup OpenTofu
