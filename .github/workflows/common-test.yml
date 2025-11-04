@@ -93,7 +93,7 @@ jobs:
           AWS_ENDPOINT_URL: http://localhost:4566
       - name: Bootstrap CDK for LocalStack
         if: ${{ inputs.useLocalStack }}
-        run: npx cdk bootstrap aws://000000000000/eu-west-1
+        run: npx cdk bootstrap aws://000000000000/eu-west-1 -c environment=test
         working-directory: test/cdk-basic
         env:
           AWS_ENDPOINT_URL: http://localhost:4566
@@ -184,7 +184,7 @@ jobs:
           AWS_ENDPOINT_URL: http://localhost:4566
       - name: Bootstrap CDK for LocalStack
         if: ${{ inputs.useLocalStack }}
-        run: npx cdk bootstrap aws://000000000000/eu-west-1
+        run: npx cdk bootstrap aws://000000000000/eu-west-1 -c environment=test
         working-directory: test/cdk-esm
         env:
           AWS_ENDPOINT_URL: http://localhost:4566
