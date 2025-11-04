@@ -48,6 +48,13 @@ async function regularMode(context: any, event: any) {
     });
   }, 5 * 1000);
 
+  let region: string | undefined;
+  if (process.env.NODE_TLS_REJECT_UNAUTHORIZED === '0') {
+    // it is localstack
+    region = process.env.AWS_REGION;
+    Logger.verbose(`Region is set to ${region} due to LocalStack detection`);
+  }
+
   const ioTService = await IoTService.connect({
     onMessage: async (message: IoTMessage) => {
       if (Logger.isVerbose()) {
@@ -83,6 +90,7 @@ async function regularMode(context: any, event: any) {
       }
     },
     topic,
+    region,
   });
 
   const payload: IoTMessage = {

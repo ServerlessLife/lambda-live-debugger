@@ -122,19 +122,12 @@ async function connect(props?: {
     credentials,
   });
 
-  let region = props?.region;
-
-  if (!region && process.env.NODE_TLS_REJECT_UNAUTHORIZED === '0') {
-    // it is localstack
-    region = process.env.AWS_REGION ?? 'us-east-1';
-  }
-
   device = new iot.device({
     protocol: 'wss',
     host: endpoint,
     reconnectPeriod: 1,
     keepalive: 60,
-    region,
+    region: props?.region,
     accessKeyId: credentials?.accessKeyId,
     secretKey: credentials?.secretAccessKey,
     sessionToken: credentials?.sessionToken,
