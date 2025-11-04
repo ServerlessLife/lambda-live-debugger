@@ -76,6 +76,9 @@ jobs:
         run: |
           npm i lambda-live-debugger@${{ inputs.version || 'latest' }}
         working-directory: test
+      - name: Install cdklocal for LocalStack
+        if: ${{ inputs.useLocalStack }}
+        run: npm i -g cdklocal
       - name: Configure AWS Credentials
         if: ${{ !inputs.useLocalStack }}
         uses: aws-actions/configure-aws-credentials@v4
@@ -93,12 +96,12 @@ jobs:
           AWS_ENDPOINT_URL: http://localhost:4566
       - name: Bootstrap CDK for LocalStack
         if: ${{ inputs.useLocalStack }}
-        run: npx cdk bootstrap aws://000000000000/eu-west-1 -c environment=test
+        run: npx cdklocal bootstrap aws://000000000000/eu-west-1 -c environment=test
         working-directory: test/cdk-basic
         env:
           AWS_ENDPOINT_URL: http://localhost:4566
-          # CDK_DEFAULT_REGION: eu-west-1
       - name: Destroy
+        if: ${{ !inputs.useLocalStack }}
         run: npm run destroy
         working-directory: test/cdk-basic
         continue-on-error: true
@@ -167,6 +170,9 @@ jobs:
         run: |
           npm i lambda-live-debugger@${{ inputs.version || 'latest' }}
         working-directory: test
+      - name: Install cdklocal for LocalStack
+        if: ${{ inputs.useLocalStack }}
+        run: npm i -g cdklocal
       - name: Configure AWS Credentials
         if: ${{ !inputs.useLocalStack }}
         uses: aws-actions/configure-aws-credentials@v4
@@ -184,12 +190,12 @@ jobs:
           AWS_ENDPOINT_URL: http://localhost:4566
       - name: Bootstrap CDK for LocalStack
         if: ${{ inputs.useLocalStack }}
-        run: npx cdk bootstrap aws://000000000000/eu-west-1 -c environment=test
+        run: npx cdklocal bootstrap aws://000000000000/eu-west-1 -c environment=test
         working-directory: test/cdk-esm
         env:
           AWS_ENDPOINT_URL: http://localhost:4566
-          # CDK_DEFAULT_REGION: eu-west-1
       - name: Destroy
+        if: ${{ !inputs.useLocalStack }}
         run: npm run destroy
         working-directory: test/cdk-esm
         continue-on-error: true
@@ -266,6 +272,7 @@ jobs:
         env:
           AWS_ENDPOINT_URL: http://localhost:4566
       - name: Destroy
+        if: ${{ !inputs.useLocalStack }}
         run: npm run destroy
         working-directory: test/sls-basic
         continue-on-error: true
@@ -274,6 +281,7 @@ jobs:
         working-directory: test/sls-basic
         env:
           AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
+          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/sls-basic.test.ts
         env:
@@ -342,6 +350,7 @@ jobs:
         env:
           AWS_ENDPOINT_URL: http://localhost:4566
       - name: Destroy
+        if: ${{ !inputs.useLocalStack }}
         run: npm run destroy
         working-directory: test/sls-esbuild-cjs
         continue-on-error: true
@@ -350,6 +359,7 @@ jobs:
         working-directory: test/sls-esbuild-cjs
         env:
           AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
+          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/sls-esbuild-cjs.test.ts
         env:
@@ -418,6 +428,7 @@ jobs:
         env:
           AWS_ENDPOINT_URL: http://localhost:4566
       - name: Destroy
+        if: ${{ !inputs.useLocalStack }}
         run: npm run destroy
         working-directory: test/sls-esbuild-esm
         continue-on-error: true
@@ -426,6 +437,7 @@ jobs:
         working-directory: test/sls-esbuild-esm
         env:
           AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
+          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/sls-esbuild-esm.test.ts
         env:
@@ -494,6 +506,7 @@ jobs:
         env:
           AWS_ENDPOINT_URL: http://localhost:4566
       - name: Destroy
+        if: ${{ !inputs.useLocalStack }}
         run: npm run destroy
         working-directory: test/osls-basic
         continue-on-error: true
@@ -502,6 +515,7 @@ jobs:
         working-directory: test/osls-basic
         env:
           AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
+          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/osls-basic.test.ts
         env:
@@ -570,6 +584,7 @@ jobs:
         env:
           AWS_ENDPOINT_URL: http://localhost:4566
       - name: Destroy
+        if: ${{ !inputs.useLocalStack }}
         run: npm run destroy
         working-directory: test/osls-esbuild-cjs
         continue-on-error: true
@@ -578,6 +593,7 @@ jobs:
         working-directory: test/osls-esbuild-cjs
         env:
           AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
+          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/osls-esbuild-cjs.test.ts
         env:
@@ -646,6 +662,7 @@ jobs:
         env:
           AWS_ENDPOINT_URL: http://localhost:4566
       - name: Destroy
+        if: ${{ !inputs.useLocalStack }}
         run: npm run destroy
         working-directory: test/osls-esbuild-esm
         continue-on-error: true
@@ -654,6 +671,7 @@ jobs:
         working-directory: test/osls-esbuild-esm
         env:
           AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
+          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/osls-esbuild-esm.test.ts
         env:
@@ -725,6 +743,7 @@ jobs:
         env:
           AWS_ENDPOINT_URL: http://localhost:4566
       - name: Destroy
+        if: ${{ !inputs.useLocalStack }}
         run: npm run destroy
         working-directory: test/sam-basic
         continue-on-error: true
@@ -804,6 +823,7 @@ jobs:
         env:
           AWS_ENDPOINT_URL: http://localhost:4566
       - name: Destroy
+        if: ${{ !inputs.useLocalStack }}
         run: npm run destroy
         working-directory: test/sam-alt
         continue-on-error: true
@@ -886,6 +906,7 @@ jobs:
           terraform init -backend-config="bucket=lld-terraform-basic"
         working-directory: test/terraform-basic
       - name: Destroy
+        if: ${{ !inputs.useLocalStack }}
         run: npm run destroy
         working-directory: test/terraform-basic
         continue-on-error: true
@@ -968,6 +989,7 @@ jobs:
           tofu init -backend-config="bucket=lld-opentofu-basic"
         working-directory: test/opentofu-basic
       - name: Destroy
+        if: ${{ !inputs.useLocalStack }}
         run: npm run destroy
         working-directory: test/opentofu-basic
         continue-on-error: true
