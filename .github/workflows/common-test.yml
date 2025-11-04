@@ -265,10 +265,16 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/sls-basic
+        env:
+          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/sls-basic.test.ts
+        env:
+          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/sls-basic.test.ts
+        env:
+          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
 
   test-sls-esbuild-cjs:
     runs-on: ubuntu-latest
@@ -338,10 +344,16 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/sls-esbuild-cjs
+        env:
+          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/sls-esbuild-cjs.test.ts
+        env:
+          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/sls-esbuild-cjs.test.ts
+        env:
+          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
 
   test-sls-esbuild-esm:
     runs-on: ubuntu-latest
@@ -411,10 +423,16 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/sls-esbuild-esm
+        env:
+          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/sls-esbuild-esm.test.ts
+        env:
+          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/sls-esbuild-esm.test.ts
+        env:
+          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
 
   test-osls-basic:
     runs-on: ubuntu-latest
@@ -484,10 +502,16 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/osls-basic
+        env:
+          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/osls-basic.test.ts
+        env:
+          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/osls-basic.test.ts
+        env:
+          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
 
   test-osls-esbuild-cjs:
     runs-on: ubuntu-latest
@@ -557,10 +581,16 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/osls-esbuild-cjs
+        env:
+          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/osls-esbuild-cjs.test.ts
+        env:
+          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/osls-esbuild-cjs.test.ts
+        env:
+          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
 
   test-osls-esbuild-esm:
     runs-on: ubuntu-latest
@@ -630,10 +660,16 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/osls-esbuild-esm
+        env:
+          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/osls-esbuild-esm.test.ts
+        env:
+          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/osls-esbuild-esm.test.ts
+        env:
+          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
 
   test-sam-basic:
     runs-on: ubuntu-latest
