@@ -266,7 +266,7 @@ jobs:
         working-directory: test/sls-basic
         continue-on-error: true
       - name: Deploy
-        run: npm run deploy
+        run: npx serverless deploy --region eu-west-1
         working-directory: test/sls-basic
         env:
           AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
@@ -346,7 +346,7 @@ jobs:
         working-directory: test/sls-esbuild-cjs
         continue-on-error: true
       - name: Deploy
-        run: npm run deploy
+        run: npx serverless deploy --region eu-west-1
         working-directory: test/sls-esbuild-cjs
         env:
           AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
@@ -426,7 +426,7 @@ jobs:
         working-directory: test/sls-esbuild-esm
         continue-on-error: true
       - name: Deploy
-        run: npm run deploy
+        run: npx serverless deploy --region eu-west-1
         working-directory: test/sls-esbuild-esm
         env:
           AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
@@ -506,7 +506,7 @@ jobs:
         working-directory: test/osls-basic
         continue-on-error: true
       - name: Deploy
-        run: npm run deploy
+        run: npx serverless deploy --region eu-west-1
         working-directory: test/osls-basic
         env:
           AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
@@ -586,7 +586,7 @@ jobs:
         working-directory: test/osls-esbuild-cjs
         continue-on-error: true
       - name: Deploy
-        run: npm run deploy
+        run: npx serverless deploy --region eu-west-1
         working-directory: test/osls-esbuild-cjs
         env:
           AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
@@ -666,7 +666,7 @@ jobs:
         working-directory: test/osls-esbuild-esm
         continue-on-error: true
       - name: Deploy
-        run: npm run deploy
+        run: npx serverless deploy --region eu-west-1
         working-directory: test/osls-esbuild-esm
         env:
           AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
