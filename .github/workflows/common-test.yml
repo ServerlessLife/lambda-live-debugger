@@ -89,17 +89,17 @@ jobs:
       - name: Configure LocalStack AWS Credentials
         if: ${{ inputs.useLocalStack }}
         run: |
-          aws configure set aws_access_key_id test
-          aws configure set aws_secret_access_key test
-          aws configure set region eu-west-1
-        env:
-          AWS_ENDPOINT_URL: http://localhost:4566
+          {
+            echo "AWS_ACCESS_KEY_ID=test"
+            echo "AWS_SECRET_ACCESS_KEY=test"
+            echo "AWS_REGION=eu-west-1"
+            echo "AWS_DEFAULT_REGION=eu-west-1"
+            echo "AWS_ENDPOINT_URL=http://localhost:4566"
+          } >> "$GITHUB_ENV"
       - name: Bootstrap CDK for LocalStack
         if: ${{ inputs.useLocalStack }}
         run: npx cdklocal bootstrap aws://000000000000/eu-west-1 -c environment=test
         working-directory: test/cdk-basic
-        env:
-          AWS_ENDPOINT_URL: http://localhost:4566
       - name: Destroy
         if: ${{ !inputs.useLocalStack }}
         run: npm run destroy
@@ -108,25 +108,15 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/cdk-basic
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/cdk-basic.test.ts
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/cdk-basic.test.ts
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Deploy YAML version
         run: npm run deploy-yaml
         working-directory: test/cdk-basic
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test YAML
         run: npx vitest --retry 2 test/cdk-basic.test.ts
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
 
   test-cdk-esm:
     runs-on: ubuntu-latest
@@ -183,17 +173,17 @@ jobs:
       - name: Configure LocalStack AWS Credentials
         if: ${{ inputs.useLocalStack }}
         run: |
-          aws configure set aws_access_key_id test
-          aws configure set aws_secret_access_key test
-          aws configure set region eu-west-1
-        env:
-          AWS_ENDPOINT_URL: http://localhost:4566
+          {
+            echo "AWS_ACCESS_KEY_ID=test"
+            echo "AWS_SECRET_ACCESS_KEY=test"
+            echo "AWS_REGION=eu-west-1"
+            echo "AWS_DEFAULT_REGION=eu-west-1"
+            echo "AWS_ENDPOINT_URL=http://localhost:4566"
+          } >> "$GITHUB_ENV"
       - name: Bootstrap CDK for LocalStack
         if: ${{ inputs.useLocalStack }}
         run: npx cdklocal bootstrap aws://000000000000/eu-west-1 -c environment=test
         working-directory: test/cdk-esm
-        env:
-          AWS_ENDPOINT_URL: http://localhost:4566
       - name: Destroy
         if: ${{ !inputs.useLocalStack }}
         run: npm run destroy
@@ -202,16 +192,10 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/cdk-esm
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/cdk-esm.test.ts
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/cdk-esm.test.ts
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
 
   test-sls-basic:
     runs-on: ubuntu-latest
@@ -266,11 +250,13 @@ jobs:
       - name: Configure LocalStack AWS Credentials
         if: ${{ inputs.useLocalStack }}
         run: |
-          aws configure set aws_access_key_id test
-          aws configure set aws_secret_access_key test
-          aws configure set region eu-west-1
-        env:
-          AWS_ENDPOINT_URL: http://localhost:4566
+          {
+            echo "AWS_ACCESS_KEY_ID=test"
+            echo "AWS_SECRET_ACCESS_KEY=test"
+            echo "AWS_REGION=eu-west-1"
+            echo "AWS_DEFAULT_REGION=eu-west-1"
+            echo "AWS_ENDPOINT_URL=http://localhost:4566"
+          } >> "$GITHUB_ENV"
       - name: Destroy
         if: ${{ !inputs.useLocalStack }}
         run: npm run destroy
@@ -279,17 +265,10 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/sls-basic
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
-          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/sls-basic.test.ts
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/sls-basic.test.ts
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
 
   test-sls-esbuild-cjs:
     runs-on: ubuntu-latest
@@ -344,11 +323,13 @@ jobs:
       - name: Configure LocalStack AWS Credentials
         if: ${{ inputs.useLocalStack }}
         run: |
-          aws configure set aws_access_key_id test
-          aws configure set aws_secret_access_key test
-          aws configure set region eu-west-1
-        env:
-          AWS_ENDPOINT_URL: http://localhost:4566
+          {
+            echo "AWS_ACCESS_KEY_ID=test"
+            echo "AWS_SECRET_ACCESS_KEY=test"
+            echo "AWS_REGION=eu-west-1"
+            echo "AWS_DEFAULT_REGION=eu-west-1"
+            echo "AWS_ENDPOINT_URL=http://localhost:4566"
+          } >> "$GITHUB_ENV"
       - name: Destroy
         if: ${{ !inputs.useLocalStack }}
         run: npm run destroy
@@ -357,17 +338,10 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/sls-esbuild-cjs
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
-          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/sls-esbuild-cjs.test.ts
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/sls-esbuild-cjs.test.ts
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
 
   test-sls-esbuild-esm:
     runs-on: ubuntu-latest
@@ -422,11 +396,13 @@ jobs:
       - name: Configure LocalStack AWS Credentials
         if: ${{ inputs.useLocalStack }}
         run: |
-          aws configure set aws_access_key_id test
-          aws configure set aws_secret_access_key test
-          aws configure set region eu-west-1
-        env:
-          AWS_ENDPOINT_URL: http://localhost:4566
+          {
+            echo "AWS_ACCESS_KEY_ID=test"
+            echo "AWS_SECRET_ACCESS_KEY=test"
+            echo "AWS_REGION=eu-west-1"
+            echo "AWS_DEFAULT_REGION=eu-west-1"
+            echo "AWS_ENDPOINT_URL=http://localhost:4566"
+          } >> "$GITHUB_ENV"
       - name: Destroy
         if: ${{ !inputs.useLocalStack }}
         run: npm run destroy
@@ -435,17 +411,10 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/sls-esbuild-esm
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
-          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/sls-esbuild-esm.test.ts
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/sls-esbuild-esm.test.ts
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
 
   test-osls-basic:
     runs-on: ubuntu-latest
@@ -500,11 +469,13 @@ jobs:
       - name: Configure LocalStack AWS Credentials
         if: ${{ inputs.useLocalStack }}
         run: |
-          aws configure set aws_access_key_id test
-          aws configure set aws_secret_access_key test
-          aws configure set region eu-west-1
-        env:
-          AWS_ENDPOINT_URL: http://localhost:4566
+          {
+            echo "AWS_ACCESS_KEY_ID=test"
+            echo "AWS_SECRET_ACCESS_KEY=test"
+            echo "AWS_REGION=eu-west-1"
+            echo "AWS_DEFAULT_REGION=eu-west-1"
+            echo "AWS_ENDPOINT_URL=http://localhost:4566"
+          } >> "$GITHUB_ENV"
       - name: Destroy
         if: ${{ !inputs.useLocalStack }}
         run: npm run destroy
@@ -513,17 +484,10 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/osls-basic
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
-          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/osls-basic.test.ts
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/osls-basic.test.ts
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
 
   test-osls-esbuild-cjs:
     runs-on: ubuntu-latest
@@ -578,11 +542,13 @@ jobs:
       - name: Configure LocalStack AWS Credentials
         if: ${{ inputs.useLocalStack }}
         run: |
-          aws configure set aws_access_key_id test
-          aws configure set aws_secret_access_key test
-          aws configure set region eu-west-1
-        env:
-          AWS_ENDPOINT_URL: http://localhost:4566
+          {
+            echo "AWS_ACCESS_KEY_ID=test"
+            echo "AWS_SECRET_ACCESS_KEY=test"
+            echo "AWS_REGION=eu-west-1"
+            echo "AWS_DEFAULT_REGION=eu-west-1"
+            echo "AWS_ENDPOINT_URL=http://localhost:4566"
+          } >> "$GITHUB_ENV"
       - name: Destroy
         if: ${{ !inputs.useLocalStack }}
         run: npm run destroy
@@ -591,17 +557,10 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/osls-esbuild-cjs
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
-          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/osls-esbuild-cjs.test.ts
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/osls-esbuild-cjs.test.ts
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
 
   test-osls-esbuild-esm:
     runs-on: ubuntu-latest
@@ -656,11 +615,13 @@ jobs:
       - name: Configure LocalStack AWS Credentials
         if: ${{ inputs.useLocalStack }}
         run: |
-          aws configure set aws_access_key_id test
-          aws configure set aws_secret_access_key test
-          aws configure set region eu-west-1
-        env:
-          AWS_ENDPOINT_URL: http://localhost:4566
+          {
+            echo "AWS_ACCESS_KEY_ID=test"
+            echo "AWS_SECRET_ACCESS_KEY=test"
+            echo "AWS_REGION=eu-west-1"
+            echo "AWS_DEFAULT_REGION=eu-west-1"
+            echo "AWS_ENDPOINT_URL=http://localhost:4566"
+          } >> "$GITHUB_ENV"
       - name: Destroy
         if: ${{ !inputs.useLocalStack }}
         run: npm run destroy
@@ -669,17 +630,10 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/osls-esbuild-esm
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
-          AWS_SDK_LOAD_CONFIG: ${{ inputs.useLocalStack && '1' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/osls-esbuild-esm.test.ts
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/osls-esbuild-esm.test.ts
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
 
   test-sam-basic:
     runs-on: ubuntu-latest
@@ -737,11 +691,13 @@ jobs:
       - name: Configure LocalStack AWS Credentials
         if: ${{ inputs.useLocalStack }}
         run: |
-          aws configure set aws_access_key_id test
-          aws configure set aws_secret_access_key test
-          aws configure set region eu-west-1
-        env:
-          AWS_ENDPOINT_URL: http://localhost:4566
+          {
+            echo "AWS_ACCESS_KEY_ID=test"
+            echo "AWS_SECRET_ACCESS_KEY=test"
+            echo "AWS_REGION=eu-west-1"
+            echo "AWS_DEFAULT_REGION=eu-west-1"
+            echo "AWS_ENDPOINT_URL=http://localhost:4566"
+          } >> "$GITHUB_ENV"
       - name: Destroy
         if: ${{ !inputs.useLocalStack }}
         run: npm run destroy
@@ -750,16 +706,10 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/sam-basic
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/sam-basic.test.ts
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/sam-basic.test.ts
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
 
   test-sam-alt:
     runs-on: ubuntu-latest
@@ -817,11 +767,13 @@ jobs:
       - name: Configure LocalStack AWS Credentials
         if: ${{ inputs.useLocalStack }}
         run: |
-          aws configure set aws_access_key_id test
-          aws configure set aws_secret_access_key test
-          aws configure set region eu-west-1
-        env:
-          AWS_ENDPOINT_URL: http://localhost:4566
+          {
+            echo "AWS_ACCESS_KEY_ID=test"
+            echo "AWS_SECRET_ACCESS_KEY=test"
+            echo "AWS_REGION=eu-west-1"
+            echo "AWS_DEFAULT_REGION=eu-west-1"
+            echo "AWS_ENDPOINT_URL=http://localhost:4566"
+          } >> "$GITHUB_ENV"
       - name: Destroy
         if: ${{ !inputs.useLocalStack }}
         run: npm run destroy
@@ -830,16 +782,10 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/sam-alt
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/sam-alt.test.ts
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/sam-alt.test.ts
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
 
   test-terraform-basic:
     runs-on: ubuntu-latest
@@ -893,11 +839,13 @@ jobs:
       - name: Configure LocalStack AWS Credentials
         if: ${{ inputs.useLocalStack }}
         run: |
-          aws configure set aws_access_key_id test
-          aws configure set aws_secret_access_key test
-          aws configure set region eu-west-1
-        env:
-          AWS_ENDPOINT_URL: http://localhost:4566
+          {
+            echo "AWS_ACCESS_KEY_ID=test"
+            echo "AWS_SECRET_ACCESS_KEY=test"
+            echo "AWS_REGION=eu-west-1"
+            echo "AWS_DEFAULT_REGION=eu-west-1"
+            echo "AWS_ENDPOINT_URL=http://localhost:4566"
+          } >> "$GITHUB_ENV"
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
       - name: Terraform Init
@@ -913,16 +861,10 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/terraform-basic
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/terraform-basic.test.ts
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/terraform-basic.test.ts
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
 
   test-opentofu-basic:
     runs-on: ubuntu-latest
@@ -976,11 +918,13 @@ jobs:
       - name: Configure LocalStack AWS Credentials
         if: ${{ inputs.useLocalStack }}
         run: |
-          aws configure set aws_access_key_id test
-          aws configure set aws_secret_access_key test
-          aws configure set region eu-west-1
-        env:
-          AWS_ENDPOINT_URL: http://localhost:4566
+          {
+            echo "AWS_ACCESS_KEY_ID=test"
+            echo "AWS_SECRET_ACCESS_KEY=test"
+            echo "AWS_REGION=eu-west-1"
+            echo "AWS_DEFAULT_REGION=eu-west-1"
+            echo "AWS_ENDPOINT_URL=http://localhost:4566"
+          } >> "$GITHUB_ENV"
       - name: Setup OpenTofu
         uses: opentofu/setup-opentofu@v1
       - name: OpenTofu Init
@@ -996,13 +940,7 @@ jobs:
       - name: Deploy
         run: npm run deploy
         working-directory: test/opentofu-basic
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test
         run: npx vitest --retry 2 test/opentofu-basic.test.ts
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/opentofu-basic.test.ts
-        env:
-          AWS_ENDPOINT_URL: ${{ inputs.useLocalStack && 'http://localhost:4566' || '' }}
