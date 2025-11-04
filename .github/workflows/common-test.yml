@@ -37,7 +37,7 @@ jobs:
   test-cdk-basic:
     runs-on: ubuntu-latest
     concurrency:
-      group: test-cdk-basic
+      group: test-cdk-basic-${{ inputs.useLocalStack }}
     steps:
       - uses: actions/checkout@v4
       - name: Start LocalStack
@@ -122,7 +122,7 @@ jobs:
   test-cdk-esm:
     runs-on: ubuntu-latest
     concurrency:
-      group: test-cdk-esm
+      group: test-cdk-esm-${{ inputs.useLocalStack }}
     steps:
       - uses: actions/checkout@v4
       - name: Start LocalStack
@@ -202,7 +202,7 @@ jobs:
   test-sls-basic:
     runs-on: ubuntu-latest
     concurrency:
-      group: test-sls-basic
+      group: test-sls-basic-${{ inputs.useLocalStack }}
     steps:
       - uses: actions/checkout@v4
       - name: Start LocalStack
@@ -282,7 +282,7 @@ jobs:
   test-sls-esbuild-cjs:
     runs-on: ubuntu-latest
     concurrency:
-      group: test-sls-esbuild-cjs
+      group: test-sls-esbuild-cjs-${{ inputs.useLocalStack }}
     steps:
       - uses: actions/checkout@v4
       - name: Start LocalStack
@@ -362,7 +362,7 @@ jobs:
   test-sls-esbuild-esm:
     runs-on: ubuntu-latest
     concurrency:
-      group: test-sls-esbuild-esm
+      group: test-sls-esbuild-esm-${{ inputs.useLocalStack }}
     steps:
       - uses: actions/checkout@v4
       - name: Start LocalStack
@@ -442,7 +442,7 @@ jobs:
   test-osls-basic:
     runs-on: ubuntu-latest
     concurrency:
-      group: test-osls-basic
+      group: test-osls-basic-${{ inputs.useLocalStack }}
     steps:
       - uses: actions/checkout@v4
       - name: Start LocalStack
@@ -522,7 +522,7 @@ jobs:
   test-osls-esbuild-cjs:
     runs-on: ubuntu-latest
     concurrency:
-      group: test-osls-esbuild-cjs
+      group: test-osls-esbuild-cjs-${{ inputs.useLocalStack }}
     steps:
       - uses: actions/checkout@v4
       - name: Start LocalStack
@@ -602,7 +602,7 @@ jobs:
   test-osls-esbuild-esm:
     runs-on: ubuntu-latest
     concurrency:
-      group: test-osls-esbuild-esm
+      group: test-osls-esbuild-esm-${{ inputs.useLocalStack }}
     steps:
       - uses: actions/checkout@v4
       - name: Start LocalStack
@@ -682,7 +682,7 @@ jobs:
   test-sam-basic:
     runs-on: ubuntu-latest
     concurrency:
-      group: test-sam-basic
+      group: test-sam-basic-${{ inputs.useLocalStack }}
     steps:
       - uses: actions/checkout@v4
       - name: Start LocalStack
@@ -759,7 +759,7 @@ jobs:
   test-sam-alt:
     runs-on: ubuntu-latest
     concurrency:
-      group: test-sam-alt
+      group: test-sam-alt-${{ inputs.useLocalStack }}
     steps:
       - uses: actions/checkout@v4
       - name: Start LocalStack
@@ -836,7 +836,7 @@ jobs:
   test-terraform-basic:
     runs-on: ubuntu-latest
     concurrency:
-      group: test-terraform-basic
+      group: test-terraform-basic-${{ inputs.useLocalStack }}
     steps:
       - uses: actions/checkout@v4
       - name: Start LocalStack
@@ -892,6 +892,7 @@ jobs:
             echo "AWS_DEFAULT_REGION=eu-west-1"
             echo "AWS_ENDPOINT_URL=http://localhost:4566"
             echo "AWS_ENDPOINT_URL_S3=http://localhost:4566"
+            echo "AWS_S3_FORCE_PATH_STYLE=1"
           } >> "$GITHUB_ENV"
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -916,7 +917,7 @@ jobs:
   test-opentofu-basic:
     runs-on: ubuntu-latest
     concurrency:
-      group: test-opentofu-basic
+      group: test-opentofu-basic-${{ inputs.useLocalStack }}
     steps:
       - uses: actions/checkout@v4
       - name: Start LocalStack
@@ -972,6 +973,7 @@ jobs:
             echo "AWS_DEFAULT_REGION=eu-west-1"
             echo "AWS_ENDPOINT_URL=http://localhost:4566"
             echo "AWS_ENDPOINT_URL_S3=http://localhost:4566"
+            echo "AWS_S3_FORCE_PATH_STYLE=1"
           } >> "$GITHUB_ENV"
       - name: Setup OpenTofu
         uses: opentofu/setup-opentofu@v1
