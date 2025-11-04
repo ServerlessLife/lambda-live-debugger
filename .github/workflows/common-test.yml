@@ -78,7 +78,7 @@ jobs:
         working-directory: test
       - name: Install cdklocal for LocalStack
         if: ${{ inputs.useLocalStack }}
-        run: npm i -g aws-cdk-local
+        run: npm i -g aws-cdk-local aws-cdk
       - name: Configure AWS Credentials
         if: ${{ !inputs.useLocalStack }}
         uses: aws-actions/configure-aws-credentials@v4
@@ -162,7 +162,7 @@ jobs:
         working-directory: test
       - name: Install cdklocal for LocalStack
         if: ${{ inputs.useLocalStack }}
-        run: npm i -g aws-cdk-local
+        run: npm i -g aws-cdk-local aws-cdk
       - name: Configure AWS Credentials
         if: ${{ !inputs.useLocalStack }}
         uses: aws-actions/configure-aws-credentials@v4
