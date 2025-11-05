@@ -46,14 +46,14 @@ jobs:
         # Picking random test so I can have environment
         working-directory: test/sam-basic
 
-  test:
-    uses: ./.github/workflows/common-test.yml
-    secrets: inherit
-    needs: remove-old-layers
-    with:
-      mode: build
-      testMonorepo: false
-      useLocalStack: false
+  # test:
+  #   uses: ./.github/workflows/common-test.yml
+  #   secrets: inherit
+  #   needs: remove-old-layers
+  #   with:
+  #     mode: build
+  #     testMonorepo: false
+  #     useLocalStack: false
 
   test-localstack:
     uses: ./.github/workflows/common-test.yml

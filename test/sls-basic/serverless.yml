@@ -6,6 +6,9 @@ provider:
   runtime: nodejs20.x
   region: eu-west-1
 
+plugins:
+  - serverless-localstack
+
 functions:
   - ${file(./functions1.yml)}
   - ${file(./functions2.yml)}

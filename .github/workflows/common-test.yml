@@ -109,7 +109,12 @@ jobs:
         working-directory: test/cdk-basic
         continue-on-error: true
       - name: Deploy
-        run: npm run deploy
+        if: ${{ !inputs.useLocalStack }}
+        run: cdk deploy --all -c environment=test --require-approval never --outputs-file cdk-outputs.json
+        working-directory: test/cdk-basic
+      - name: Deploy (LocalStack)
+        if: ${{ inputs.useLocalStack }}
+        run: cdklocal deploy --all -c environment=test --require-approval never --outputs-file cdk-outputs.json
         working-directory: test/cdk-basic
       - name: Test
         run: npx vitest --retry 2 test/cdk-basic.test.ts
@@ -194,7 +199,12 @@ jobs:
         working-directory: test/cdk-esm
         continue-on-error: true
       - name: Deploy
-        run: npm run deploy
+        if: ${{ !inputs.useLocalStack }}
+        run: cdk deploy --all -c environment=test --require-approval never --outputs-file cdk-outputs.json
+        working-directory: test/cdk-esm
+      - name: Deploy (LocalStack)
+        if: ${{ inputs.useLocalStack }}
+        run: cdklocal deploy --all -c environment=test --require-approval never --outputs-file cdk-outputs.json
         working-directory: test/cdk-esm
       - name: Test
         run: npx vitest --retry 2 test/cdk-esm.test.ts
@@ -877,6 +887,9 @@ jobs:
         run: |
           npm i lambda-live-debugger@${{ inputs.version || 'latest' }}
         working-directory: test
+      - name: Install terraform-local for LocalStack
+        if: ${{ inputs.useLocalStack }}
+        run: pip install terraform-local
       - name: Configure AWS Credentials
         if: ${{ !inputs.useLocalStack }}
         uses: aws-actions/configure-aws-credentials@v4
@@ -899,9 +912,16 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
       - name: Terraform Init
+        if: ${{ !inputs.useLocalStack }}
         run: |
           ./create_bucket.sh lld-terraform-basic
           terraform init -backend-config="bucket=lld-terraform-basic"
+        working-directory: test/terraform-basic
+      - name: Terraform Init (LocalStack)
+        if: ${{ inputs.useLocalStack }}
+        run: |
+          ./create_bucket.sh lld-terraform-basic
+          tflocal init -backend-config="bucket=lld-terraform-basic"
         working-directory: test/terraform-basic
       - name: Destroy
         if: ${{ !inputs.useLocalStack }}
@@ -909,7 +929,12 @@ jobs:
         working-directory: test/terraform-basic
         continue-on-error: true
       - name: Deploy
-        run: npm run deploy
+        if: ${{ !inputs.useLocalStack }}
+        run: npm run build && terraform apply -auto-approve && terraform output -json > terraform-outputs.json
+        working-directory: test/terraform-basic
+      - name: Deploy (LocalStack)
+        if: ${{ inputs.useLocalStack }}
+        run: npm run build && tflocal apply -auto-approve && tflocal output -json > terraform-outputs.json
         working-directory: test/terraform-basic
       - name: Test
         run: npx vitest --retry 2 test/terraform-basic.test.ts
