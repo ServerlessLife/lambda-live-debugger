@@ -38,6 +38,8 @@ async function startDebuggerInternal(folder: string, args: string[] = []) {
 
   argsI.push('-v');
 
+  argsI.push('--region eu-west-1');
+
   let command = `node ${
     testMonorepo ? '' : '../../'
   }dist/lldebugger.mjs ${argsI?.join(' ')}`;

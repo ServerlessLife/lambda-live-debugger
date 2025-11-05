@@ -4,11 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "init": "./create_bucket.sh lld-terraform-basic-marko && terraform init -backend-config=\"bucket=lld-terraform-basic-marko\"",
+    "init": "./create_bucket.sh lld-terraform-basic-marko && terraform init -backend-config=\"bucket=lld-terraform-basic-marko\" -backend-config=\"region=eu-west-1\"",
+    "init:localstack": "./create_bucket.sh lld-terraform-basic && tflocal init -backend-config=\"bucket=lld-terraform-basic\" -backend-config=\"region=eu-west-1\"",
+    "install:localstack": "pip install terraform-local",
     "build_test-ts-esmodule": "cd services/testTsEsModule && npx tsc && cp package.json ./dist && cd ../..",
     "build_test-ts-commonjs": "cd services/testTsCommonJs && npx tsc && cp package.json ./dist && cd ../..",
     "build": "npm run build_test-ts-esmodule && npm run build_test-ts-commonjs",
     "deploy": "npm run build && terraform apply -auto-approve && terraform output -json > terraform-outputs.json",
+    "deploy:localstack": "npm run build && tflocal apply -auto-approve && tflocal output -json > terraform-outputs.json",
     "destroy": "npm run build && terraform destroy -auto-approve"
   },
   "keywords": [],

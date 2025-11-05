@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "deploy": "serverless deploy --stage=test",
+    "deploy": "serverless deploy --stage=test --region eu-west-1",
+    "deploy:localstack": "serverless deploy --stage=test --region eu-west-1",
+    "install:localstack": "npm install --save-dev serverless-localstack",
     "destroy": "serverless remove --stage=test"
   },
   "keywords": [],

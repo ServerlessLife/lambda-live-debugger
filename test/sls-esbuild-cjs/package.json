@@ -5,7 +5,9 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "deploy": "serverless deploy",
+    "deploy": "serverless deploy --region eu-west-1",
+    "deploy:localstack": "serverless deploy --region eu-west-1",
+    "install:localstack": "npm install --save-dev serverless-localstack",
     "destroy": "serverless remove"
   },
   "keywords": [],
