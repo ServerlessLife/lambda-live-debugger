@@ -19,6 +19,16 @@ jobs:
       mode: global
       testMonorepo: false
       version: ${{ inputs.version }}
+      useLocalStack: false
+    secrets: inherit
+
+  test-global-not-monorepo-localstack:
+    uses: ./.github/workflows/common-test.yml
+    with:
+      mode: global
+      testMonorepo: false
+      version: ${{ inputs.version }}
+      useLocalStack: true
     secrets: inherit
 
   test-local-not-monorepo:
@@ -28,6 +38,17 @@ jobs:
       mode: local
       testMonorepo: false
       version: ${{ inputs.version }}
+      useLocalStack: false
+    secrets: inherit
+
+  test-local-not-monorepo-localstack:
+    needs: test-global-not-monorepo
+    uses: ./.github/workflows/common-test.yml
+    with:
+      mode: local
+      testMonorepo: false
+      version: ${{ inputs.version }}
+      useLocalStack: true
     secrets: inherit
 
   test-global-monorepo:
@@ -37,6 +58,17 @@ jobs:
       mode: global
       testMonorepo: true
       version: ${{ inputs.version }}
+      useLocalStack: false
+    secrets: inherit
+
+  test-global-monorepo-localstack:
+    needs: test-local-not-monorepo
+    uses: ./.github/workflows/common-test.yml
+    with:
+      mode: global
+      testMonorepo: true
+      version: ${{ inputs.version }}
+      useLocalStack: true
     secrets: inherit
 
   test-local-monorepo:
@@ -46,4 +78,15 @@ jobs:
       mode: local
       testMonorepo: true
       version: ${{ inputs.version }}
+      useLocalStack: false
+    secrets: inherit
+
+  test-local-monorepo-localstack:
+    needs: test-global-monorepo
+    uses: ./.github/workflows/common-test.yml
+    with:
+      mode: local
+      testMonorepo: true
+      version: ${{ inputs.version }}
+      useLocalStack: true
     secrets: inherit

@@ -13,6 +13,15 @@ const lambdasProcessingObservableMode = new Set<string>();
  */
 async function connect() {
   topic = `${Configuration.config.debuggerId}/events`;
+
+  let region = Configuration.config.region;
+  if (!region && Configuration.config.localStack) {
+    region = process.env.AWS_REGION || 'us-east-1';
+    Logger.verbose(
+      `Empty region detected with LocalStack, defaulting to ${region}`,
+    );
+  }
+
   ioTServiceConnection = await IoTService.connect({
     onMessage: onMessageFromLambda,
     topic,

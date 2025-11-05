@@ -1061,6 +1061,11 @@ function getEnvironmentVariablesForDebugger({
     env.LLD_VERBOSE = 'true';
   }
 
+  // Disable TLS verification for LocalStack
+  if (Configuration.config.localStack) {
+    env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+  }
+
   return env;
 }
 

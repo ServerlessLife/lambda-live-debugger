@@ -4,7 +4,10 @@
   "private": true,
   "scripts": {
     "build": "sam build --config-env test --config-file alt-samconfig.yaml --template-file alt-template.yaml",
-    "deploy": "npm run build && sam deploy --config-env test --config-file alt-samconfig.yaml --no-confirm-changeset && npm run export_outputs",
+    "build:localstack": "samlocal build --config-env test --config-file alt-samconfig.yaml --template-file alt-template.yaml",
+    "deploy": "npm run build && sam deploy --config-env test --config-file alt-samconfig.yaml --no-confirm-changeset --region eu-west-1 && npm run export_outputs",
+    "deploy:localstack": "npm run build:localstack && samlocal deploy --config-env test --config-file alt-samconfig.yaml --no-confirm-changeset --region eu-west-1 && npm run export_outputs",
+    "install:localstack": "pip install aws-sam-cli-local",
     "export_outputs": "aws cloudformation describe-stacks --stack-name lld-test-sam-alt --output json --query Stacks[0].Outputs > sam-outputs.json",
     "destroy": "sam delete --config-env test --config-file alt-samconfig.yaml --no-prompts"
   },

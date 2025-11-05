@@ -55,6 +55,11 @@ async function run() {
     return;
   }
 
+  if (Configuration.config.localStack) {
+    //https://github.com/localstack/localstack/issues/13308
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+  }
+
   let message = `Starting the debugger ${
     Configuration.config.observable
       ? 'in Observability mode'

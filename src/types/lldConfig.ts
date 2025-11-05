@@ -91,4 +91,11 @@ export type LldConfigCliArgs = {
 
 export type LldConfigTs = Partial<LldConfigBase>;
 
-export type LldConfig = LldConfigCliArgs & LldConfigTs & { debuggerId: string };
+export type LldConfig = LldConfigCliArgs &
+  LldConfigTs & {
+    debuggerId: string;
+    /**
+     * Indicates whether LocalStack is being used instead of real AWS services.
+     */
+    localStack: boolean;
+  };
