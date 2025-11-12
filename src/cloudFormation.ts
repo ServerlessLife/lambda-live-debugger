@@ -9,6 +9,7 @@ import { Logger } from './logger.js';
 import * as yaml from 'yaml';
 
 let cloudFormationClient: CloudFormationClient;
+const originalConsoleError = console.error;
 
 /**
  * Get CloudFormation stack template
@@ -84,13 +85,16 @@ async function getCloudFormationResources(
   stackName: string,
   awsConfiguration: AwsConfiguration,
 ) {
+  let ListStackResourcesCommand: typeof ListStackResourcesCommandType;
   // temporary disable console.error because SAM framework outputs useless errors
-  const originalConsoleError = console.error;
-  console.error = function () {};
-  const { ListStackResourcesCommand } = await import(
-    '@aws-sdk/client-cloudformation'
-  );
-  console.error = originalConsoleError;
+  try {
+    console.error = function () {};
+
+    const clientCloudFormation = await import('@aws-sdk/client-cloudformation');
+    ListStackResourcesCommand = clientCloudFormation.ListStackResourcesCommand;
+  } finally {
+    console.error = originalConsoleError;
+  }
 
   const cloudFormationClient: CloudFormationClient =
     await getCloudFormationClient(awsConfiguration);
