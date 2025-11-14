@@ -352,12 +352,14 @@ If you have a new feature idea, please create and issue.
 (alphabetical)
 
 - [Ben Moses](https://github.com/benjymoses)
+- [Elias Brange](https://www.linkedin.com/in/eliasbrange)
 - [Kristian Dreher](https://www.linkedin.com/in/kristiandreher)
 - [Hugo Lewenhaupt](https://www.linkedin.com/in/hugo-lewenhaupt-84751289)
 - [Roger Chi](https://rogerchi.com/)
 - [Sebastian / avocadomaster](https://github.com/avocadomaster)
 - [Sebastian Bille](https://blog.sebastianbille.com)
 - [Quentin Laurent](https://github.com/Spotchi)
+
 - ⭐ Your name here for notable code or documentation contributions or sample projects submitted with a bug report that resulted in tool improvement.
 
 ## Disclaimer
