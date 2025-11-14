@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import * as crypto from 'crypto';
 import { IoTMessage, IoTService } from '../ioTService.js';
 import { Logger } from '../logger.js';
 
