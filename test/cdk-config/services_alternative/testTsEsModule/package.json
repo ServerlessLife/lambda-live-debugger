@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "type": "module",
   "devDependencies": {
-    "@tsconfig/node22": "^22.0.2"
+    "@tsconfig/node22": "^22.0.3"
   },
   "dependencies": {
-    "@aws-sdk/client-sts": "^3.920.0"
+    "@aws-sdk/client-sts": "^3.931.0"
   }
 }
