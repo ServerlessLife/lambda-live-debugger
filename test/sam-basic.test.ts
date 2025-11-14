@@ -14,7 +14,7 @@ import { getTestProjectFolder } from './utils/getTestProjectFolder.js';
 
 export const execAsync = promisify(exec);
 
-const observableMode = process.env.OBSERVABLE_MODE === 'true';
+export const observableMode = process.env.OBSERVABLE_MODE === 'true';
 
 describe('sam-basic', async () => {
   const folder = await getTestProjectFolder('sam-basic');
@@ -98,6 +98,102 @@ describe('sam-basic', async () => {
 
     expect(response.inputEvent).toEqual(payload);
     expect(response.runningLocally).toEqual(!observableMode);
+    if (observableMode) {
+      await validateLocalResponse(lambdaName, payload);
+    }
+  });
+
+  test('call Lambda - testTsCommonJsFromNestedStack', async () => {
+    const lambdaName = await getSamFunctionName(
+      folder,
+      'FunctionNameTestTsCommonJsFromNestedStack',
+    );
+
+    const payload = getSamplePayload(lambdaName);
+    const response = await callLambda(lambdaName, payload);
+
+    expect(response.inputEvent).toEqual(payload);
+    expect(response.runningLocally).toEqual(!observableMode);
+    if (observableMode) {
+      await validateLocalResponse(lambdaName, payload);
+    }
+  });
+
+  test('call Lambda - testTsEsModuleFromNestedStack', async () => {
+    const lambdaName = await getSamFunctionName(
+      folder,
+      'FunctionNameTestTsEsModuleFromNestedStack',
+    );
+
+    const payload = getSamplePayload(lambdaName);
+    const response = await callLambda(lambdaName, payload);
+
+    expect(response.inputEvent).toEqual(payload);
+    expect(response.runningLocally).toEqual(!observableMode);
+    if (observableMode) {
+      await validateLocalResponse(lambdaName, payload);
+    }
+  });
+
+  test('call Lambda - testJsCommonJsFromNestedStack', async () => {
+    const lambdaName = await getSamFunctionName(
+      folder,
+      'FunctionNameTestJsCommonJsFromNestedStack',
+    );
+
+    const payload = getSamplePayload(lambdaName);
+    const response = await callLambda(lambdaName, payload);
+
+    expect(response.runningLocally).toEqual(!observableMode);
+    expect(response.inputEvent).toEqual(payload);
+    if (observableMode) {
+      await validateLocalResponse(lambdaName, payload);
+    }
+  });
+
+  test('call Lambda - testTsCommonJsNested', async () => {
+    const lambdaName = await getSamFunctionName(
+      folder,
+      'FunctionNameTestTsCommonJsNested',
+    );
+
+    const payload = getSamplePayload(lambdaName);
+    const response = await callLambda(lambdaName, payload);
+
+    expect(response.inputEvent).toEqual(payload);
+    expect(response.runningLocally).toEqual(!observableMode);
+    if (observableMode) {
+      await validateLocalResponse(lambdaName, payload);
+    }
+  });
+
+  test('call Lambda - testTsEsModuleNested', async () => {
+    const lambdaName = await getSamFunctionName(
+      folder,
+      'FunctionNameTestTsEsModuleNested',
+    );
+
+    const payload = getSamplePayload(lambdaName);
+    const response = await callLambda(lambdaName, payload);
+
+    expect(response.inputEvent).toEqual(payload);
+    expect(response.runningLocally).toEqual(!observableMode);
+    if (observableMode) {
+      await validateLocalResponse(lambdaName, payload);
+    }
+  });
+
+  test('call Lambda - testJsCommonJsNested', async () => {
+    const lambdaName = await getSamFunctionName(
+      folder,
+      'FunctionNameTestJsCommonJsNested',
+    );
+
+    const payload = getSamplePayload(lambdaName);
+    const response = await callLambda(lambdaName, payload);
+
+    expect(response.runningLocally).toEqual(!observableMode);
+    expect(response.inputEvent).toEqual(payload);
     if (observableMode) {
       await validateLocalResponse(lambdaName, payload);
     }
