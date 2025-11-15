@@ -1,15 +1,15 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  sam-basic
+  Nested Stack for sam-basic
 
 Transform:
   - AWS::Serverless-2016-10-31
 
 Resources:
-  NestedStack:
+  NestedNestedStack:
     Type: AWS::Serverless::Application
     Properties:
-      Location: nested-stack.yaml
+      Location: nested-nested-stack.yaml
 
   testTsCommonJs:
     Type: AWS::Serverless::Function
@@ -71,38 +71,17 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
 
-  testJsEsModule:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: services/testJsEsModule/lambda.lambdaHandler
-      Runtime: nodejs22.x
-      Architectures:
-        - x86_64
-      MemorySize: 128
-      Timeout: 10
-      Policies:
-        - AWSLambdaBasicExecutionRole
-
 Outputs:
-  FunctionNameTestJsCommonJs:
-    Value: !Ref testJsCommonJs
-  FunctionNameTestJsEsModule:
-    Value: !Ref testJsEsModule
   FunctionNameTestTsCommonJs:
     Value: !Ref testTsCommonJs
   FunctionNameTestTsEsModule:
     Value: !Ref testTsEsModule
-  # Outputs from nested stack
-  FunctionNameTestTsCommonJsFromNestedStack:
-    Value: !GetAtt NestedStack.Outputs.FunctionNameTestTsCommonJs
-  FunctionNameTestTsEsModuleFromNestedStack:
-    Value: !GetAtt NestedStack.Outputs.FunctionNameTestTsEsModule
-  FunctionNameTestJsCommonJsFromNestedStack:
-    Value: !GetAtt NestedStack.Outputs.FunctionNameTestJsCommonJs
-  # Outputs from nested-nested stack (via nested stack)
+  FunctionNameTestJsCommonJs:
+    Value: !Ref testJsCommonJs
+  # Pass through outputs from nested-nested stack
   FunctionNameTestTsCommonJsNested:
-    Value: !GetAtt NestedStack.Outputs.FunctionNameTestTsCommonJsNested
+    Value: !GetAtt NestedNestedStack.Outputs.FunctionNameTestTsCommonJsNested
   FunctionNameTestTsEsModuleNested:
-    Value: !GetAtt NestedStack.Outputs.FunctionNameTestTsEsModuleNested
+    Value: !GetAtt NestedNestedStack.Outputs.FunctionNameTestTsEsModuleNested
   FunctionNameTestJsCommonJsNested:
-    Value: !GetAtt NestedStack.Outputs.FunctionNameTestJsCommonJsNested
+    Value: !GetAtt NestedNestedStack.Outputs.FunctionNameTestJsCommonJsNested

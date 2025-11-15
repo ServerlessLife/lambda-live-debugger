@@ -110,16 +110,12 @@ export class SamFramework implements IFramework {
 
     const lambdas: any[] = [];
 
-    // get all resources of type AWS::Serverless::Function
-    for (const resourceName in template.Resources) {
-      const resource = template.Resources[resourceName];
-      if (resource.Type === 'AWS::Serverless::Function') {
-        lambdas.push({
-          Name: resourceName,
-          ...resource,
-        });
-      }
-    }
+    // Recursively parse templates to find all Lambda functions, including those in nested stacks
+    await this.parseLambdasFromTemplate(
+      template,
+      path.dirname(path.resolve(samTemplateFile)),
+      lambdas,
+    );
 
     const lambdasDiscovered: LambdaResource[] = [];
 
@@ -130,9 +126,17 @@ export class SamFramework implements IFramework {
       awsConfiguration,
     );
 
+    const stackAndNestedStackNames = [
+      ...new Set(lambdasInStack.map((l) => l.stackName)),
+    ];
+
     Logger.verbose(
       `[SAM] Found Lambdas in stack ${stackName}:`,
       JSON.stringify(lambdasInStack, null, 2),
+    );
+
+    Logger.verbose(
+      `[SAM] Found the following stacks and nested stacks: ${stackAndNestedStackNames.join(', ')}`,
     );
 
     // get tags for each Lambda
@@ -220,6 +224,65 @@ export class SamFramework implements IFramework {
     }
 
     return lambdasDiscovered;
+  }
+
+  /**
+   * Recursively parse templates to find all Lambda functions, including nested stacks
+   * @param template The parsed CloudFormation/SAM template
+   * @param templateDir The directory containing the template file
+   * @param lambdas The array to collect Lambda functions into
+   */
+  private async parseLambdasFromTemplate(
+    template: any,
+    templateDir: string,
+    lambdas: any[],
+  ): Promise<void> {
+    if (!template.Resources) {
+      return;
+    }
+
+    for (const resourceName in template.Resources) {
+      const resource = template.Resources[resourceName];
+
+      // Check if it's a Lambda function
+      if (resource.Type === 'AWS::Serverless::Function') {
+        lambdas.push({
+          Name: resourceName,
+          ...resource,
+        });
+      }
+      // Check if it's a nested stack
+      else if (
+        resource.Type === 'AWS::Serverless::Application' ||
+        resource.Type === 'AWS::CloudFormation::Stack'
+      ) {
+        const nestedTemplateLocation = resource.Properties?.Location;
+        if (nestedTemplateLocation) {
+          try {
+            const nestedTemplatePath = path.resolve(
+              templateDir,
+              nestedTemplateLocation,
+            );
+            const nestedTemplateContent = await fs.readFile(
+              nestedTemplatePath,
+              'utf-8',
+            );
+            const nestedTemplate = yaml.parse(nestedTemplateContent);
+
+            // Recursively parse the nested template
+            await this.parseLambdasFromTemplate(
+              nestedTemplate,
+              path.dirname(nestedTemplatePath),
+              lambdas,
+            );
+          } catch (err: any) {
+            Logger.warn(
+              `[SAM] Could not parse nested template at ${nestedTemplateLocation}: ${err.message}`,
+            );
+          }
+        }
+      }
+    }
   }
 }
 

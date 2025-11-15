@@ -1,16 +1,11 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  sam-basic
+  Nested Nested Stack for sam-basic
 
 Transform:
   - AWS::Serverless-2016-10-31
 
 Resources:
-  NestedStack:
-    Type: AWS::Serverless::Application
-    Properties:
-      Location: nested-stack.yaml
-
   testTsCommonJs:
     Type: AWS::Serverless::Function
     Properties:
@@ -71,38 +66,10 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
 
-  testJsEsModule:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: services/testJsEsModule/lambda.lambdaHandler
-      Runtime: nodejs22.x
-      Architectures:
-        - x86_64
-      MemorySize: 128
-      Timeout: 10
-      Policies:
-        - AWSLambdaBasicExecutionRole
-
 Outputs:
-  FunctionNameTestJsCommonJs:
-    Value: !Ref testJsCommonJs
-  FunctionNameTestJsEsModule:
-    Value: !Ref testJsEsModule
-  FunctionNameTestTsCommonJs:
-    Value: !Ref testTsCommonJs
-  FunctionNameTestTsEsModule:
-    Value: !Ref testTsEsModule
-  # Outputs from nested stack
-  FunctionNameTestTsCommonJsFromNestedStack:
-    Value: !GetAtt NestedStack.Outputs.FunctionNameTestTsCommonJs
-  FunctionNameTestTsEsModuleFromNestedStack:
-    Value: !GetAtt NestedStack.Outputs.FunctionNameTestTsEsModule
-  FunctionNameTestJsCommonJsFromNestedStack:
-    Value: !GetAtt NestedStack.Outputs.FunctionNameTestJsCommonJs
-  # Outputs from nested-nested stack (via nested stack)
   FunctionNameTestTsCommonJsNested:
-    Value: !GetAtt NestedStack.Outputs.FunctionNameTestTsCommonJsNested
+    Value: !Ref testTsCommonJs
   FunctionNameTestTsEsModuleNested:
-    Value: !GetAtt NestedStack.Outputs.FunctionNameTestTsEsModuleNested
+    Value: !Ref testTsEsModule
   FunctionNameTestJsCommonJsNested:
-    Value: !GetAtt NestedStack.Outputs.FunctionNameTestJsCommonJsNested
+    Value: !Ref testJsCommonJs
