@@ -6,6 +6,6 @@
     "@tsconfig/node22": "^22.0.3"
   },
   "dependencies": {
-    "@aws-sdk/client-sts": "^3.931.0"
+    "@aws-sdk/client-sts": "^3.932.0"
   }
 }
