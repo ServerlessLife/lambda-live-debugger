@@ -11,17 +11,17 @@
     "destroy": "cdk destroy  --all -c environment=test --force"
   },
   "devDependencies": {
-    "@tsconfig/node22": "^22.0.3",
-    "@types/aws-lambda": "^8.10.158",
+    "@tsconfig/node22": "^22.0.5",
+    "@types/aws-lambda": "^8.10.159",
     "@types/node": "24.10.1",
-    "aws-cdk": "2.1031.2",
+    "aws-cdk": "2.1033.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.20.6",
     "typescript": "~5.9.3"
   },
   "dependencies": {
-    "@aws-sdk/client-sts": "^3.931.0",
-    "aws-cdk-lib": "2.224.0",
+    "@aws-sdk/client-sts": "^3.936.0",
+    "aws-cdk-lib": "2.227.0",
     "constructs": "^10.4.3",
     "source-map-support": "^0.5.21"
   }
