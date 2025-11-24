@@ -1,0 +1,18 @@
+service: lls-osls-nested-nested
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs22.x
+  region: eu-west-1
+
+functions:
+  testJsCommonJsFromNestedStack:
+    handler: services/testJsCommonJs/lambda.lambdaHandler
+
+  testJsEsModuleFromNestedStack:
+    handler: services/testJsEsModule/lambda.lambdaHandler
+
+nestedStacks:
+  NestedNestedStack:
+    template: nested-nested-stack.yml

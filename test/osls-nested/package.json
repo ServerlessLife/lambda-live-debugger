@@ -1,0 +1,20 @@
+{
+  "name": "osls-nested",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "serverless deploy --stage=test",
+    "destroy": "serverless remove --stage=test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "osls": "^3.59.3",
+    "serverless-nested-stack": "^0.0.7"
+  },
+  "dependencies": {
+    "@aws-sdk/client-sts": "^3.936.0"
+  }
+}

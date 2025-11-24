@@ -171,6 +171,26 @@
       "cwd": "${workspaceRoot}/test/osls-basic"
     },
     {
+      "name": "LLDebugger - OSLS nested",
+      "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
+      "args": ["../../src/lldebugger.ts", "--stage=test"],
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal",
+      "type": "node",
+      "cwd": "${workspaceRoot}/test/osls-nested"
+    },
+    {
+      "name": "LLDebugger - OSLS nested - observability",
+      "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
+      "args": ["../../src/lldebugger.ts", "--stage=test", "-o"],
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal",
+      "type": "node",
+      "cwd": "${workspaceRoot}/test/osls-nested"
+    },
+    {
       "name": "LLDebugger - OSLS EsBuild CJS",
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": ["../../src/lldebugger.ts"],

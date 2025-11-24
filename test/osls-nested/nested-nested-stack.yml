@@ -1,0 +1,14 @@
+service: lls-osls-nested-nested-nested
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs22.x
+  region: eu-west-1
+
+functions:
+  testJsCommonJsNested:
+    handler: services/testJsCommonJs/lambda.lambdaHandler
+
+  testJsEsModuleNested:
+    handler: services/testJsEsModule/lambda.lambdaHandler

@@ -182,60 +182,173 @@ export class SlsFramework implements IFramework {
       config,
     );
 
+    // Get functions from main configuration
     const lambdas = serverless.service.functions;
 
     Logger.verbose(`[SLS] Found Lambdas:`, JSON.stringify(lambdas, null, 2));
 
+    // Process main stack functions
     for (const func in lambdas) {
-      const lambda = lambdas[func] as Serverless.FunctionDefinitionHandler;
-      const handlerFull = lambda.handler;
-      const handlerParts = handlerFull.split('.');
-      const handler = handlerParts[1];
-
-      const possibleCodePaths = [
-        `${handlerParts[0]}.ts`,
-        `${handlerParts[0]}.js`,
-        `${handlerParts[0]}.cjs`,
-        `${handlerParts[0]}.mjs`,
-      ];
-      let codePath: string | undefined;
-      for (const cp of possibleCodePaths) {
-        try {
-          await fs.access(cp, constants.F_OK);
-          codePath = cp;
-          break;
-        } catch {
-          // ignore, file not found
-        }
-      }
-
-      if (!codePath) {
-        throw new Error(`Code path not found for handler: ${handlerFull}`);
-      }
-
-      const functionName = lambda.name;
-      if (!functionName) {
-        throw new Error(`Function name not found for handler: ${handlerFull}`);
-      }
-
-      const packageJsonPath = await findPackageJson(codePath);
-      Logger.verbose(`[SLS] package.json path: ${packageJsonPath}`);
-
-      const lambdaResource: LambdaResource = {
-        functionName,
-        codePath,
-        handler,
-        packageJsonPath,
+      const lambdaResource = await this.processFunction(
+        func,
+        lambdas[func] as Serverless.FunctionDefinitionHandler,
         esBuildOptions,
-        metadata: {
-          framework: 'sls',
-        },
-      };
-
+      );
       lambdasDiscovered.push(lambdaResource);
     }
 
+    // Check for nested stacks (serverless-nested-stack plugin)
+    const nestedStacks = (serverless.service as any).nestedStacks;
+    if (nestedStacks) {
+      Logger.verbose(
+        `[SLS] Found nested stacks configuration:`,
+        JSON.stringify(nestedStacks, null, 2),
+      );
+
+      const nestedLambdas = await this.parseNestedStacks(
+        nestedStacks,
+        esBuildOptions,
+      );
+      lambdasDiscovered.push(...nestedLambdas);
+    }
+
     return lambdasDiscovered;
+  }
+
+  /**
+   * Process a single Lambda function
+   */
+  private async processFunction(
+    funcName: string,
+    lambda: Serverless.FunctionDefinitionHandler,
+    esBuildOptions: EsBuildOptions | undefined,
+  ): Promise<LambdaResource> {
+    const handlerFull = lambda.handler;
+    const handlerParts = handlerFull.split('.');
+    const handler = handlerParts[1];
+
+    const possibleCodePaths = [
+      `${handlerParts[0]}.ts`,
+      `${handlerParts[0]}.js`,
+      `${handlerParts[0]}.cjs`,
+      `${handlerParts[0]}.mjs`,
+    ];
+    let codePath: string | undefined;
+    for (const cp of possibleCodePaths) {
+      try {
+        await fs.access(cp, constants.F_OK);
+        codePath = cp;
+        break;
+      } catch {
+        // ignore, file not found
+      }
+    }
+
+    if (!codePath) {
+      throw new Error(`Code path not found for handler: ${handlerFull}`);
+    }
+
+    const functionName = lambda.name;
+    if (!functionName) {
+      throw new Error(`Function name not found for handler: ${handlerFull}`);
+    }
+
+    const packageJsonPath = await findPackageJson(codePath);
+    Logger.verbose(`[SLS] package.json path: ${packageJsonPath}`);
+
+    const lambdaResource: LambdaResource = {
+      functionName,
+      codePath,
+      handler,
+      packageJsonPath,
+      esBuildOptions,
+      metadata: {
+        framework: 'sls',
+      },
+    };
+
+    return lambdaResource;
+  }
+
+  /**
+   * Parse nested stacks recursively
+   */
+  private async parseNestedStacks(
+    nestedStacks: any,
+    esBuildOptions: EsBuildOptions | undefined,
+    currentDir: string = process.cwd(),
+  ): Promise<LambdaResource[]> {
+    const lambdas: LambdaResource[] = [];
+
+    for (const stackName in nestedStacks) {
+      const stackConfig = nestedStacks[stackName];
+      const templatePath = stackConfig.template;
+
+      if (!templatePath) {
+        Logger.verbose(
+          `[SLS] Nested stack ${stackName} has no template property`,
+        );
+        continue;
+      }
+
+      const resolvedTemplatePath = path.resolve(currentDir, templatePath);
+      Logger.verbose(
+        `[SLS] Parsing nested stack ${stackName}: ${resolvedTemplatePath}`,
+      );
+
+      try {
+        const templateContent = await fs.readFile(
+          resolvedTemplatePath,
+          'utf-8',
+        );
+        const yaml = await import('yaml');
+        const nestedConfig = yaml.parse(templateContent);
+
+        // Process functions in nested stack
+        if (nestedConfig.functions) {
+          Logger.verbose(
+            `[SLS] Found functions in nested stack ${stackName}:`,
+            JSON.stringify(nestedConfig.functions, null, 2),
+          );
+
+          for (const funcName in nestedConfig.functions) {
+            const func = nestedConfig.functions[funcName];
+            const lambdaResource = await this.processFunction(
+              funcName,
+              func as Serverless.FunctionDefinitionHandler,
+              esBuildOptions,
+            );
+            lambdas.push(lambdaResource);
+          }
+        }
+
+        // Recursively process nested stacks within this stack
+        if (nestedConfig.nestedStacks) {
+          Logger.verbose(
+            `[SLS] Found nested stacks within ${stackName}:`,
+            JSON.stringify(nestedConfig.nestedStacks, null, 2),
+          );
+
+          const templateDir = path.dirname(resolvedTemplatePath);
+          const deeperNestedLambdas = await this.parseNestedStacks(
+            nestedConfig.nestedStacks,
+            esBuildOptions,
+            templateDir,
+          );
+          lambdas.push(...deeperNestedLambdas);
+        }
+      } catch (err: any) {
+        Logger.warn(
+          `[SLS] Could not parse nested stack at ${resolvedTemplatePath}: ${err.message}`,
+        );
+      }
+    }
+
+    Logger.verbose(
+      `[SLS] Finished parsing nested stacks, found ${lambdas.length} Lambda function(s)${lambdas.length > 0 ? `:\n${lambdas.map((l) => `  - ${l.functionName}`).join('\n')}` : ''}`,
+    );
+
+    return lambdas;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

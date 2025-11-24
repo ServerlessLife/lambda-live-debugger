@@ -1,0 +1,18 @@
+service: lls-osls-nested
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs22.x
+  region: eu-west-1
+
+plugins:
+  - serverless-nested-stack
+
+functions:
+  - ${file(./functions1.yml)}
+  - ${file(./functions2.yml)}
+
+nestedStacks:
+  NestedStack:
+    template: nested-stack.yml
