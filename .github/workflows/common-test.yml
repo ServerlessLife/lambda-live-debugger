@@ -131,6 +131,55 @@ jobs:
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/cdk-esm.test.ts
 
+  test-cdk-nested:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: test-cdk-nested
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.node_version }}
+          registry-url: 'https://registry.npmjs.org'
+      - name: Install dependencies
+        run: |
+          node prepareForTest.js cdk-nested
+          npm i
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        if: ${{ inputs.mode == 'build' }}
+        with:
+          name: dist
+          path: dist
+      - name: Install lambda-live-debugger globally
+        if: ${{ inputs.mode == 'global' }}
+        run: |
+          npm i lambda-live-debugger@${{ inputs.version || 'latest' }} -g
+        working-directory: test
+      - name: Install lambda-live-debugger locally
+        if: ${{ inputs.mode == 'local' }}
+        run: |
+          npm i lambda-live-debugger@${{ inputs.version || 'latest' }}
+        working-directory: test
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-west-1
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: GitHubActions
+      - name: Destroy
+        run: npm run destroy
+        working-directory: test/cdk-nested
+        continue-on-error: true
+      - name: Deploy
+        run: npm run deploy
+        working-directory: test/cdk-nested
+      - name: Test
+        run: npx vitest --retry 2 test/cdk-nested.test.ts
+      - name: Test - observability mode
+        run: OBSERVABLE_MODE=true npx vitest --retry 2 test/cdk-nested.test.ts
+
   test-sls-basic:
     runs-on: ubuntu-latest
     concurrency:
@@ -483,6 +532,59 @@ jobs:
         run: npx vitest --retry 2 test/sam-basic.test.ts
       - name: Test - observability mode
         run: OBSERVABLE_MODE=true npx vitest --retry 2 test/sam-basic.test.ts
+
+  test-sam-nested:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: test-sam-nested
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.node_version }}
+          registry-url: 'https://registry.npmjs.org'
+      - name: Install dependencies
+        run: |
+          node prepareForTest.js sam-nested
+          npm i
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        if: ${{ inputs.mode == 'build' }}
+        with:
+          name: dist
+          path: dist
+      - name: Install lambda-live-debugger globally
+        if: ${{ inputs.mode == 'global' }}
+        run: |
+          npm i lambda-live-debugger@${{ inputs.version || 'latest' }} -g
+        working-directory: test
+      - name: Install lambda-live-debugger locally
+        if: ${{ inputs.mode == 'local' }}
+        run: |
+          npm i lambda-live-debugger@${{ inputs.version || 'latest' }}
+        working-directory: test
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-west-1
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: GitHubActions
+      - name: Destroy
+        run: npm run destroy
+        working-directory: test/sam-nested
+        continue-on-error: true
+      - name: Deploy
+        run: npm run deploy
+        working-directory: test/sam-nested
+      - name: Test
+        run: npx vitest --retry 2 test/sam-nested.test.ts
+      - name: Test - observability mode
+        run: OBSERVABLE_MODE=true npx vitest --retry 2 test/sam-nested.test.ts
 
   test-sam-alt:
     runs-on: ubuntu-latest

@@ -139,11 +139,13 @@ async function getCloudFormationResources(
 async function getLambdasInStack(
   stackName: string,
   awsConfiguration: AwsConfiguration,
+  stackLogicalId?: string,
 ): Promise<
   Array<{
     lambdaName: string;
     logicalId: string;
     stackName: string;
+    stackLogicalId: string;
   }>
 > {
   const response = await getCloudFormationResources(
@@ -165,6 +167,7 @@ async function getLambdasInStack(
         lambdaName: resource.PhysicalResourceId!,
         logicalId: resource.LogicalResourceId!,
         stackName: stackName,
+        stackLogicalId: stackLogicalId ?? stackName,
       };
     }) ?? [];
 
@@ -175,6 +178,7 @@ async function getLambdasInStack(
       const lambdasInNestedStack = await getLambdasInStack(
         nestedStack.PhysicalResourceId,
         awsConfiguration,
+        nestedStack.LogicalResourceId,
       );
 
       return lambdasInNestedStack;

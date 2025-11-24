@@ -10,6 +10,7 @@ import { CloudFormation } from '../cloudFormation.js';
 import { AwsConfiguration } from '../types/awsConfiguration.js';
 import { LldConfigBase } from '../types/lldConfig.js';
 import { Logger } from '../logger.js';
+import type { Format } from 'esbuild';
 
 /**
  * Support for AWS SAM framework
@@ -102,24 +103,10 @@ export class SamFramework implements IFramework {
       throw new Error(`Stack name not found in ${samConfigFile}`);
     }
 
-    const samTemplateContent = await fs.readFile(
-      path.resolve(samTemplateFile),
-      'utf-8',
+    const lambdas = await this.parseLambdasFromTemplate(
+      samTemplateFile,
+      stackName,
     );
-    const template = yaml.parse(samTemplateContent);
-
-    const lambdas: any[] = [];
-
-    // get all resources of type AWS::Serverless::Function
-    for (const resourceName in template.Resources) {
-      const resource = template.Resources[resourceName];
-      if (resource.Type === 'AWS::Serverless::Function') {
-        lambdas.push({
-          Name: resourceName,
-          ...resource,
-        });
-      }
-    }
 
     const lambdasDiscovered: LambdaResource[] = [];
 
@@ -137,37 +124,33 @@ export class SamFramework implements IFramework {
 
     // get tags for each Lambda
     for (const func of lambdas) {
-      const handlerFull = path.join(
-        func.Properties.CodeUri ?? '',
-        func.Properties.Handler,
-      );
+      const handlerFull = path.join(func.codeUri ?? '', func.handler);
       const handlerParts = handlerFull.split('.');
       const handler = handlerParts[1];
 
       const functionName = lambdasInStack.find(
-        (lambda) => lambda.logicalId === func.Name,
+        (lambda) =>
+          lambda.logicalId === func.name &&
+          lambda.stackLogicalId === func.stackLogicalId,
       )?.lambdaName;
 
       if (!functionName) {
-        throw new Error(`Function name not found for function: ${func.Name}`);
+        throw new Error(`Function name not found for function: ${func.name}`);
       }
 
       let esBuildOptions: EsBuildOptions | undefined = undefined;
 
       let codePath: string | undefined;
-      if (func.Metadata?.BuildMethod?.toLowerCase() === 'esbuild') {
-        if (func.Metadata?.BuildProperties?.EntryPoints?.length > 0) {
-          codePath = path.join(
-            func.Properties.CodeUri ?? '',
-            func.Metadata?.BuildProperties?.EntryPoints[0],
-          );
+      if (func.buildMethod?.toLowerCase() === 'esbuild') {
+        if (func.entryPoints && func.entryPoints.length > 0) {
+          codePath = path.join(func.codeUri ?? '', func.entryPoints[0]);
         }
 
         esBuildOptions = {
-          external: func.Metadata?.BuildProperties?.External,
-          minify: func.Metadata?.BuildProperties?.Minify,
-          format: func.Metadata?.BuildProperties?.Format,
-          target: func.Metadata?.BuildProperties?.Target,
+          external: func.external,
+          minify: func.minify,
+          format: func.format,
+          target: func.target,
         };
       }
 
@@ -221,6 +204,97 @@ export class SamFramework implements IFramework {
 
     return lambdasDiscovered;
   }
+
+  /**
+   * Recursively parse templates to find all Lambda functions, including nested stacks
+   * @param templatePath The path to the CloudFormation/SAM template file
+   * @param stackName The name of the stack this template belongs to (for nested stacks)
+   */
+  private async parseLambdasFromTemplate(
+    templatePath: string,
+    stackName: string,
+  ): Promise<ParsedLambda[]> {
+    const resolvedTemplatePath = path.resolve(templatePath);
+    const templateDir = path.dirname(resolvedTemplatePath);
+
+    let template: any;
+    try {
+      const templateContent = await fs.readFile(resolvedTemplatePath, 'utf-8');
+      template = yaml.parse(templateContent);
+    } catch (err: any) {
+      Logger.warn(
+        `[SAM] Could not read or parse template at ${templatePath}: ${err.message}`,
+      );
+      return [];
+    }
+
+    if (!template.Resources) {
+      return [];
+    }
+
+    const lambdas: ParsedLambda[] = [];
+
+    for (const resourceName in template.Resources) {
+      const resource = template.Resources[resourceName];
+
+      // Check if it's a Lambda function
+      if (resource.Type === 'AWS::Serverless::Function') {
+        lambdas.push({
+          templatePath,
+          name: resourceName,
+          codeUri: resource.Properties?.CodeUri,
+          handler: resource.Properties?.Handler,
+          buildMethod: resource.Metadata?.BuildMethod,
+          entryPoints: resource.Metadata?.BuildProperties?.EntryPoints,
+          external: resource.Metadata?.BuildProperties?.External,
+          minify: resource.Metadata?.BuildProperties?.Minify,
+          format: resource.Metadata?.BuildProperties?.Format as
+            | Format
+            | undefined,
+          target: resource.Metadata?.BuildProperties?.Target,
+          stackLogicalId: stackName,
+        });
+      }
+      // Check if it's a nested stack
+      else if (
+        resource.Type === 'AWS::Serverless::Application' ||
+        resource.Type === 'AWS::CloudFormation::Stack'
+      ) {
+        const nestedTemplateLocation =
+          resource.Properties?.Location ?? resource.Properties?.TemplateURL;
+        if (nestedTemplateLocation) {
+          const nestedTemplatePath = path.resolve(
+            templateDir,
+            nestedTemplateLocation,
+          );
+
+          const nestedLambdas = await this.parseLambdasFromTemplate(
+            nestedTemplatePath,
+            resourceName,
+          );
+          lambdas.push(...nestedLambdas);
+        }
+      }
+    }
+
+    Logger.verbose(JSON.stringify(lambdas, null, 2));
+
+    return lambdas;
+  }
 }
 
 export const samFramework = new SamFramework();
+
+type ParsedLambda = {
+  templatePath: string;
+  name: string;
+  codeUri?: string;
+  handler: string;
+  buildMethod?: string;
+  entryPoints?: string[];
+  external?: string[];
+  minify?: boolean;
+  format?: Format;
+  target?: string;
+  stackLogicalId: string;
+};
