@@ -231,6 +231,26 @@
       "cwd": "${workspaceRoot}/test/sam-basic"
     },
     {
+      "name": "LLDebugger - SAM nested",
+      "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
+      "args": ["../../src/lldebugger.ts", "--config-env=test"],
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal",
+      "type": "node",
+      "cwd": "${workspaceRoot}/test/sam-nested"
+    },
+    {
+      "name": "LLDebugger - SAM nested - observability",
+      "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
+      "args": ["../../src/lldebugger.ts", "--config-env=test", "-o"],
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal",
+      "type": "node",
+      "cwd": "${workspaceRoot}/test/sam-nested"
+    },
+    {
       "name": "LLDebugger - SAM alt",
       "program": "${workspaceRoot}/node_modules/tsx/dist/cli.mjs",
       "args": [
