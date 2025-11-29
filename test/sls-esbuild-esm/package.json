@@ -18,7 +18,7 @@
     "@types/aws-lambda": "^8.10.159"
   },
   "dependencies": {
-    "@tsconfig/node22": "^22.0.5",
+    "@tsconfig/node24": "^24.0.3",
     "@aws-sdk/client-sts": "^3.940.0"
   }
 }

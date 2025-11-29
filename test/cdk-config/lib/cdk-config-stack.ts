@@ -13,7 +13,7 @@ export class CdkbasicStack extends cdk.Stack {
       {
         entry: 'services/testTsCommonJs/lambda.ts',
         handler: 'lambdaHandler',
-        runtime: lambda.Runtime.NODEJS_22_X,
+        runtime: lambda.Runtime.NODEJS_24_X,
       },
     );
 
@@ -23,7 +23,7 @@ export class CdkbasicStack extends cdk.Stack {
       {
         entry: 'services/testTsEsModule/lambda.ts',
         handler: 'lambdaHandler',
-        runtime: lambda.Runtime.NODEJS_22_X,
+        runtime: lambda.Runtime.NODEJS_24_X,
         bundling: {
           format: lambda_nodejs.OutputFormat.ESM,
         },
@@ -36,7 +36,7 @@ export class CdkbasicStack extends cdk.Stack {
       {
         entry: 'services/testJsCommonJs/lambda.js',
         handler: 'lambdaHandler',
-        runtime: lambda.Runtime.NODEJS_22_X,
+        runtime: lambda.Runtime.NODEJS_24_X,
       },
     );
 
@@ -47,7 +47,7 @@ export class CdkbasicStack extends cdk.Stack {
       {
         entry: 'services/testJsEsModule/lambda.js',
         handler: 'lambdaHandler',
-        runtime: lambda.Runtime.NODEJS_22_X,
+        runtime: lambda.Runtime.NODEJS_24_X,
         bundling: {
           format: lambda_nodejs.OutputFormat.ESM,
         },
@@ -58,7 +58,7 @@ export class CdkbasicStack extends cdk.Stack {
       this,
       'TestJsCommonJsBase',
       {
-        runtime: lambda.Runtime.NODEJS_22_X,
+        runtime: lambda.Runtime.NODEJS_24_X,
         handler: 'lambda.lambdaHandler',
         code: lambda.Code.fromAsset('services/testJsCommonJs'),
       },
@@ -68,7 +68,7 @@ export class CdkbasicStack extends cdk.Stack {
       this,
       'TestJsEsModuleBase',
       {
-        runtime: lambda.Runtime.NODEJS_22_X,
+        runtime: lambda.Runtime.NODEJS_24_X,
         handler: 'lambda.lambdaHandler',
         code: lambda.Code.fromAsset('services/testJsEsModule'),
       },

@@ -214,8 +214,8 @@ async function deployLayer() {
     Content: {
       ZipFile: layerContent,
     },
-    CompatibleArchitectures: ['x86_64', 'arm64'],
-    CompatibleRuntimes: ['nodejs18.x', 'nodejs20.x'],
+    //CompatibleArchitectures: ['x86_64', 'arm64'],
+    //CompatibleRuntimes: ['nodejs18.x', 'nodejs20.x', 'nodejs22.x', 'nodejs24.x'],
   });
 
   const response = await getLambdaClient().send(publishLayerVersionCommand);

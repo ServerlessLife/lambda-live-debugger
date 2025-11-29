@@ -52,7 +52,7 @@ resource "aws_s3_object" "test-js-commonjs_1_zip" {
 resource "aws_lambda_function" "test-js-commonjs_1" {
   function_name = "lld-terraform-basic-test-js-commonjs_1"
   handler       = "lambda.lambdaHandler"
-  runtime       = "nodejs22.x"
+  runtime       = "nodejs24.x"
 
   s3_bucket = aws_s3_object.test-js-commonjs_1_zip.bucket
   s3_key    = aws_s3_object.test-js-commonjs_1_zip.key
@@ -78,7 +78,7 @@ resource "aws_s3_object" "test-js-commonjs_2_zip" {
 resource "aws_lambda_function" "test-js-commonjs_2" {
   function_name = "lld-terraform-basic-test-js-commonjs_2"
   handler       = "lambda.lambdaHandler"
-  runtime       = "nodejs22.x"
+  runtime       = "nodejs24.x"
 
   s3_bucket = aws_s3_object.test-js-commonjs_2_zip.bucket
   s3_key    = aws_s3_object.test-js-commonjs_2_zip.key
@@ -92,7 +92,7 @@ module "test-js-commonjs_3" {
 
   function_name = "lld-terraform-basic-test-js-commonjs_3"
   handler       = "lambda.lambdaHandler"
-  runtime       = "nodejs22.x"
+  runtime       = "nodejs24.x"
 
   source_path = "services/testJsCommonJs"
 }
@@ -114,7 +114,7 @@ resource "aws_s3_object" "test-js-esmodule_zip" {
 resource "aws_lambda_function" "test-js-esmodule" {
   function_name = "lld-terraform-basic-test-js-esmodule"
   handler       = "lambda.lambdaHandler"
-  runtime       = "nodejs22.x"
+  runtime       = "nodejs24.x"
 
   s3_bucket = aws_s3_object.test-js-esmodule_zip.bucket
   s3_key    = aws_s3_object.test-js-esmodule_zip.key
@@ -140,7 +140,7 @@ resource "aws_s3_object" "test-ts-esmodule_zip" {
 resource "aws_lambda_function" "test-ts-esmodule" {
   function_name = "lld-terraform-basic-test-ts-esmodule"
   handler       = "lambda.lambdaHandler"
-  runtime       = "nodejs22.x"
+  runtime       = "nodejs24.x"
 
   s3_bucket = aws_s3_object.test-ts-esmodule_zip.bucket
   s3_key    = aws_s3_object.test-ts-esmodule_zip.key
@@ -166,7 +166,7 @@ resource "aws_s3_object" "test-ts-commonjs_zip" {
 resource "aws_lambda_function" "test-ts-commonjs" {
   function_name = "lld-terraform-basic-test-ts-commonjs"
   handler       = "lambda.lambdaHandler"
-  runtime       = "nodejs22.x"
+  runtime       = "nodejs24.x"
 
   s3_bucket = aws_s3_object.test-ts-commonjs_zip.bucket
   s3_key    = aws_s3_object.test-ts-commonjs_zip.key

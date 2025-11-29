@@ -9,7 +9,7 @@
     "destroy": "sam delete --config-env test --config-file alt-samconfig.yaml --no-prompts"
   },
   "devDependencies": {
-    "@tsconfig/node22": "^22.0.5",
+    "@tsconfig/node24": "^24.0.3",
     "@types/aws-lambda": "^8.10.159"
   },
   "dependencies": {
