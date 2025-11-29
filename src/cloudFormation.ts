@@ -64,9 +64,8 @@ async function getCloudFormationStackTemplate(
  */
 async function getCloudFormationClient(awsConfiguration: AwsConfiguration) {
   if (!cloudFormationClient) {
-    const { CloudFormationClient } = await import(
-      '@aws-sdk/client-cloudformation'
-    );
+    const { CloudFormationClient } =
+      await import('@aws-sdk/client-cloudformation');
     cloudFormationClient = new CloudFormationClient({
       region: awsConfiguration.region,
       credentials: AwsCredentials.getCredentialsProvider(awsConfiguration),
