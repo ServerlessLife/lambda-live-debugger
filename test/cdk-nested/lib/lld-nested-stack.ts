@@ -19,7 +19,7 @@ export class LLDNestedStack extends NestedStack {
         // a different way to get the path
         entry: path.join(__dirname, '../services/testTsCommonJs/lambda.ts'),
         handler: 'lambdaHandler',
-        runtime: lambda.Runtime.NODEJS_22_X,
+        runtime: lambda.Runtime.NODEJS_24_X,
         logRetention: log.RetentionDays.ONE_DAY,
       },
     );
@@ -30,7 +30,7 @@ export class LLDNestedStack extends NestedStack {
       {
         entry: 'services/testTsEsModule/lambda.ts',
         handler: 'lambdaHandler',
-        runtime: lambda.Runtime.NODEJS_22_X,
+        runtime: lambda.Runtime.NODEJS_24_X,
         bundling: {
           format: lambda_nodejs.OutputFormat.ESM,
         },
@@ -44,7 +44,7 @@ export class LLDNestedStack extends NestedStack {
       {
         entry: 'services/testJsCommonJs/lambda.js',
         handler: 'lambdaHandler',
-        runtime: lambda.Runtime.NODEJS_22_X,
+        runtime: lambda.Runtime.NODEJS_24_X,
         logRetention: log.RetentionDays.ONE_DAY,
       },
     );

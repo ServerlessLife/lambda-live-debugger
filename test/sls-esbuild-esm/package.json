@@ -14,11 +14,11 @@
   "devDependencies": {
     "esbuild": "^0.27.0",
     "serverless": "^3.38.0",
-    "serverless-esbuild": "^1.56.0",
+    "serverless-esbuild": "^1.56.1",
     "@types/aws-lambda": "^8.10.159"
   },
   "dependencies": {
-    "@tsconfig/node22": "^22.0.5",
-    "@aws-sdk/client-sts": "^3.936.0"
+    "@tsconfig/node24": "^24.0.3",
+    "@aws-sdk/client-sts": "^3.940.0"
   }
 }

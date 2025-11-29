@@ -11,7 +11,7 @@ Resources:
     Properties:
       CodeUri: services/testTsCommonJs/
       Handler: lambda.lambdaHandler
-      Runtime: nodejs22.x
+      Runtime: nodejs24.x
       Architectures:
         - x86_64
       MemorySize: 128
@@ -33,7 +33,7 @@ Resources:
     Properties:
       CodeUri: services/testTsEsModule/
       Handler: lambda.lambdaHandler
-      Runtime: nodejs22.x
+      Runtime: nodejs24.x
       Architectures:
         - x86_64
       MemorySize: 128
@@ -58,7 +58,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: services/testJsCommonJs/lambda.lambdaHandler
-      Runtime: nodejs22.x
+      Runtime: nodejs24.x
       Architectures:
         - x86_64
       MemorySize: 128
