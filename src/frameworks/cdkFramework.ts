@@ -580,7 +580,7 @@ export class CdkFramework implements IFramework {
         await worker.terminate();
       });
 
-      worker.on('error', (error) => {
+      worker.on('error', (error: any) => {
         reject(
           new Error(`Error running CDK code in worker: ${error.message}`, {
             cause: error,
