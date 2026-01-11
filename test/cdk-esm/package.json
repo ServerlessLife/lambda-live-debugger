@@ -13,7 +13,7 @@
   "devDependencies": {
     "@tsconfig/node24": "^24.0.3",
     "@types/aws-lambda": "^8.10.159",
-    "@types/node": "25.0.5",
+    "@types/node": "25.0.6",
     "aws-cdk": "2.1100.3",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
