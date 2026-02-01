@@ -13,12 +13,12 @@
   "license": "ISC",
   "devDependencies": {
     "esbuild": "^0.27.2",
-    "osls": "^3.61.1",
+    "osls": "^3.62.1",
     "serverless-esbuild": "^1.57.0",
-    "@types/aws-lambda": "^8.10.159"
+    "@types/aws-lambda": "^8.10.160"
   },
   "dependencies": {
-    "@tsconfig/node24": "^24.0.3",
-    "@aws-sdk/client-sts": "^3.966.0"
+    "@tsconfig/node24": "^24.0.4",
+    "@aws-sdk/client-sts": "^3.980.0"
   }
 }
