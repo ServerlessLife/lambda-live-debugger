@@ -11,9 +11,9 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "osls": "^3.61.1"
+    "osls": "^3.62.1"
   },
   "dependencies": {
-    "@aws-sdk/client-sts": "^3.966.0"
+    "@aws-sdk/client-sts": "^3.980.0"
   }
 }
