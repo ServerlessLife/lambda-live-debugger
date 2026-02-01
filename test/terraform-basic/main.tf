@@ -95,6 +95,10 @@ module "test-js-commonjs_3" {
   runtime       = "nodejs24.x"
 
   source_path = "services/testJsCommonJs"
+
+  # Prevents "fileexists returned inconsistent result" error in CI/CD
+  # when archive is created during the same terraform apply
+  ignore_source_code_hash = true
 }
 
 // services/testJsEsModule/lambda.js
