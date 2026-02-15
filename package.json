@@ -83,17 +83,17 @@
     "docs:preview": "vitepress preview"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.2",
+    "@eslint/js": "^10.0.1",
     "@tsconfig/node24": "^24.0.4",
     "@types/aws-iot-device-sdk": "^2.2.9",
     "@types/eslint-config-prettier": "^6.11.3",
     "@types/inquirer": "^9.0.9",
-    "@types/node": "^25.1.0",
-    "@types/serverless": "^3.12.27",
-    "aws-cdk": "2.1104.0",
-    "aws-cdk-lib": "2.236.0",
+    "@types/node": "^25.2.3",
+    "@types/serverless": "^3.12.28",
+    "aws-cdk": "2.1106.0",
+    "aws-cdk-lib": "2.238.0",
     "constructs": "^10.4.5",
-    "eslint": "^9.39.2",
+    "eslint": "^10.0.0",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.3.0",
     "husky": "^9.1.7",
@@ -103,26 +103,26 @@
     "serverless": "^3.38.0",
     "serverless-esbuild": "^1.57.0",
     "tsx": "^4.21.0",
-    "typescript-eslint": "^8.54.0",
+    "typescript-eslint": "^8.55.0",
     "vitepress": "^1.6.4",
     "vitest": "^4.0.18"
   },
   "dependencies": {
-    "@aws-sdk/client-cloudformation": "^3.980.0",
-    "@aws-sdk/client-iam": "^3.980.0",
-    "@aws-sdk/client-iot": "^3.980.0",
-    "@aws-sdk/client-iot-data-plane": "^3.980.0",
-    "@aws-sdk/client-lambda": "^3.980.0",
-    "@aws-sdk/client-s3": "^3.980.0",
-    "@aws-sdk/credential-providers": "^3.980.0",
+    "@aws-sdk/client-cloudformation": "^3.990.0",
+    "@aws-sdk/client-iam": "^3.990.0",
+    "@aws-sdk/client-iot": "^3.990.0",
+    "@aws-sdk/client-iot-data-plane": "^3.990.0",
+    "@aws-sdk/client-lambda": "^3.990.0",
+    "@aws-sdk/client-s3": "^3.990.0",
+    "@aws-sdk/credential-providers": "^3.990.0",
     "@smithy/shared-ini-file-loader": "^4.4.3",
     "aws-iot-device-sdk": "^2.2.16",
     "chalk": "^5.6.2",
     "chokidar": "^3.6.0",
     "commander": "^14.0.3",
-    "esbuild": "^0.27.2",
-    "fast-xml-parser": "^5.3.4",
-    "inquirer": "^13.2.2",
+    "esbuild": "^0.27.3",
+    "fast-xml-parser": "^5.3.6",
+    "inquirer": "^13.2.4",
     "jsonc-parser": "^3.3.1",
     "node-machine-id": "^1.1.12",
     "toml": "^3.0.0",
@@ -170,7 +170,7 @@
   ],
   "overrides": {
     "serverless-esbuild": {
-      "esbuild": "^0.27.2"
+      "esbuild": "^0.27.3"
     }
   }
 }
