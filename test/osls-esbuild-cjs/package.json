@@ -12,12 +12,12 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "esbuild": "^0.27.2",
+    "esbuild": "^0.27.3",
     "osls": "^3.62.1",
     "serverless-esbuild": "^1.57.0",
     "@tsconfig/node24": "^24.0.4"
   },
   "dependencies": {
-    "@aws-sdk/client-sts": "^3.980.0"
+    "@aws-sdk/client-sts": "^3.990.0"
   }
 }
