@@ -171,6 +171,7 @@ export async function getFunctionName(folder: string, functionName: string) {
   } catch (e: any) {
     throw new Error(
       `Failed to parse Terraform outputs: ${e.message}. JSON: ${jsonString}`,
+      { cause: e },
     );
   }
 
