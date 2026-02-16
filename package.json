@@ -171,6 +171,21 @@
   "overrides": {
     "serverless-esbuild": {
       "esbuild": "^0.27.3"
+    },
+    "typescript-eslint": {
+      "eslint": "$eslint"
+    },
+    "@typescript-eslint/eslint-plugin": {
+      "eslint": "$eslint"
+    },
+    "@typescript-eslint/parser": {
+      "eslint": "$eslint"
+    },
+    "@typescript-eslint/type-utils": {
+      "eslint": "$eslint"
+    },
+    "@typescript-eslint/utils": {
+      "eslint": "$eslint"
     }
   }
 }

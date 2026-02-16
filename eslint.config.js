@@ -15,6 +15,7 @@ export default [
       'src/extension/aws/*.js',
       '.vitepress/cache/**',
       '**/.terraform/**',
+      '**/.venv/**',
     ],
   },
   {

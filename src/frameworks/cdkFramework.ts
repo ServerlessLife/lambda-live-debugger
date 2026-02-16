@@ -653,7 +653,9 @@ export class CdkFramework implements IFramework {
       contextFromJson = JSON.parse(cdkContextJson);
     } catch (err: any) {
       if (err.code !== 'ENOENT') {
-        throw new Error(`Error reading cdk.context.json: ${err.message}`);
+        throw new Error(`Error reading cdk.context.json: ${err.message}`, {
+          cause: err,
+        });
       }
     }
 
@@ -663,7 +665,9 @@ export class CdkFramework implements IFramework {
       cdkJson = JSON.parse(await fs.readFile(cdkConfigPath, 'utf8'));
     } catch (err: any) {
       if (err.code !== 'ENOENT') {
-        throw new Error(`Error reading cdk.json: ${err.message}`);
+        throw new Error(`Error reading cdk.json: ${err.message}`, {
+          cause: err,
+        });
       }
     }
 

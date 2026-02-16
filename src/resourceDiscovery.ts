@@ -38,7 +38,7 @@ async function getCurrentFrameworkName(config: LldConfig) {
 async function getLambdas(
   config: LldConfig,
 ): Promise<LambdaResource[] | undefined> {
-  let resources: LambdaResource[] | undefined = undefined;
+  let resources: LambdaResource[] | undefined;
 
   let frameworks = [...frameworksSupported];
 

@@ -96,6 +96,7 @@ export class SlsFramework implements IFramework {
         'If you are running Lambda Live Debugger from a global installation, install Serverless Framework globally as well. If you are using monorepo, install Serverless Framework also in the project root folder. The fork of Serverless Framework https://github.com/oss-serverless/serverless is also supported.',
       );
       throw new Error(`Error loading serverless modules. ${error.message}`, {
+        // eslint-disable-next-line preserve-caught-error -- intentionally using error1 ?? error2 as cause
         cause: error,
       });
     }
