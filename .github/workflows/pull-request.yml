@@ -10,6 +10,9 @@ permissions:
   id-token: write
   contents: write
 
+env:
+  node_version: 24
+
 jobs:
   build:
     uses: ./.github/workflows/common-build.yml
