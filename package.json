@@ -14,8 +14,13 @@
     "organization": false
   },
   "exports": {
-    ".": "./dist/index.mjs"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.mjs"
+    }
   },
+  "typings": "dist/index.d.ts",
   "keywords": [
     "aws",
     "lambda",
@@ -38,7 +43,6 @@
   "bin": {
     "lld": "dist/lldebugger.mjs"
   },
-  "typings": "dist/index.d.ts",
   "scripts": {
     "typecheck": "tsc --noEmit -p tsconfig.typecheck.json && npx tsc --noEmit -p src/extension/tsconfig.json",
     "lint": "eslint . --fix",
