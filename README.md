@@ -366,6 +366,7 @@ If you have a new feature idea, please create and issue.
 (alphabetical)
 
 - [Ben Moses](https://github.com/benjymoses)
+- [Brad Hader](https://github.com/brad-hader-FHR)
 - [Elias Brange](https://www.linkedin.com/in/eliasbrange)
 - [Kristian Dreher](https://www.linkedin.com/in/kristiandreher)
 - [Hugo Lewenhaupt](https://www.linkedin.com/in/hugo-lewenhaupt-84751289)
