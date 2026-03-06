@@ -3,7 +3,7 @@ import * as path from 'path';
 import { EsBuildOptions, LambdaResource } from '../types/resourcesDiscovery.js';
 import { constants } from 'fs';
 import { findPackageJson } from '../utils/findPackageJson.js';
-import type Serverless from 'serverless';
+import type { Serverless } from './slsFrameworkTypes.js';
 import { IFramework } from './iFrameworks.js';
 import { LldConfigBase } from '../types/lldConfig.js';
 import { Logger } from '../logger.js';
