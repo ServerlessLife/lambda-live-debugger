@@ -13,16 +13,16 @@
   "devDependencies": {
     "@tsconfig/node24": "^24.0.4",
     "@types/aws-lambda": "^8.10.161",
-    "@types/node": "25.3.3",
-    "aws-cdk": "2.1109.0",
+    "@types/node": "25.5.0",
+    "aws-cdk": "2.1114.1",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
-    "typescript": "~5.9.3"
+    "typescript": "~6.0.2"
   },
   "dependencies": {
-    "@aws-sdk/client-sts": "^3.1002.0",
-    "aws-cdk-lib": "2.241.0",
-    "constructs": "^10.5.1",
+    "@aws-sdk/client-sts": "^3.1019.0",
+    "aws-cdk-lib": "2.245.0",
+    "constructs": "^10.6.0",
     "source-map-support": "^0.5.21"
   }
 }
