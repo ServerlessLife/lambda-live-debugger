@@ -1,8 +1,9 @@
 {
   "extends": "@tsconfig/node24/tsconfig.json",
   "compilerOptions": {
-    "moduleResolution": "node",
-    "module": "CommonJS",
+    "moduleResolution": "nodenext",
+    "module": "nodenext",
+    "types": ["node"],
     "outDir": "./dist"
   }
 }
