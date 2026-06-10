@@ -81,6 +81,18 @@ jobs:
         working-directory: test/cdk-basic
       - name: Test YAML
         run: npx vitest --retry 2 test/cdk-basic.test.ts
+      # Repeat the tests with the previous version of aws-cdk-lib
+      # to validate the code injection into aws-cdk-lib works with both versions
+      # Remove package-lock.json first: it still contains entries for the workspaces removed
+      # by prepareForTest.js, which confuses npm and leaves aws-cdk-lib uninstalled
+      - name: Install previous CDK version
+        run: |
+          rm package-lock.json
+          npm i aws-cdk@2.1124.1 aws-cdk-lib@2.257.0 constructs@10.6.0 -w test/cdk-basic
+      - name: Test - previous CDK version
+        run: npx vitest --retry 2 test/cdk-basic.test.ts
+      - name: Test - previous CDK version - observability mode
+        run: OBSERVABLE_MODE=true npx vitest --retry 2 test/cdk-basic.test.ts
 
   test-cdk-esm:
     runs-on: ubuntu-latest

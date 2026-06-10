@@ -383,12 +383,14 @@ export class CdkFramework implements IFramework {
           ) {
             // prevent initializing Docker if esbuild is no installed
             // Docker is used for bundling if esbuild is not installed, but it is not needed at this point
-            const origCode =
-              'const shouldBuildImage=props.forceDockerBundling||!Bundling.esbuildInstallation;';
+            // The class is named "Bundling" in aws-cdk-lib <= 2.257 and "Bundling2" in >= 2.258
+            // (renamed by the decorator transform), so match both with a regex.
+            const origCodeRegex =
+              /const shouldBuildImage=props\.forceDockerBundling\|\|!Bundling\d*\.esbuildInstallation;/;
             const replaceCode = 'const shouldBuildImage=false;';
 
-            if (contents.includes(origCode)) {
-              contents = contents.replace(origCode, replaceCode);
+            if (origCodeRegex.test(contents)) {
+              contents = contents.replace(origCodeRegex, replaceCode);
             } else {
               throw new Error(
                 `Can not find code to inject in ${args.path} to prevent initializing Docker`,
