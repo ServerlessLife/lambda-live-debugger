@@ -1,5 +1,5 @@
 service: lls-osls-basic
-frameworkVersion: '3'
+frameworkVersion: '4'
 
 provider:
   name: aws

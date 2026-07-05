@@ -16,8 +16,7 @@ export interface ServerlessService {
   plugins: string[];
   functions: {
     [key: string]:
-      | Serverless.FunctionDefinitionHandler
-      | Serverless.FunctionDefinitionImage;
+      Serverless.FunctionDefinitionHandler | Serverless.FunctionDefinitionImage;
   };
 }
 

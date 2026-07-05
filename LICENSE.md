@@ -217,15 +217,15 @@ means
 
 4. Inability to Comply Due to Statute or Regulation
 
-   If it is impossible for You to comply with any of the terms of this License
-   with respect to some or all of the Covered Software due to statute, judicial
-   order, or regulation then You must: (a) comply with the terms of this License
-   to the maximum extent possible; and (b) describe the limitations and the code
-   they affect. Such description must be placed in a text file included with all
-   distributions of the Covered Software under this License. Except to the
-   extent prohibited by statute or regulation, such description must be
-   sufficiently detailed for a recipient of ordinary skill to be able to
-   understand it.
+If it is impossible for You to comply with any of the terms of this License
+with respect to some or all of the Covered Software due to statute, judicial
+order, or regulation then You must: (a) comply with the terms of this License
+to the maximum extent possible; and (b) describe the limitations and the code
+they affect. Such description must be placed in a text file included with all
+distributions of the Covered Software under this License. Except to the
+extent prohibited by statute or regulation, such description must be
+sufficiently detailed for a recipient of ordinary skill to be able to
+understand it.
 
 5. Termination
 

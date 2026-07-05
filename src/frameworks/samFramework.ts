@@ -249,8 +249,7 @@ export class SamFramework implements IFramework {
           external: resource.Metadata?.BuildProperties?.External,
           minify: resource.Metadata?.BuildProperties?.Minify,
           format: resource.Metadata?.BuildProperties?.Format as
-            | Format
-            | undefined,
+            Format | undefined,
           target: resource.Metadata?.BuildProperties?.Target,
           stackLogicalId: stackName,
         });
