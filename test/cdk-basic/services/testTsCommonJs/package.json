@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "type": "commonjs",
   "devDependencies": {
-    "@tsconfig/node24": "^24.0.4"
+    "@tsconfig/node24": "^24.0.5"
   },
   "dependencies": {
-    "@aws-sdk/client-sts": "^3.1085.0"
+    "@aws-sdk/client-sts": "^3.1111.0"
   }
 }
